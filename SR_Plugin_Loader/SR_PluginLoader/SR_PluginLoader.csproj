@@ -87,7 +87,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetFileName)" /Y
-COPY "$(TargetPath)" "$(TargetDir)/../../../Installer/$(TargetFileName)" /Y</PostBuildEvent>
+COPY "$(TargetPath)" "$(TargetDir)/../../../../Installer/$(TargetFileName)" /Y
+CD "$(TargetDir)/../../../"
+7za.exe a "./../Installer.zip" -w "./../Installer/*"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
