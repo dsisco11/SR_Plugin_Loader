@@ -1,7 +1,7 @@
 # SR_Plugin_Loader
 A plugin loader for SlimeRancher
 
-<h2>For NON-Developers</h2>
+<h2>Installing</h2>
 If you are just looking for the installer then click <a href="https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Installer.zip">HERE</a>
 
 <h2>For Developers</h2>
