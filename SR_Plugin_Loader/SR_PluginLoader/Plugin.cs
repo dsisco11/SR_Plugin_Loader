@@ -53,8 +53,8 @@ namespace SR_PluginLoader
         /// </summary>
         public void load()
         {
-            this.Load_Assets();
             this.Load_DLL();
+            this.Load_Assets();
             this.Load_Plugin_Info();
         }
 
@@ -77,31 +77,40 @@ namespace SR_PluginLoader
 
         private void Load_Assets()
         {
-            if (this.dir == null || this.dir.Length<=0 || !Directory.Exists(this.dir)) return;
-            string icon_file = this.Get_Image_File_Named("icon");
-            string thumb_file = this.Get_Image_File_Named("thumb");
+            if (this.dll == null) return;
+            string icon_file = "icon.png";
+            string thumb_file = "thumb.png";
+
             
             if (icon_file != null)
             {
-                this.icon = new Texture2D(0,0, TextureFormat.RGBA32, true);
-                this.icon.filterMode = FilterMode.Trilinear;
-                byte[] buf = File.ReadAllBytes(icon_file);
+                byte[] buf = this.Load_Resource(icon_file);
                 if (buf != null)
                 {
+                    this.icon = new Texture2D(0, 0, TextureFormat.RGBA32, true);
+                    this.icon.filterMode = FilterMode.Trilinear;
                     this.icon.LoadImage(buf);
                     this.icon.Apply(true);
+                }
+                else
+                {
+                    this.icon = null;
                 }
             }
 
             if (thumb_file != null)
             {
-                this.thumbnail = new Texture2D(0,0, TextureFormat.RGBA32, true);
-                this.thumbnail.filterMode = FilterMode.Trilinear;
-                byte[] buf = File.ReadAllBytes(thumb_file);
+                byte[] buf = this.Load_Resource(thumb_file);
                 if (buf != null)
                 {
+                    this.thumbnail = new Texture2D(0, 0, TextureFormat.RGBA32, true);
+                    this.thumbnail.filterMode = FilterMode.Trilinear;
                     this.thumbnail.LoadImage(buf);
                     this.thumbnail.Apply(true);
+                }
+                else
+                {
+                    this.thumbnail = null;
                 }
             }
         }
@@ -333,6 +342,46 @@ namespace SR_PluginLoader
             else
             {
                 this.Enable();
+            }
+        }
+
+        
+        public byte[] Load_Resource(string name)
+        {
+            try
+            {
+                string[] assets = this.dll.GetManifestResourceNames();
+                if (assets == null || assets.Length <= 0) return null;
+                
+                string asset_name = assets.FirstOrDefault(r => r.EndsWith(name));
+                if (asset_name == null || asset_name.Length <= 0) return null;
+
+
+                using (Stream stream = this.dll.GetManifestResourceStream(asset_name))
+                {
+                    if (stream == null) return null;
+
+                    byte[] buf = new byte[stream.Length];
+                    int read = stream.Read(buf, 0, (int)stream.Length);
+                    if (read < (int)stream.Length)
+                    {
+                        int remain = ((int)stream.Length - read);
+                        int r = 0;
+                        while (r < remain && remain > 0)
+                        {
+                            r = stream.Read(buf, read, remain);
+                            read += r;
+                            remain -= r;
+                        }
+                    }
+
+                    return buf;
+                }
+            }
+            catch (Exception ex)
+            {
+                DebugHud.Log(ex);
+                return null;
             }
         }
     }
