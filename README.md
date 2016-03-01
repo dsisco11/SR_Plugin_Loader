@@ -9,6 +9,8 @@ For a guide on HOW to install the plugin loader look <a href="https://github.com
 Example plugins are under the examples folder.  
 To learn more about all of the features this project offers look at the <a href="https://github.com/dsisco11/SR_Plugin_Loader/wiki">WIKI</a>.  
 
+## License
+SR Plugin Loader is released under the <a href="https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)">Apache 2.0 license</a>
 
 <h2>ScreenShot</h2>
 <img src="http://i.imgur.com/oXmJ1oc.jpg" />
