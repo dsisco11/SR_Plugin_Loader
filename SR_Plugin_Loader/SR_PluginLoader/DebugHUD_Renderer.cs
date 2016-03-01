@@ -68,7 +68,7 @@ namespace SR_PluginLoader
             this.lines.Add(str);
 
             this.console_lines.text = String.Join("\n", this.lines.ToArray());
-            string msg = String.Format("{0} new errors", this.new_count);
+            string msg = String.Format("{0} new logs", this.new_count);
             alert_content.text = msg;
             alert_sub_content.text = String.Format("<i>Press <b>{0}</b> to open the plugins console.</i>", this.OPEN_KEY);
 

@@ -290,15 +290,15 @@ namespace SR_PluginLoader
             this.needs_layout = false;
 
             this.screen_area = new Rect(0f, 0f, Screen.width, Screen.height);
-            this.area = new Rect(pos.x, pos.y, this.size.x, this.size.y);
+            this.area = new Rect(pos.x-1f, pos.y-1f, this.size.x+2f, this.size.y+2f);//give our rendering area more space for borders
             this.window_area = new Rect(0f, 0f, this.size.x, this.size.y);
 
             this.tb_area = new Rect(0f, 0f, this.size.x, tb_height);
             this.tb_shadow_area = new Rect(tb_area.xMin, tb_area.yMax, tb_area.size.x, 1f);
 
-            this.left_shadow_area = new Rect(pos.x - 1f, pos.y, 1f, this.size.y);
-            this.right_shadow_area = new Rect(pos.x + this.size.x, pos.y, 1f, this.size.y);
-            this.bottom_shadow_area = new Rect(pos.x, pos.y + this.size.y, this.size.x, 1f);
+            this.left_shadow_area = new Rect(window_area.x - 1f, window_area.y, 1f, window_area.size.y);
+            this.right_shadow_area = new Rect(window_area.x + window_area.size.x, window_area.y, 1f, window_area.size.y);
+            this.bottom_shadow_area = new Rect(window_area.x, window_area.y + window_area.size.y, window_area.size.x, 1f);
 
             this.plugin_list_area = new Rect(pos.x + list_pad, pos.y + title_bar_height, plugin_list_width - list_pad2, this.size.y - title_bar_height - list_pad);
             this.plugin_list_inner_area = new Rect(0f, 0f, plugin_list_area.width, this.plugin_selectors.Last().position.yMax);
