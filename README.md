@@ -16,5 +16,8 @@ To learn more about all of the features this project offers look at the <a href=
 ## License
 SR Plugin Loader is released under the <a href="https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)">Apache 2.0 license</a>
 
+## Donate
+If you would like to help support me then you can <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DYGPA5XA4MWC2">Donate</a>!
+
 ## ScreenShot
 <img src="http://i.imgur.com/oXmJ1oc.jpg" />
