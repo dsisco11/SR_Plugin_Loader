@@ -83,11 +83,12 @@ namespace SR_PluginLoader
         public static void Assemble_Plugin_List()
         {
             plugins.Clear();
-            string[] dirs = Directory.GetDirectories(pluginDir);
-            foreach(string dir in dirs)
+            string[] files = Directory.GetFiles(pluginDir);
+            foreach(string file in files)
             {
-                string folder = dir.Remove(0, pluginDir.Length);
-                string file = String.Format("{0}/{1}.dll", dir, folder);
+                string ext = Path.GetExtension(file);
+                if (ext != ".dll") continue;
+
                 Plugin plug = new Plugin(file);
 
                 string name = Path.GetFileNameWithoutExtension(file);
@@ -102,7 +103,6 @@ namespace SR_PluginLoader
                     DebugHud.Log(ex);
                 }
             }
-            //DebugHud.Log("Assemble_Plugin_List FINISHED!");
         }
 
         public static void Setup_Plugin_Dir()
