@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Security;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -62,6 +64,27 @@ namespace SR_PluginLoader
                 DebugHud.Log(ex);
                 return null;
             }
+        }
+
+        public static byte[] Read_Stream(Stream stream)
+        {
+            if (stream == null) return null;
+
+            byte[] buf = new byte[stream.Length];
+            int read = stream.Read(buf, 0, (int)stream.Length);
+            if (read < (int)stream.Length)
+            {
+                int remain = ((int)stream.Length - read);
+                int r = 0;
+                while (r < remain && remain > 0)
+                {
+                    r = stream.Read(buf, read, remain);
+                    read += r;
+                    remain -= r;
+                }
+            }
+
+            return buf;
         }
 
 
@@ -155,5 +178,6 @@ namespace SR_PluginLoader
             var tex = Get_Gradient_Texture(pixels, dir, clr1, clr2, exponential, exponent);
             style.background = tex;
         }
+        
     }
 }

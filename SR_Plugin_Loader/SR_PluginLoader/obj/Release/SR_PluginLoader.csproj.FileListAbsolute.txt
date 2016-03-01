@@ -1,0 +1,15 @@
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\SR_PluginLoader.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\SR_PluginLoader.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\Assembly-CSharp.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\UnityEngine.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\UnityEngine.UI.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\UnityEngine.Analytics.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\Assembly-CSharp-firstpass.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\SiscosHooks.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\UnityEngine.xml
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\SiscosHooks.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.Properties.Resources.resources
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.csproj.GenerateResource.Cache
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.csprojResolveAssemblyReference.cache

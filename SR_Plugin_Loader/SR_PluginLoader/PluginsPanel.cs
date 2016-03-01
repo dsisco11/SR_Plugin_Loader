@@ -17,9 +17,10 @@ namespace SR_PluginLoader
         private GUIStyle plugin_title_text = null, plugin_vers_text = null, plugin_desc_text = null;
         private Plugin selected = null;
         private List<PluginSelector> plugin_selectors = new List<PluginSelector>();
+        private List<UI_Notification> notifications = new List<UI_Notification>();
         private GUIContent pl_title = new GUIContent(), pl_desc = new GUIContent(), pl_vers = new GUIContent();
         private Texture pl_thumb = null;
-        private Rect screen_area, area, window_area, tb_area, tb_shadow_area, close_btn_area, left_shadow_area, right_shadow_area, bottom_shadow_area;
+        private Rect screen_area, area, window_area, tb_area, tb_shadow_area, close_btn_area, left_shadow_area, right_shadow_area, bottom_shadow_area, notification_area;
         private Rect pl_title_area, pl_desc_area, pl_vers_area, pl_thumb_area, pl_toggle_area;
         private Vector2 selected_plugin_info_scroll = Vector2.zero, plugin_list_scroll = Vector2.zero;
         private Rect selected_plugin_info_area, selected_plugin_info_inner_area;
@@ -27,6 +28,7 @@ namespace SR_PluginLoader
         private float tb_height { get { return (title_bar_height - 4f); } }
         private ToggleSwitch pl_toggle = new ToggleSwitch();
         private bool needs_layout = true;
+        public bool active = false;
 
 
         private Vector2 _pos = Vector2.zero;
@@ -41,7 +43,11 @@ namespace SR_PluginLoader
         private const float thumbnail_size = 150f;
 
 
-
+        public void Add_Notice(UI_Notification notice)
+        {
+            this.notifications.Add(notice);
+            this.needs_layout = true;
+        }
 
         private void Awake()
         {
@@ -114,7 +120,7 @@ namespace SR_PluginLoader
 
         private void close()
         {
-            this.gameObject.SetActive(false);
+            this.active = false;
             MainMenu.mainmenu.SetActive(true);
         }
 
@@ -124,6 +130,20 @@ namespace SR_PluginLoader
             {
                 this.close();
             }
+
+            List<UI_Notification> trash = new List<UI_Notification>();
+            foreach (var notice in notifications)
+            {
+                notice.Update();
+                if (notice.should_die) trash.Add(notice);
+            }
+
+            foreach(var notice in trash)
+            {
+                notifications.Remove(notice);
+            }
+
+            if (trash.Count > 0) this.doLayout();
         }
 
         private bool handleEvents()
@@ -153,7 +173,11 @@ namespace SR_PluginLoader
                 this.Update_Plugins_UI();
             }
             if (this.needs_layout) this.doLayout();
-            if (!this.gameObject.activeSelf) return;
+
+            this.render_notifications();
+
+            // Abort drawing the panel IF we are not currently visible
+            if (!this.gameObject.activeSelf || !this.active) return;
             this._pos = Vector2.zero;//recalculate every frame, idk it just makes me feel safe.
 
             if (!handleEvents()) return;
@@ -245,6 +269,19 @@ namespace SR_PluginLoader
             GUI.Box(right_shadow_area, GUIContent.none, this.shadow_style);
         }
 
+        private void render_notifications()
+        {
+            GUI.BeginGroup(this.notification_area);
+            foreach(var notice in notifications)
+            {
+                if(notice.Display())
+                {
+                    //remove the notification.
+                    notice.should_die = true;
+                }
+            }
+            GUI.EndGroup();
+        }
 
 
         public void Update_Plugins_UI()
@@ -293,6 +330,9 @@ namespace SR_PluginLoader
             this.area = new Rect(pos.x-1f, pos.y-1f, this.size.x+2f, this.size.y+2f);//give our rendering area more space for borders
             this.window_area = new Rect(0f, 0f, this.size.x, this.size.y);
 
+            const float notice_pad = 5f;
+            this.notification_area = new Rect(Screen.width - (UI_Notification.notification_width + notice_pad), notice_pad, UI_Notification.notification_width + notice_pad, (Screen.height - notice_pad));
+
             this.tb_area = new Rect(0f, 0f, this.size.x, tb_height);
             this.tb_shadow_area = new Rect(tb_area.xMin, tb_area.yMax, tb_area.size.x, 1f);
 
@@ -322,6 +362,14 @@ namespace SR_PluginLoader
             if (this.selected != null)
             {
                 this.select_plugin(this.selected);
+            }
+
+            float yPos = 0f;
+            foreach (var notice in this.notifications)
+            {
+                notice.doLayout();
+                notice.Set_Pos(0f, yPos);
+                yPos += (notice.height + 3f);
             }
         }
 
@@ -408,7 +456,7 @@ namespace SR_PluginLoader
 
         private Rect calcTextRect(float x, float y, float width, float height, GUIContent content, GUIStyle style = null)
         {
-            if (style != null) height = style.CalcSize(content).y;
+            if (style != null) height = style.CalcHeight(content, width);
 
             return new Rect(x, y, width, height);
         }

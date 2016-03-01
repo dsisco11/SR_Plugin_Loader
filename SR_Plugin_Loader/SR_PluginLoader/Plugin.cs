@@ -57,24 +57,7 @@ namespace SR_PluginLoader
             this.Load_Assets();
             this.Load_Plugin_Info();
         }
-
-        private string Get_Image_File_Named(string name)
-        {
-            string[] extensions = new string[] { "png", "jpg", "jpeg" };
-            string file = String.Format("{0}/{1}", this.dir, name);
-
-            foreach(string ext in extensions)
-            {
-                string fn = String.Format("{0}.{1}", file, ext);
-                if(File.Exists(fn))
-                {
-                    return fn;
-                }
-            }
-
-            return null;
-        }
-
+        
         private void Load_Assets()
         {
             if (this.dll == null) return;

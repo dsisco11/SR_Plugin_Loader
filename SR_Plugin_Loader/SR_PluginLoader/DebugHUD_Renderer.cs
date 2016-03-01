@@ -9,13 +9,14 @@ namespace SR_PluginLoader
 {
     public class DebugHUD_Renderer : MonoBehaviour
     {
-        private const float PANEL_WIDTH = 400f;
+        private const float PANEL_WIDTH = 500f;
         private List<string> lines = new List<string>();
         private Dictionary<string, int> stacks = new Dictionary<string, int>();
         //private String lines_joined = "";
         private GUIContent console_lines = new GUIContent();
         private GUIContent alert_content = new GUIContent();
         private GUIContent alert_sub_content = new GUIContent();
+        private bool needs_layout = true;
 
         private Rect screen_area, console_text_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area;
 
@@ -41,7 +42,6 @@ namespace SR_PluginLoader
         private static GUISkin skin = null;
 
         private bool open = false;
-        private bool has_new = false;
         private int new_count = 0;
         private bool pressed = false, hover = false;
         private int id = 0;
@@ -51,7 +51,7 @@ namespace SR_PluginLoader
 
         public void Awake()
         {
-            //this.setupEvents();
+            this.setupEvents();
             this.Clear();
         }
 
@@ -63,10 +63,10 @@ namespace SR_PluginLoader
 
         public void Add_Line(string str)
         {
-            this.has_new = true;
             this.new_count++;
             this.lines.Add(str);
 
+            this.needs_layout = true;
             this.console_lines.text = String.Join("\n", this.lines.ToArray());
             string msg = String.Format("{0} new logs", this.new_count);
             alert_content.text = msg;
@@ -137,7 +137,6 @@ namespace SR_PluginLoader
                 this.open = (!this.open);
                 if (this.open)
                 {
-                    this.has_new = false;
                     this.new_count = 0;
                 }
             }
@@ -161,6 +160,7 @@ namespace SR_PluginLoader
 
         private void doLayout()
         {
+            this.needs_layout = false;
             float offsetH = 50f;
 
             screen_area = new Rect(0f, 0f, Screen.width, Screen.height);
@@ -169,7 +169,7 @@ namespace SR_PluginLoader
 
             float console_width = (PANEL_WIDTH + scrollbar_width);//lest I ever change the width and neglect to also change the below text height calculation's width.
             console_inner_area = new Rect(0f, 0f, console_width, console_text_style.CalcHeight(console_lines, console_width));
-            console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width, console_inner_area.height);
+            console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width - scrollbar_width - 2f, console_inner_area.height);
             console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, console_text_area.height);
         }
         /// <summary>
@@ -207,7 +207,7 @@ namespace SR_PluginLoader
         public void OnGUI()
         {
             if (bg_fade == null) this.Init_BG_Fade();
-            if(Event.current.GetTypeForControl(id) == EventType.Layout)
+            if(Event.current.GetTypeForControl(id) == EventType.Layout || this.needs_layout)
             {
                 this.doLayout();
                 return;

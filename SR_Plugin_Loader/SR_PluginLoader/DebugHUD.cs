@@ -41,18 +41,23 @@ namespace SR_PluginLoader
             DebugHud.log_file = new FileStream(logPath, FileMode.Create);
         }
 
-        private static void write_log(string format, params object[] args)
+        private static void write_log(string str)
         {
             if (DebugHud.log_file == null) DebugHud.open_log_stream();
-
-            string str = String.Format(format, args);
+            
             if (!str.EndsWith("\n")) str += "\n";
             UnityEngine.Debug.Log(str);
 
             byte[] bytes = new byte[str.Length * sizeof(char)];
             System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-            
+
             DebugHud.log_file.Write(bytes, 0, bytes.Length);
+        }
+
+        private static void write_log(string format, params object[] args)
+        {
+            string str = String.Format(format, args);
+            write_log(str);
         }
 
         public static string Format_Log(Exception ex, int stack_offset=0)
@@ -108,6 +113,11 @@ namespace SR_PluginLoader
             DebugHud.Add_Line(str);
         }
 
+        public static void Log(string str)
+        {
+            DebugHud.Add_Line(str);
+        }
+
         public static void Log(Exception ex)
         {
             string str = DebugHud.Format_Log(ex);
@@ -115,9 +125,15 @@ namespace SR_PluginLoader
         }
 
 
+
         public static void LogSilent(string format, params object[] args)
         {
             string str = DebugHud.Format_Log(format, 0, args);
+            DebugHud.write_log(str);
+        }
+
+        public static void LogSilent(string str)
+        {
             DebugHud.write_log(str);
         }
 

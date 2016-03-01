@@ -5,9 +5,13 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
-using UnityEngineInternal;
-using System.Threading;
+using System.Net;
+using SimpleJSON;
+using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 using System.Diagnostics;
+using Microsoft.CSharp;
+using System.CodeDom.Compiler;
 
 namespace SR_PluginLoader
 {
@@ -15,7 +19,7 @@ namespace SR_PluginLoader
     {
         public static string TITLE { get { return String.Format("[Sisco++'s Plugin Loader] {0}", Loader.VERSION); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
-        public static Plugin_Version VERSION = new Plugin_Version(0, 1);// even though really this isnt a plugin...
+        public static Plugin_Version VERSION = new Plugin_Version(0, 2);// even though really this isnt a plugin, I guess if we ever do major changes a plugin could specify the loader as a requirement and set a specific version.
 
         private static GameObject root = null;
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
@@ -23,9 +27,13 @@ namespace SR_PluginLoader
         public static int _plugin_id = 0;
         public static Texture2D tex_unknown = new Texture2D(1, 1);
         public static Texture2D tex_alert = new Texture2D(1, 1);
+        public static bool has_updates = false;
+
         public static string[] INCLUDE_DIRS = new string[] {  };
         public static FileStream config_stream = null;
         private static bool CONFIG_LOCK = false;
+        private static WebClient web = new WebClient();
+        private static string update_helper_file = null;
 
 
         private static MainMenu menu = null;
@@ -43,13 +51,15 @@ namespace SR_PluginLoader
                 DebugHud.Init();
                 Loader.menu = Loader.root.AddComponent<MainMenu>();
 
-                DebugHud.Log("Unity v{0}", Application.unityVersion);
+                Setup_Update_Helper();
                 Setup_Plugin_Dir();
                 Load_Assets();
+                Check_For_Updates();
+
                 Setup_Assembly_Resolver();
                 Assemble_Plugin_List();
                 Load_Config();
-                Update_Plugins_UI();
+                //Update_Plugins_UI();
             }
             catch(Exception ex)
             {
@@ -57,10 +67,18 @@ namespace SR_PluginLoader
             }
         }
 
+        private static void Setup_Update_Helper()
+        {
+            string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            update_helper_file = String.Format("{0}/Auto_Update_Helper.exe", dir);
+
+            //Let's keep the users folder as uncluttered as possible eh?
+            if (File.Exists(update_helper_file)) File.Delete(update_helper_file);
+        }
+
         public static void Update_Plugins_UI()
         {
-            var panel = MainMenu.plugins_panel.GetComponent<PluginsPanel>();
-            panel.Update_Plugins_UI();
+            MainMenu.plugins_panel.Update_Plugins_UI();
         }
 
         public static void Load_Assets()
@@ -251,6 +269,10 @@ namespace SR_PluginLoader
             Loader.Save_Config();
         }
 
+        public static void Add_Notice(UI_Notification notice)
+        {
+            MainMenu.plugins_panel.Add_Notice(notice);
+        }
 
 
         public static void Setup_Assembly_Resolver()
@@ -284,6 +306,199 @@ namespace SR_PluginLoader
 
             Assembly assembly = Assembly.LoadFrom(assemblyPath);
             return assembly;
+        }
+
+        private static void Check_For_Updates()
+        {
+            has_updates = Do_Update_Check();
+            if(has_updates == true)
+            {
+                Add_Notice(new UI_Notification()
+                {
+                    msg = "A new version of the plugin loader is available\nClick this box to update!",
+                    title = "Update Available",
+                    onClick = delegate(){ Loader.Auto_Update(); }
+                });
+            }
+        }
+
+        public static void Auto_Update()
+        {
+            DebugHud.Log("Updating plugin loader...");
+            byte[] buf = web.DownloadData("https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer/SR_PluginLoader.dll");
+            string file = Assembly.GetExecutingAssembly().Location;
+            string new_file = String.Format("{0}.tmp", file);
+            string old_file = String.Format("{0}.old", file);
+            
+            File.WriteAllBytes(new_file, buf);
+            if (File.Exists(old_file)) File.Delete(old_file);
+            File.Replace(new_file, file, old_file);
+            // We have to restart the game for this to take effect.
+            Restart_App();
+        }
+
+        /// <summary>
+        /// Checks GitHub to see if the currently installed version of the plugin loader is the most up to date.
+        /// </summary>
+        private static bool Do_Update_Check()
+        {
+            // Time to check with GitHub and see if there is a newer version of the plugin loader out!
+            try
+            {
+                // Add a useragent string so GitHub doesnt return 403 and also so they can have a chat if they like.
+                web.Headers.Add("user-agent", "SR_Plugin_Loader on GitHub");
+                // Add a handler for SSL certs because mono doesnt have any trusted ones by default
+                ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+
+                // Fetch repo information
+                string url = "https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1";
+                string jsonStr = web.DownloadString(url);
+                if (jsonStr == null || jsonStr.Length <= 0)
+                {
+                    DebugHud.Log("[AutoUpdater] Got a NULL or empty response from server!");
+                    return false;
+                }
+
+                // Parse the json response from GitHub
+                var git = SimpleJSON.JSON.Parse(jsonStr);
+                var tree = git["tree"].AsArray;
+
+                // Find the plugin loaders DLL installation file
+                foreach (JSONNode file in tree)
+                {
+                    if(String.Compare(file["path"], "Installer/SR_PluginLoader.dll") == 0)
+                    {
+                        // Compare the SHA1 hash for the dll on GitHub to the hash for the one currently installed
+                        string nSHA = file["sha"];
+                        string cSHA = Get_Current_Version_Sha();
+
+                        if (String.Compare(nSHA, cSHA) != 0)
+                        {
+                            // ok they don't match, now let's just make double sure that it isn't because we are using an unreleased developer version
+                            // First find the url for the file on GitHub
+                            string tmpurl = file["url"];
+                            // now we want to replace it's hash with ours and check if it exists!
+                            tmpurl = tmpurl.Replace(nSHA, cSHA);
+                            string jStr = "";
+                            
+                            // Try and download the file info for the currently installed loaders sha1 hash
+                            try
+                            {
+                                jStr = web.DownloadString(tmpurl);
+                            }
+                            catch(WebException ex)
+                            {
+                                DebugHud.Log(ex);
+                                // A file for this hash does not exhist on the github repo. So this must be a Dev version.
+                                return false;
+                            }
+                            
+                            return true;
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                DebugHud.Log(ex);
+            }
+            return false;//no update
+        }
+
+        /// <summary>
+        /// Gets the SHA1 hash for the currently installed version of the plugin loader so it can be compared to the one on github and updated if needed
+        /// </summary>
+        /// <returns></returns>
+        private static string Get_Current_Version_Sha()
+        {
+            string file = Assembly.GetExecutingAssembly().Location;
+            var buf = File.ReadAllBytes(file);
+            string data = Encoding.ASCII.GetString(buf);
+            data = ("blob" + data.Length + "\0" + data);
+
+            System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+            byte[] hash = sha1.ComputeHash( Encoding.ASCII.GetBytes(data));
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("x2"));
+            }
+
+            return sb.ToString();
+        }
+
+
+        private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+        {
+            //Return true if the server certificate is ok
+            if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
+
+            bool acceptCertificate = true;
+            string msg = "The server could not be validated for the following reason(s):\r\n";
+
+            //The server did not present a certificate
+            if ((sslPolicyErrors &
+                 SslPolicyErrors.RemoteCertificateNotAvailable) == SslPolicyErrors.RemoteCertificateNotAvailable)
+            {
+                msg = msg + "\r\n    -The server did not present a certificate.\r\n";
+                acceptCertificate = false;
+            }
+            else
+            {
+                //The certificate does not match the server name
+                if ((sslPolicyErrors &
+                     SslPolicyErrors.RemoteCertificateNameMismatch) == SslPolicyErrors.RemoteCertificateNameMismatch)
+                {
+                    msg = msg + "\r\n    -The certificate name does not match the authenticated name.\r\n";
+                    acceptCertificate = false;
+                }
+
+                //There is some other problem with the certificate
+                if ((sslPolicyErrors &
+                     SslPolicyErrors.RemoteCertificateChainErrors) == SslPolicyErrors.RemoteCertificateChainErrors)
+                {
+                    foreach (X509ChainStatus item in chain.ChainStatus)
+                    {
+                        if (item.Status != X509ChainStatusFlags.RevocationStatusUnknown &&
+                            item.Status != X509ChainStatusFlags.OfflineRevocation)
+                            break;
+
+                        if (item.Status != X509ChainStatusFlags.NoError)
+                        {
+                            msg = msg + "\r\n    -" + item.StatusInformation;
+                            acceptCertificate = false;
+                        }
+                    }
+                }
+            }
+
+            //If Validation failed, present message box
+            if (acceptCertificate == false)
+            {
+                msg = msg + "\r\nDo you wish to override the security check?";
+                //          if (MessageBox.Show(msg, "Security Alert: Server could not be validated",
+                //                       MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+                acceptCertificate = true;
+            }
+
+            return acceptCertificate;
+        }
+
+        private static void Restart_App()
+        {
+            byte[] buf = Utility.Load_Resource("Restart_Helper.exe");
+            if (buf != null && buf.Length > 0)
+            {
+                File.WriteAllBytes(update_helper_file, buf);
+                string args = String.Format("{0}", Process.GetCurrentProcess().Id);
+                Process.Start(update_helper_file, args);
+            }
+            else
+            {
+                DebugHud.Log("Failed to unpack the auto update helper!");
+            }
         }
     }
 }

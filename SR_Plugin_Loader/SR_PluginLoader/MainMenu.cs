@@ -12,7 +12,8 @@ namespace SR_PluginLoader
     class MainMenu : MonoBehaviour
     {
         public static GameObject mainmenu = null;
-        public static GameObject plugins_panel = null;
+        private static GameObject plugins_panel_root = null;
+        public static PluginsPanel plugins_panel = null;
         private static bool _active = false;
         public static bool Active { get { return MainMenu._active; } }
 
@@ -22,15 +23,14 @@ namespace SR_PluginLoader
 
         public void Awake()
         {
-
+            this.TrySpawnPluginPanel();
         }
 
         private void Update()
         {
-            if (MainMenu.mainmenu == null)
+            if(MainMenu.mainmenu == null)
             {
                 this.TrySpawnPluginMenu();
-                this.TrySpawnPluginPanel();
             }
         }
 
@@ -41,11 +41,9 @@ namespace SR_PluginLoader
 
         private void TrySpawnPluginPanel()
         {
-            MainMenu.plugins_panel = new GameObject("PluginsPanel");
-            MainMenu.plugins_panel.AddComponent<PluginsPanel>();
-            UnityEngine.Object.DontDestroyOnLoad(MainMenu.plugins_panel);
-            MainMenu.plugins_panel.SetActive(false);
-
+            MainMenu.plugins_panel_root = new GameObject("PluginsPanel");
+            MainMenu.plugins_panel = MainMenu.plugins_panel_root.AddComponent<PluginsPanel>();
+            UnityEngine.Object.DontDestroyOnLoad(MainMenu.plugins_panel_root);
         }
 
         private void TrySpawnPluginMenu()
@@ -104,7 +102,7 @@ namespace SR_PluginLoader
             MainMenu._active = true;
             MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
             MainMenu.mainmenu.SetActive(false);
-            MainMenu.plugins_panel.SetActive(true);
+            MainMenu.plugins_panel.active = true;
         }
 
         private void OnGUI()
