@@ -2,7 +2,8 @@
 A plugin loader for SlimeRancher
 
 <h2>Installing</h2>
-If you are just looking for the installer then click <a href="https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Installer.zip">HERE</a>
+If you are just looking for the installer then click <a href="https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Installer.zip">HERE</a>  
+For a guide on HOW to install the plugin loader look <a href="https://github.com/dsisco11/SR_Plugin_Loader/wiki/Installation">HERE</a>
 
 <h2>For Developers</h2>
 <ul>
