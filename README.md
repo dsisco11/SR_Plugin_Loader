@@ -1,4 +1,4 @@
-## SR Plugin Loader
+# SlimeRancher Plugin Loader
 A plugin loader for SlimeRancher
 
 <h2>Installing</h2>
