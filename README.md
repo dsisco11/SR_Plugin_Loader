@@ -12,7 +12,9 @@ On windows by default this should be `C:\Program Files (x86)\Steam\steamapps\com
 ## For Developers
 Example plugins are under the examples folder.  
 To learn more about all of the features this project offers look at the <a href="https://github.com/dsisco11/SR_Plugin_Loader/wiki">WIKI</a>.  
-
+**ALSO**  
+If you are planning on creating a plugin you should absolutely check out the EventHook library I made for SlimeRancher <a href="https://github.com/dsisco11/SiscosHooks">Here is a link.</a>  
+  
 ## License
 SR Plugin Loader is released under the <a href="https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)">Apache 2.0 license</a>
 
