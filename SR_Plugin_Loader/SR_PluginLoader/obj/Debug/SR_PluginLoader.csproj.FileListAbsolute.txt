@@ -28,3 +28,15 @@ C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.csproj.GenerateResource.Cache
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.dll
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.pdb
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Debug\SR_PluginLoader.dll
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Debug\SR_PluginLoader.pdb
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Debug\UnityEngine.Analytics.dll
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Debug\SiscosHooks.dll
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Debug\UnityEngine.xml
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Debug\SiscosHooks.pdb
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.csprojResolveAssemblyReference.cache
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.Properties.Resources.resources
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.csproj.GenerateResource.Cache
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.dll
+C:\Users\saty-\Documents\SRLoader\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Debug\SR_PluginLoader.pdb
