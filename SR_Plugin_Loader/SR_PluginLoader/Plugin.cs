@@ -21,7 +21,7 @@ namespace SR_PluginLoader
         /// </summary>
         public bool has_dependency_issues = false;
         public List<Plugin_Dependency> unmet_dependencys = new List<Plugin_Dependency>();
-
+        
         public string file = null;
         public string dir = null;
         private string dll_name = null;
@@ -112,6 +112,28 @@ namespace SR_PluginLoader
             {
                 DebugHud.Log(ex);
             }
+        }
+
+        /// <summary>
+        /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to the one the developer given
+        /// </summary>
+        /// <returns></returns>
+        public string Get_Version_Sha()
+        {
+            var buf = File.ReadAllBytes(file);
+            string data = Encoding.ASCII.GetString(buf);
+            data = ("blob" + data.Length + "\0" + data);
+
+            System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+            byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data));
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("x2"));
+            }
+
+            return sb.ToString();
         }
 
         private void Add_Error(string format, params object[] args)

@@ -477,7 +477,7 @@ namespace SR_PluginLoader
             return acceptCertificate;
         }
 
-        private static void Restart_App()
+        public static void Restart_App()
         {
             byte[] buf = Utility.Load_Resource("Restart_Helper.exe");
             if (buf != null && buf.Length > 0)
