@@ -18,7 +18,12 @@ namespace SR_PluginLoader
     {
         private static Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>> events = new Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>>();
         private static Dictionary<object, List<Sisco_Hook_Ref>> tracker = new Dictionary<object, List<Sisco_Hook_Ref>>();
-        
+
+        public static _hook_result call_static(HOOK_ID hook, params object[] args)
+        {
+            object robj = (object)null;
+            return call(hook, ref robj, args);
+        }
         public static _hook_result call(HOOK_ID hook, ref object sender, params object[] args)
         {
             _hook_result result = new _hook_result(false, args);
