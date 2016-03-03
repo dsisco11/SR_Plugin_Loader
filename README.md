@@ -9,7 +9,7 @@ To install a plugin copy the plugin DLL to the _plugins_ folder within your Slim
 On windows by default this should be `C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher\plugins`
 
 ## Help & Support  
-If you need help with anything dont be afraid to create an <a href="/issues">issue report</a>!
+If you need help with anything dont be afraid to create an <a href="issues">issue report</a>!
 
 ## For Developers  
 Example plugins are under the examples folder.  
