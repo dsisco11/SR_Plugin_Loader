@@ -388,7 +388,6 @@ namespace SR_PluginLoader
                             }
                             catch(WebException ex)
                             {
-                                DebugHud.Log(ex);
                                 // A file for this hash does not exhist on the github repo. So this must be a Dev version.
                                 return false;
                             }
@@ -436,50 +435,39 @@ namespace SR_PluginLoader
                 return true;
 
             bool acceptCertificate = true;
-            string msg = "The server could not be validated for the following reason(s):\r\n";
 
             //The server did not present a certificate
-            if ((sslPolicyErrors &
-                 SslPolicyErrors.RemoteCertificateNotAvailable) == SslPolicyErrors.RemoteCertificateNotAvailable)
+            if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateNotAvailable) == SslPolicyErrors.RemoteCertificateNotAvailable)
             {
-                msg = msg + "\r\n    -The server did not present a certificate.\r\n";
                 acceptCertificate = false;
             }
             else
             {
                 //The certificate does not match the server name
-                if ((sslPolicyErrors &
-                     SslPolicyErrors.RemoteCertificateNameMismatch) == SslPolicyErrors.RemoteCertificateNameMismatch)
+                if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateNameMismatch) == SslPolicyErrors.RemoteCertificateNameMismatch)
                 {
-                    msg = msg + "\r\n    -The certificate name does not match the authenticated name.\r\n";
                     acceptCertificate = false;
                 }
 
                 //There is some other problem with the certificate
-                if ((sslPolicyErrors &
-                     SslPolicyErrors.RemoteCertificateChainErrors) == SslPolicyErrors.RemoteCertificateChainErrors)
+                if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateChainErrors) == SslPolicyErrors.RemoteCertificateChainErrors)
                 {
                     foreach (X509ChainStatus item in chain.ChainStatus)
                     {
-                        if (item.Status != X509ChainStatusFlags.RevocationStatusUnknown &&
-                            item.Status != X509ChainStatusFlags.OfflineRevocation)
+                        if (item.Status != X509ChainStatusFlags.RevocationStatusUnknown && item.Status != X509ChainStatusFlags.OfflineRevocation)
                             break;
 
                         if (item.Status != X509ChainStatusFlags.NoError)
                         {
-                            msg = msg + "\r\n    -" + item.StatusInformation;
                             acceptCertificate = false;
                         }
                     }
                 }
             }
 
-            //If Validation failed, present message box
+            //If Validation failed
             if (acceptCertificate == false)
             {
-                msg = msg + "\r\nDo you wish to override the security check?";
-                //          if (MessageBox.Show(msg, "Security Alert: Server could not be validated",
-                //                       MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
                 acceptCertificate = true;
             }
 
