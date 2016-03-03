@@ -7,9 +7,8 @@ using System.Reflection.Emit;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
-using SiscosHooks;
 using SR_PluginLoader;
-
+using SR_PluginLoader.SiscosHooks;
 
 namespace ExtraControls
 {
@@ -20,6 +19,7 @@ namespace ExtraControls
         */
         public static Plugin_Data PLUGIN_INFO = new Plugin_Data()
         {
+			AUTHOR = "Sisco++",
             NAME = "ExtraControls",
             DESCRIPTION = @"
 - Holding the ALT key will make the VacPak's suction ignore slimes.

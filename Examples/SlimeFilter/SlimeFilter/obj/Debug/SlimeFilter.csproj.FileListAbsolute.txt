@@ -1,0 +1,14 @@
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\obj\Debug\SlimeFilter.csprojResolveAssemblyReference.cache
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\SlimeFilter.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\SlimeFilter.pdb
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\Assembly-CSharp.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\SiscosHooks.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\SR_PluginLoader.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\UnityEngine.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\UnityEngine.UI.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\UnityEngine.Analytics.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\Assembly-CSharp-firstpass.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\SiscosHooks.pdb
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\bin\Debug\UnityEngine.xml
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\obj\Debug\SlimeFilter.dll
+C:\CODE\GAME_MODS\SlimeFilter\SlimeFilter\obj\Debug\SlimeFilter.pdb

@@ -14,10 +14,6 @@ namespace SR_PluginLoader
         /// </summary>
         private bool isHovering = false;
         /// <summary>
-        /// Is the mouse currently clicked on this control?
-        /// </summary>
-        private bool isDepressed = false;
-        /// <summary>
         /// The switch state of this control
         /// </summary>
         private bool toggled = false;
@@ -108,7 +104,6 @@ namespace SR_PluginLoader
                     {
                         GUIUtility.hotControl = id;
                         Event.current.Use();
-                        this.isDepressed = true;
                     }
                     break;
                 case EventType.MouseUp:
@@ -116,7 +111,6 @@ namespace SR_PluginLoader
                     {
                         GUIUtility.hotControl = 0;
                         Event.current.Use();
-                        this.isDepressed = false;
                         if (this.isHovering) return true;
                     }
                     return false;

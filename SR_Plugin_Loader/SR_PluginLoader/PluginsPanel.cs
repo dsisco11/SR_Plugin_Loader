@@ -13,7 +13,7 @@ namespace SR_PluginLoader
         public Vector2 size = new Vector2(650f, 400f);
         private Vector2 scroll = Vector2.zero;
         private GUISkin skin = null;
-        private GUIStyle title_style = null, screen_darkener = null, shadow_style = null, highlight_style = null, plugin_list_style = null, scrollbar_style = null;
+        private GUIStyle title_style = null, screen_darkener = null, shadow_style = null, highlight_style = null, plugin_list_style = null;
         private GUIStyle plugin_title_text = null, plugin_vers_text = null, plugin_desc_text = null;
         private Plugin selected = null;
         private List<PluginSelector> plugin_selectors = new List<PluginSelector>();

@@ -22,6 +22,35 @@ namespace SR_PluginLoader
 
     public static class Utility
     {
+        public static string SHA(string data)
+        {
+            System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+            byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data));
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("x2"));
+            }
+
+            return sb.ToString();
+        }
+
+        public static string SHA(string format, params object[] args)
+        {
+            string data = String.Format(format, args);
+            System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+            byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data));
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("x2"));
+            }
+
+            return sb.ToString();
+        }
+
         public static void Log_Resource_Names()
         {
             var thisExe = System.Reflection.Assembly.GetExecutingAssembly();

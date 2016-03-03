@@ -55,6 +55,8 @@
   <ItemGroup>
     <Compile Include="DebugHUD.cs" />
     <Compile Include="DebugHUD_Renderer.cs" />
+    <Compile Include="SiscosHooks\HOOKS.cs" />
+    <Compile Include="SiscosHooks\HOOK_DATA.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="MainMenu.cs" />
     <Compile Include="Plugin.cs" />
@@ -70,9 +72,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="SimpleJSON.cs" />
+    <Compile Include="SiscosHooks\SiscosHooks.cs" />
+    <Compile Include="SiscosHooks\Siscos_Return.cs" />
+    <Compile Include="SiscosHooks\Sisco_Hook_Ref.cs" />
     <Compile Include="ToggleSwitch.cs" />
     <Compile Include="UI_Notification.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="SiscosHooks\_hook_result.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -89,6 +95,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Restart_Helper.exe" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetFileName)" /Y

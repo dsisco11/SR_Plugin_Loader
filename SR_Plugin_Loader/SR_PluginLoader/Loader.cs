@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Reflection;
@@ -10,8 +9,6 @@ using SimpleJSON;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Diagnostics;
-using Microsoft.CSharp;
-using System.CodeDom.Compiler;
 
 namespace SR_PluginLoader
 {
@@ -386,7 +383,7 @@ namespace SR_PluginLoader
                             {
                                 jStr = web.DownloadString(tmpurl);
                             }
-                            catch(WebException ex)
+                            catch
                             {
                                 // A file for this hash does not exhist on the github repo. So this must be a Dev version.
                                 return false;
@@ -404,6 +401,10 @@ namespace SR_PluginLoader
             return false;//no update
         }
 
+        public static Plugin GetPluginByHash(string hash)
+        {
+            return null;
+        }
         /// <summary>
         /// Gets the SHA1 hash for the currently installed version of the plugin loader so it can be compared to the one on github and updated if needed
         /// </summary>

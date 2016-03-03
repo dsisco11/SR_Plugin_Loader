@@ -14,6 +14,9 @@ namespace SR_PluginLoader
         public Plugin_Data data = null;
         private int _id = 0;
         public int id { get { return this._id; } }
+        public string Hash { get { return Utility.SHA(String.Format("{0}.{1}", this.data.AUTHOR, this.data.NAME)); } }
+        public bool IsInstalled { get { return (Loader.GetPluginByHash(Hash) != null); } }
+
 
         public bool enabled = false;
         /// <summary>
@@ -46,6 +49,7 @@ namespace SR_PluginLoader
 
             this.enabled = en;
         }
+
 
         /// <summary>
         /// This is where we actually do all the loading, to prevent any exceptions from causing the plugin instance to not be put into our global plugins map.
@@ -177,7 +181,6 @@ namespace SR_PluginLoader
                 DebugHud.Log(ex);
                 return false;
             }
-            return false;
         }
 
         private Assembly load_assembly(bool reload=false)

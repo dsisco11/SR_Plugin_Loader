@@ -7,6 +7,7 @@ namespace SR_PluginLoader
 {
     public class Plugin_Data
     {
+        public string AUTHOR = null;
         public string NAME = null;
         public string DESCRIPTION = null;
         public Plugin_Version VERSION = null;

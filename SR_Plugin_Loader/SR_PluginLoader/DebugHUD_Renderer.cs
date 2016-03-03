@@ -43,7 +43,6 @@ namespace SR_PluginLoader
 
         private bool open = false;
         private int new_count = 0;
-        private bool pressed = false, hover = false;
         private int id = 0;
 
         private KeyCode OPEN_KEY = KeyCode.Tab;
