@@ -14,7 +14,10 @@ namespace SR_PluginLoader
 {
     public static class Loader
     {
+        public static string DOWNLOADURL { get { return "http://satycreations.com/developer.json"; } }
+
         public static string TITLE { get { return String.Format("[Sisco++'s Plugin Loader] {0}", Loader.VERSION); } }
+        public static string DOWNLOADTITLE { get { return String.Format("Download Plugins"); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
         public static Plugin_Version VERSION = new Plugin_Version(0, 2);// even though really this isnt a plugin, I guess if we ever do major changes a plugin could specify the loader as a requirement and set a specific version.
 
@@ -475,7 +478,7 @@ namespace SR_PluginLoader
             return acceptCertificate;
         }
 
-        private static void Restart_App()
+        public static void Restart_App()
         {
             byte[] buf = Utility.Load_Resource("Restart_Helper.exe");
             if (buf != null && buf.Length > 0)

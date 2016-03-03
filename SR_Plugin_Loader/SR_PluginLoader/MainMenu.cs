@@ -1,5 +1,8 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -14,6 +17,7 @@ namespace SR_PluginLoader
         public static GameObject mainmenu = null;
         private static GameObject plugins_panel_root = null;
         public static PluginsPanel plugins_panel = null;
+        public static PluginsDownloadPanel plugins_download_panel = null;
         private static bool _active = false;
         public static bool Active { get { return MainMenu._active; } }
 
@@ -37,12 +41,67 @@ namespace SR_PluginLoader
         private void OnLevelWasLoaded(int lvl)
         {
             MainMenu.mainmenu = null;
+
+            if(Levels.isSpecial(Application.loadedLevelName))
+            {
+                StartCoroutine(CheckForPluginUpdates());
+            }
+        }
+
+        private IEnumerator CheckForPluginUpdates()
+        {
+            int updates = 0;
+            foreach(Plugin plugin in Loader.plugins.Values)
+            {
+                if(plugin.data.UPDATEURL != null)
+                {
+                    WWW update = new WWW(plugin.data.UPDATEURL);
+
+                    while (!update.isDone)
+                        yield return new WaitForSeconds(0.1f);
+
+                    JSONNode data = JSON.Parse(update.text);
+                    if(data != null && data["plugin_hash"] != null && data["plugin_version"] != null && data["plugin_download"] != null)
+                    {
+                        if(plugin.Get_Version_Sha() != data["plugin_hash"] || plugin.data.VERSION.ToString() != data["plugin_version"])
+                        {
+                            WWW download = new WWW(data["plugin_download"]);
+
+                            while (!download.isDone)
+                                yield return new WaitForSeconds(0.1f);
+
+                            if (download.bytes.Length > 0)
+                            {
+                                string file = plugin.file;
+                                string new_file = String.Format("{0}.tmp", file);
+                                string old_file = String.Format("{0}.old", file);
+
+                                File.WriteAllBytes(new_file, download.bytes);
+                                if (File.Exists(old_file)) File.Delete(old_file);
+                                File.Replace(new_file, file, old_file);
+                                updates++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if(updates > 0)
+            {
+                Loader.Add_Notice(new UI_Notification()
+                {
+                    msg = updates + " Plugins have been Updated.\nClick this box to restart!",
+                    title = updates + " Plugins Updated",
+                    onClick = delegate () { Loader.Restart_App(); }
+                });
+            }
         }
 
         private void TrySpawnPluginPanel()
         {
             MainMenu.plugins_panel_root = new GameObject("PluginsPanel");
             MainMenu.plugins_panel = MainMenu.plugins_panel_root.AddComponent<PluginsPanel>();
+            MainMenu.plugins_download_panel = MainMenu.plugins_panel_root.AddComponent<PluginsDownloadPanel>();
             UnityEngine.Object.DontDestroyOnLoad(MainMenu.plugins_panel_root);
         }
 
