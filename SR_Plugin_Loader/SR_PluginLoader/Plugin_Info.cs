@@ -9,6 +9,7 @@ namespace SR_PluginLoader
     {
         public string NAME = null;
         public string DESCRIPTION = null;
+        public string UPDATEURL = null;
         public Plugin_Version VERSION = null;
         public List<Plugin_Dependency> DEPENDENCYS = new List<Plugin_Dependency>();
 
