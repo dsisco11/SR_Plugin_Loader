@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +10,7 @@ using UnityEngine.UI;
 
 namespace SR_PluginLoader
 {
-    public class PluginsPanel : MonoBehaviour
+    public class PluginsDownloadPanel : MonoBehaviour
     {
         public Vector2 size = new Vector2(650f, 400f);
         private Vector2 scroll = Vector2.zero;
@@ -18,9 +20,10 @@ namespace SR_PluginLoader
         private Plugin selected = null;
         private List<PluginSelector> plugin_selectors = new List<PluginSelector>();
         private List<UI_Notification> notifications = new List<UI_Notification>();
+        private Dictionary<string, Plugin_Download_Data> plugin_list = new Dictionary<string, Plugin_Download_Data>();
         private GUIContent pl_title = new GUIContent(), pl_desc = new GUIContent(), pl_vers = new GUIContent();
         private Texture pl_thumb = null;
-        private Rect screen_area, area, window_area, tb_area, tb_shadow_area, close_btn_area, install_btn_area, left_shadow_area, right_shadow_area, bottom_shadow_area, notification_area;
+        private Rect screen_area, area, window_area, tb_area, tb_shadow_area, close_btn_area, left_shadow_area, right_shadow_area, bottom_shadow_area, notification_area;
         private Rect pl_title_area, pl_desc_area, pl_vers_area, pl_thumb_area, pl_toggle_area;
         private Vector2 selected_plugin_info_scroll = Vector2.zero, plugin_list_scroll = Vector2.zero;
         private Rect selected_plugin_info_area, selected_plugin_info_inner_area;
@@ -28,8 +31,8 @@ namespace SR_PluginLoader
         private float tb_height { get { return (title_bar_height - 4f); } }
         private ToggleSwitch pl_toggle = new ToggleSwitch();
         private bool needs_layout = true;
+        private bool fetch_data = true;
         public bool active = false;
-
 
         private Vector2 _pos = Vector2.zero;
         private Vector2 pos { get { if(_pos == Vector2.zero) _pos = new Vector2((float)((Screen.width * 0.5f) - (this.size.x * 0.5f)), (float)((Screen.height * 0.5f) - (this.size.x * 0.3f))); return _pos; } }
@@ -52,7 +55,77 @@ namespace SR_PluginLoader
         private void Awake()
         {
             //this.pl_toggle = base.gameObject.AddComponent<ToggleSwitch>();
-            this.pl_toggle.SetText("Disable", "Enable");
+            this.pl_toggle.SetText("Uninstall", "Install");
+        }
+
+        public void GetPlugins()
+        {
+            fetch_data = true;
+            WWW get_plugins = new WWW(Loader.DOWNLOADURL);
+            StartCoroutine(GetPlugins(get_plugins));
+        }
+
+        private IEnumerator GetPlugins(WWW get_plugins)
+        {
+            while (!get_plugins.isDone)
+                yield return new WaitForSeconds(0.1f);
+
+            JSONNode data = JSON.Parse(get_plugins.text);
+            if (data != null && data["developers"] != null)
+            {
+                for (int i = 0; i < data["developers"].Count; i++)
+                {
+                    yield return StartCoroutine(GetPluginData(data["developers"][i]));
+                }
+            }
+            else
+            {
+                DebugHud.Log("Failed to fetch plugins");
+            }
+
+            fetch_data = false;
+        }
+
+        private IEnumerator GetPluginData(JSONNode data)
+        {
+            if (data["author"] != null && data["pluginsurl"] != null)
+            {
+                WWW get_plugin = new WWW(data["pluginsurl"]);
+
+                while (!get_plugin.isDone)
+                    yield return new WaitForSeconds(0.1f);
+
+                JSONNode plugindata = JSON.Parse(get_plugin.text);
+                if (plugindata != null && plugindata["plugin_name"] != null && plugindata["plugin_description"] != null && plugindata["plugin_download"] != null)
+                {
+                    Plugin_Download_Data plugin_download = new Plugin_Download_Data(data["author"], plugindata["plugin_name"], plugindata["plugin_description"], plugindata["plugin_download"]);
+                    if (plugindata["plugin_icon"] != null)
+                        StartCoroutine(GetPluginIcon(plugin_download, plugindata["plugin_icon"]));
+
+                    plugin_list.Add(plugin_download.Author, plugin_download);
+                }
+                else
+                {
+                    DebugHud.Log("Failed to fetch plugin data for " + data["creator"] + ": Wrong format");
+                }
+            }
+            else
+            {
+                DebugHud.Log("Failed to fetch plugin data: Wrong format");
+            }
+
+            yield return true;
+        }
+
+        private IEnumerator GetPluginIcon(Plugin_Download_Data plugin_download, string iconurl)
+        {
+            WWW fetch_icon = new WWW(iconurl);
+
+            while (!fetch_icon.isDone)
+                yield return new WaitForSeconds(0.1f);
+
+            if (fetch_icon.texture != null)
+                plugin_download.Icon = fetch_icon.texture;
         }
 
         private void init_skin()
@@ -62,6 +135,11 @@ namespace SR_PluginLoader
             this.skin.button = GUI.skin.button;
             this.skin.button.normal.textColor = Color.white;
             this.skin.button.fontStyle = FontStyle.Bold;
+
+            this.skin.label = GUI.skin.label;
+            this.skin.label.normal.textColor = Color.white;
+            this.skin.label.alignment = TextAnchor.MiddleCenter;
+            this.skin.label.fontStyle = FontStyle.Bold;
 
             skin.verticalScrollbar = new GUIStyle();
             skin.verticalScrollbar.fixedWidth = scrollbar_width;
@@ -92,7 +170,7 @@ namespace SR_PluginLoader
             Utility.Set_BG_Color(this.highlight_style.normal, 1f, 1f, 1f, 0.2f);
             
             this.plugin_list_style = new GUIStyle();
-            this.plugin_list_style.normal.background = Utility.Get_Gradient_Texture((int)PluginsPanel.plugin_list_width, GRADIENT_DIR.LEFT_RIGHT, 0.0f, 0.15f);
+            this.plugin_list_style.normal.background = Utility.Get_Gradient_Texture((int)PluginsDownloadPanel.plugin_list_width, GRADIENT_DIR.LEFT_RIGHT, 0.0f, 0.15f);
 
             //var plugin_title_text = new GUIStyle();
             plugin_title_text = new GUIStyle();
@@ -121,7 +199,7 @@ namespace SR_PluginLoader
         private void close()
         {
             this.active = false;
-            MainMenu.mainmenu.SetActive(true);
+            MainMenu.plugins_panel.active = true;
         }
 
         private void Update()
@@ -195,24 +273,30 @@ namespace SR_PluginLoader
             //draw the main window
             this.render_window();
             this.render_close_button();
-            this.render_install_button();
             this.render_titlebar();
             GUI.EndGroup();
 
-            plugin_list_style.Draw(plugin_list_area, GUIContent.none, false, false, false, false);
-            plugin_list_scroll = GUI.BeginScrollView(plugin_list_area, plugin_list_scroll, plugin_list_inner_area, false, false);
-            
-            foreach (PluginSelector sel in this.plugin_selectors)
+            if (this.fetch_data)
             {
-                if( sel.Display() )
-                {
-                    this.select_plugin(sel.Get_Plugin());
-                }
+                GUI.Label(new Rect(screen_area.center.x - 50, screen_area.center.y, 100, 30), "Loading...");
             }
-            
-            GUI.EndScrollView(true);
+            else
+            {
+                plugin_list_style.Draw(plugin_list_area, GUIContent.none, false, false, false, false);
+                plugin_list_scroll = GUI.BeginScrollView(plugin_list_area, plugin_list_scroll, plugin_list_inner_area, false, false);
 
-            this.render_selected_plugin_info();
+                foreach (PluginSelector sel in this.plugin_selectors)
+                {
+                    if (sel.Display())
+                    {
+                        this.select_plugin(sel.Get_Plugin());
+                    }
+                }
+
+                GUI.EndScrollView(true);
+
+                this.render_selected_plugin_info();
+            }
             
             GUI.skin = prev_skin;
             GUI.depth = prev_depth;
@@ -243,26 +327,16 @@ namespace SR_PluginLoader
 
         private void render_close_button()
         {
-            if (GUI.Button(this.close_btn_area, "Close"))
+            if (GUI.Button(this.close_btn_area, "Back"))
             {
                 this.close();
-            }
-        }
-
-        private void render_install_button()
-        {
-            if (GUI.Button(this.install_btn_area, "Download Plugins"))
-            {
-                this.active = false;
-                MainMenu.plugins_download_panel.GetPlugins();
-                MainMenu.plugins_download_panel.active = true;
             }
         }
 
         private void render_titlebar()
         {
             //draw the title bar area
-            this.title_style.Draw(tb_area, Loader.TITLE, false, false, false, false);
+            this.title_style.Draw(tb_area, Loader.DOWNLOADTITLE, false, false, false, false);
             //draw a small shadow beneath the title bar
             this.shadow_style.Draw(tb_shadow_area, GUIContent.none, false, false, false, false);
         }
@@ -351,23 +425,16 @@ namespace SR_PluginLoader
             this.right_shadow_area = new Rect(window_area.x + window_area.size.x, window_area.y, 1f, window_area.size.y);
             this.bottom_shadow_area = new Rect(window_area.x, window_area.y + window_area.size.y, window_area.size.x, 1f);
 
+            this.plugin_list_area = new Rect(pos.x + list_pad, pos.y + title_bar_height, plugin_list_width - list_pad2, this.size.y - title_bar_height - list_pad);
+            this.plugin_list_inner_area = new Rect(0f, 0f, plugin_list_area.width, this.plugin_selectors.Last().position.yMax);
+
+            correctInnerScrollArea(ref plugin_list_area, ref plugin_list_inner_area);
+
             float close_w = 60f;
             float close_h = 25f;
             float close_pad = 3f;
             this.close_btn_area = new Rect((0f + this.size.x) - (close_w + 0f) - close_pad, (0f + this.size.y) - (close_h + 0f) - close_pad, close_w, close_h);
 
-            float install_w = plugin_list_area.width;
-            float install_h = 25f;
-            float install_pad = 3f;
-            this.install_btn_area = new Rect(list_pad, (0f + this.size.y) - (install_h + 0f) - install_pad, install_w, install_h);
-
-            this.plugin_list_area = new Rect(pos.x + list_pad, pos.y + title_bar_height, plugin_list_width - list_pad2, this.size.y - title_bar_height - list_pad - install_h);
-            if (this.plugin_selectors.Count > 0)
-                this.plugin_list_inner_area = new Rect(0f, 0f, plugin_list_area.width, this.plugin_selectors.Last().position.yMax);
-            else
-                this.plugin_list_inner_area = new Rect(0f, 0f, plugin_list_area.width, 0f);
-
-            correctInnerScrollArea(ref plugin_list_area, ref plugin_list_inner_area);
 
             float SBW = 0f;
             if ((PluginSelector.DEFAULT_HEIGHT * (float)Loader.plugins.Count) > plugin_list_area.height) SBW = scrollbar_width;
@@ -502,7 +569,5 @@ namespace SR_PluginLoader
 
             return null;
         }
-
-
     }
 }
