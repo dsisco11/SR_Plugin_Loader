@@ -55,14 +55,17 @@
   <ItemGroup>
     <Compile Include="DebugHUD.cs" />
     <Compile Include="DebugHUD_Renderer.cs" />
+    <Compile Include="Updaters\Git_Updater.cs" />
+    <Compile Include="Singleton.cs" />
+    <Compile Include="UI\Notice_Manager.cs" />
     <Compile Include="SiscosHooks\HOOKS.cs" />
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="MainMenu.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="PluginSelector.cs" />
-    <Compile Include="PluginsDownloadPanel.cs" />
-    <Compile Include="PluginsPanel.cs" />
+    <Compile Include="UI\PluginSelector.cs" />
+    <Compile Include="UI\PluginsDownloadPanel.cs" />
+    <Compile Include="UI\PluginsPanel.cs" />
     <Compile Include="Plugin_Dependency.cs" />
     <Compile Include="Plugin_Download_Data.cs" />
     <Compile Include="Plugin_Info.cs" />
@@ -77,8 +80,9 @@
     <Compile Include="SiscosHooks\SiscosHooks.cs" />
     <Compile Include="SiscosHooks\Siscos_Return.cs" />
     <Compile Include="SiscosHooks\Sisco_Hook_Ref.cs" />
-    <Compile Include="ToggleSwitch.cs" />
-    <Compile Include="UI_Notification.cs" />
+    <Compile Include="UI\ToggleSwitch.cs" />
+    <Compile Include="UI\UI_Notification.cs" />
+    <Compile Include="Updaters\Updater_Base.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="SiscosHooks\_hook_result.cs" />
   </ItemGroup>

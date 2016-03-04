@@ -59,8 +59,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>MKDIR "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/plugins/$(TargetName)/"
-COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/plugins/$(TargetName)/$(TargetFileName)" /Y</PostBuildEvent>
+    <PostBuildEvent>COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/plugins/$(TargetFileName)" /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

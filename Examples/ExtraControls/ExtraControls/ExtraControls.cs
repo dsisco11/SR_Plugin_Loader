@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngineInternal;
-using SiscosHooks;
 using SR_PluginLoader;
 
 namespace ExtraControls
@@ -16,7 +15,7 @@ namespace ExtraControls
     {
         public void init()
         {
-            SiscoHook.register(this, HOOK_ID.Vac_Can_Capture, this.Vac_Can_Capture);
+            SiscosHooks.register(this, HOOK_ID.Vac_Can_Capture, this.Vac_Can_Capture);
         }
 
         private Sisco_Return Vac_Can_Capture(ref object sender, ref object[] args)

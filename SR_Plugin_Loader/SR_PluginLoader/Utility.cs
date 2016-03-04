@@ -1,7 +1,9 @@
-﻿using System;
+﻿using SimpleJSON;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Security;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
@@ -39,6 +41,24 @@ namespace SR_PluginLoader
         public static string SHA(string format, params object[] args)
         {
             string data = String.Format(format, args);
+            System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
+            byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data));
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append(hash[i].ToString("x2"));
+            }
+
+            return sb.ToString();
+        }
+
+        public static string Get_File_Sha1(string file)
+        {
+            var buf = File.ReadAllBytes(file);
+            string data = Encoding.ASCII.GetString(buf);
+            data = ("blob" + data.Length + "\0" + data);
+
             System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
             byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data));
 

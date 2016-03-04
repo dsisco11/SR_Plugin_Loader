@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.IO;
 using SR_PluginLoader;
-using SR_PluginLoader.SiscosHooks;
 
 namespace ExtraControls
 {

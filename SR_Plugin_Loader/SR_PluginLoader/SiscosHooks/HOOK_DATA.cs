@@ -24,10 +24,10 @@ namespace SR_PluginLoader
     public static class Injects
     {
         public static InjectionSite[] HooksList = new InjectionSite[] {
-            new InjectionSite() { hook = HOOK_ID.Get_Available_Saves, method = "GameData.AvailableGames", offset = 0 },
-            new InjectionSite() { hook = HOOK_ID.Get_Save_Directory, method = "GameData.ToPath", offset = 0 },
             new InjectionSite() { hook = HOOK_ID.Pre_Save_Game, method = "GameData.Save", offset = 0 },
             new InjectionSite() { hook = HOOK_ID.Pre_Load_Game, method = "GameData.Load", offset = 0 },
+            new InjectionSite() { hook = HOOK_ID.Get_Available_Saves, method = "GameData.AvailableGames", offset = 0 },
+            new InjectionSite() { hook = HOOK_ID.Get_Save_Directory, method = "GameData.ToPath", offset = 0 },
             new InjectionSite() { hook = HOOK_ID.Player_CanGetUpgrade, method = "PlayerState.CanGetUpgrade", offset=-1 },
             new InjectionSite() { hook = HOOK_ID.Player_ApplyUpgrade, method="PlayerState.ApplyUpgrade", offset=-1 },
             new InjectionSite() { hook = HOOK_ID.Player_Damaged, method = "PlayerState.Damage" },
@@ -36,9 +36,9 @@ namespace SR_PluginLoader
             new InjectionSite() { hook = HOOK_ID.VacPak_Think, method = "WeaponVacuum.Update" },
             new InjectionSite() { hook = HOOK_ID.PreEntitySpawn, method = "DirectedActorSpawner.Spawn" },
             new InjectionSite() { hook = HOOK_ID.EntitySpawner_Init, method = "DirectedActorSpawner.Start" },
-            new InjectionSite() { hook = HOOK_ID.EconomyInit, method = "EconomyDirector.InitForLevel" },
             new InjectionSite() { hook = HOOK_ID.Player_LoseEnergy, method = "PlayerState.SpendEnergy" },
             new InjectionSite() { hook = HOOK_ID.Player_SetEnergy, method = "PlayerState.SetEnergy" },
+            new InjectionSite() { hook = HOOK_ID.EconomyInit, method = "EconomyDirector.InitForLevel", offset=-1 },
             new InjectionSite() { hook = HOOK_ID.CellDirector_Pre_Update, method = "CellDirector.Update", offset = 0 },
             new InjectionSite() { hook = HOOK_ID.CellDirector_Post_Update, method = "CellDirector.Update", offset = -1 },
         };

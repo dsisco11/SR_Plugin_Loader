@@ -50,7 +50,6 @@ namespace SR_PluginLoader
 
         public void Awake()
         {
-            this.setupEvents();
             this.Clear();
         }
 
@@ -65,7 +64,6 @@ namespace SR_PluginLoader
             this.new_count++;
             this.lines.Add(str);
 
-            this.needs_layout = true;
             this.console_lines.text = String.Join("\n", this.lines.ToArray());
             string msg = String.Format("{0} new log{1}", this.new_count, this.new_count>1 ? "s" : "");
             alert_content.text = msg;
@@ -76,6 +74,8 @@ namespace SR_PluginLoader
 
             alert_sub_txtSz = DebugHUD_Renderer.subtext_style.CalcSize(alert_sub_content);
             alert_sub_txtPos = new Rect(alert_txtPos.xMin, alert_txtPos.yMax+3f, alert_sub_txtSz.x, alert_sub_txtSz.y);
+
+            this.needs_layout = true;
         }
 
         public void Add_Tally(string str, int cnt=1)
@@ -118,6 +118,11 @@ namespace SR_PluginLoader
             skin.verticalScrollbarThumb.fixedWidth = scrollbar_width;
             Utility.Set_BG_Color(skin.verticalScrollbarThumb.normal, new Color32(80, 80, 80, 255));
 
+            skin.horizontalScrollbar = null;
+            skin.horizontalScrollbarLeftButton = null;
+            skin.horizontalScrollbarRightButton = null;
+            skin.horizontalScrollbarThumb = null;
+
 
             DebugHUD_Renderer.console_text_style.normal.textColor = Color.white;
             DebugHUD_Renderer.console_text_style.normal.textColor = Color.white;
@@ -141,21 +146,6 @@ namespace SR_PluginLoader
             }
         }
 
-        private void setupEvents()
-        {
-            // Add event handling
-            GameObject esObject = base.gameObject;
-            EventSystem esClass = esObject.AddComponent<EventSystem>();
-            esClass.sendNavigationEvents = true;
-            esClass.pixelDragThreshold = 5;
-
-            StandaloneInputModule stdInput = esObject.AddComponent<StandaloneInputModule>();
-            stdInput.horizontalAxis = "Horizontal";
-            stdInput.verticalAxis = "Vertical";
-
-            //esObject.AddComponent<TouchInputModule>();
-        }
-
 
         private void doLayout()
         {
@@ -167,9 +157,10 @@ namespace SR_PluginLoader
             console_text_area = new Rect(5f, offsetH, PANEL_WIDTH, (Screen.height - offsetH));
 
             float console_width = (PANEL_WIDTH + scrollbar_width);//lest I ever change the width and neglect to also change the below text height calculation's width.
-            console_inner_area = new Rect(0f, 0f, console_width, console_text_style.CalcHeight(console_lines, console_width));
-            console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width - scrollbar_width - 2f, console_inner_area.height);
-            console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, console_text_area.height);
+            float text_height = console_text_style.CalcHeight(console_lines, console_width);
+            console_inner_area = new Rect(0f, 0f, console_width, Screen.height);
+            console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width - scrollbar_width - 2f, text_height);
+            console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, Screen.height);
         }
         /// <summary>
         /// Uses all of the system mouse movement, hover, and input events so we can prevent all controls under this one from getting them.
@@ -245,7 +236,8 @@ namespace SR_PluginLoader
                 // draw the debug console text
                 console_scroll = GUI.BeginScrollView(console_text_area, console_scroll, console_inner_area, false, false, skin.horizontalScrollbar, skin.horizontalScrollbar);
                     console_text_style.Draw(console_inner_text_area, console_lines, id);
-                    GUI.VerticalScrollbar(console_scrollbar_area, console_scroll.y, console_text_area.height, 0f, console_text_area.height, skin.verticalScrollbar);
+                    GUI.VerticalScrollbar(console_scrollbar_area, console_scroll.y, console_inner_text_area.height, 0f, console_inner_text_area.height, skin.verticalScrollbar);
+                //DebugHud.Log("{0} {1} {2}", console_inner_area.height, console_inner_text_area.height, console_scrollbar_area.height);
                 GUI.EndScrollView(true);
 
                 GUI.depth = prev_depth;

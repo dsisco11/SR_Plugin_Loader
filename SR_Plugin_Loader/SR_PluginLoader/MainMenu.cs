@@ -20,27 +20,38 @@ namespace SR_PluginLoader
         public static PluginsDownloadPanel plugins_download_panel = null;
         private static bool _active = false;
         public static bool Active { get { return MainMenu._active; } }
+        private static GUIContent title_content = null;
 
         private static GUIStyle title_style = null;
         private static Color blue_clr = new Color(255f / 55f, 255f / 149f, 255f / 237f);//Blue color from our old Killstreaks.tf TTT server
 
 
-        public void Awake()
+        private void Awake()
         {
+            title_content = new GUIContent(Loader.NAME);
             this.TrySpawnPluginPanel();
+        }
+
+        private void Start()
+        {
+            this.TrySpawnPluginMenu();
         }
 
         private void Update()
         {
-            if(MainMenu.mainmenu == null)
+            if (Levels.isSpecial(Application.loadedLevelName))
             {
-                this.TrySpawnPluginMenu();
+                if (MainMenu.mainmenu == null)
+                {
+                    this.TrySpawnPluginMenu();
+                }
             }
         }
 
         private void OnLevelWasLoaded(int lvl)
         {
             MainMenu.mainmenu = null;
+            return;
 
             if(Levels.isSpecial(Application.loadedLevelName))
             {
@@ -63,7 +74,7 @@ namespace SR_PluginLoader
                     JSONNode data = JSON.Parse(update.text);
                     if(data != null && data["plugin_hash"] != null && data["plugin_version"] != null && data["plugin_download"] != null)
                     {
-                        if(plugin.Get_Version_Sha() != data["plugin_hash"] || plugin.data.VERSION.ToString() != data["plugin_version"])
+                        if(String.Compare(plugin.DLL_Hash, data["plugin_hash"])!=0 || String.Compare(plugin.data.VERSION.ToString(), data["plugin_version"])!=0)
                         {
                             WWW download = new WWW(data["plugin_download"]);
 
@@ -88,12 +99,12 @@ namespace SR_PluginLoader
 
             if(updates > 0)
             {
-                Loader.Add_Notice(new UI_Notification()
+                new UI_Notification()
                 {
                     msg = updates + " Plugins have been Updated.\nClick this box to restart!",
                     title = updates + " Plugins Updated",
                     onClick = delegate () { Loader.Restart_App(); }
-                });
+                };
             }
         }
 
@@ -101,7 +112,7 @@ namespace SR_PluginLoader
         {
             MainMenu.plugins_panel_root = new GameObject("PluginsPanel");
             MainMenu.plugins_panel = MainMenu.plugins_panel_root.AddComponent<PluginsPanel>();
-            MainMenu.plugins_download_panel = MainMenu.plugins_panel_root.AddComponent<PluginsDownloadPanel>();
+            //MainMenu.plugins_download_panel = MainMenu.plugins_panel_root.AddComponent<PluginsDownloadPanel>();
             UnityEngine.Object.DontDestroyOnLoad(MainMenu.plugins_panel_root);
         }
 
@@ -169,10 +180,6 @@ namespace SR_PluginLoader
             if (MainMenu.mainmenu == null) return;
 
             MainMenu.Render_Menu_Splash();
-
-            if (MainMenu.Active)
-            {
-            }
         }
 
         private static void Render_Menu_Splash()
@@ -187,10 +194,9 @@ namespace SR_PluginLoader
                 MainMenu.title_style.padding = new RectOffset(3, 3, 3, 3);
                 MainMenu.title_style.normal.background = null;
             }
-
-            string title = Loader.NAME;
+            
             float hw = (Screen.width / 2f);
-            var txtSZ = MainMenu.title_style.CalcSize(new GUIContent(title));
+            var txtSZ = MainMenu.title_style.CalcSize(title_content);
             float X = 5f;// (hw - (txtSZ.x / 2f));
             //float Y = (Screen.height - 95f);
             float Y = (Screen.height - 25f);
@@ -199,14 +205,7 @@ namespace SR_PluginLoader
             float pad2 = (pad * 2.0f);
             Rect pos = new Rect(X, Y, 300f, 25f);
 
-            //GUI.skin.label.normal.textColor = this.blue_clr;
-            //GUI.Box(new Rect(pos.x - pad, pos.y - pad, pos.width + pad2, pos.height + pad2), "");
-            //Color prev_clr = GUI.color;
-            //GUI.color = this.blue_clr;
-            //GUI.contentColor = this.blue_clr;
-            GUI.Label(pos, title, MainMenu.title_style);
-            //GUI.color = prev_clr;
-            //GUI.contentColor = Color.white;
+            GUI.Label(pos, title_content, MainMenu.title_style);
         }
     }
 }

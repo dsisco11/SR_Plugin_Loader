@@ -40,6 +40,11 @@ namespace SR_PluginLoader
         public const float notification_height = 30f;
 
 
+        public UI_Notification()
+        {
+            Notice_Manager.Instance.Add_Notice(this);
+        }
+
         public void Set_Width(float w)
         {
             area.size = new Vector2(w, area.size.y);
@@ -172,7 +177,6 @@ namespace SR_PluginLoader
 
             float max_msg_width = (notification_width - (title_pos.x+2f));
             float msg_height = msg_style.CalcHeight(new GUIContent(this.msg), max_msg_width);
-            DebugHud.Log("Notice MSG height: {0}", msg_height);
 
             msg_pos = new Rect(new Vector2(title_pos.xMin, title_pos.yMax+2f), new Vector2(max_msg_width, msg_height));
             /*

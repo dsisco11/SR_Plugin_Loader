@@ -31,7 +31,7 @@ namespace SR_PluginLoader
 
         public static string[] INCLUDE_DIRS = new string[] {  };
         public static FileStream config_stream = null;
-        private static bool CONFIG_LOCK = false;
+        private static bool IN_LOADING_PHASE = false;
         private static WebClient web = new WebClient();
         private static string update_helper_file = null;
 
@@ -51,15 +51,16 @@ namespace SR_PluginLoader
                 DebugHud.Init();
                 Loader.menu = Loader.root.AddComponent<MainMenu>();
 
+                IN_LOADING_PHASE = true;
                 Setup_Update_Helper();
                 Setup_Plugin_Dir();
                 Load_Assets();
                 Check_For_Updates();
 
                 Setup_Assembly_Resolver();
-                Assemble_Plugin_List();
+                Assemble_Plugin_List(); 
                 Load_Config();
-                //Update_Plugins_UI();
+                IN_LOADING_PHASE = false;
             }
             catch(Exception ex)
             {
@@ -74,11 +75,6 @@ namespace SR_PluginLoader
 
             //Let's keep the users folder as uncluttered as possible eh?
             if (File.Exists(update_helper_file)) File.Delete(update_helper_file);
-        }
-
-        public static void Update_Plugins_UI()
-        {
-            MainMenu.plugins_panel.Update_Plugins_UI();
         }
 
         public static void Load_Assets()
@@ -146,7 +142,6 @@ namespace SR_PluginLoader
         
         public static void Load_Enabled_Plugins(string[] list)
         {
-            CONFIG_LOCK = true;
             foreach (var name in list)
             {
                 Plugin p = null;
@@ -162,7 +157,6 @@ namespace SR_PluginLoader
                     }
                 }
             }
-            CONFIG_LOCK = false;
         }
 
         public static void Load_Config()
@@ -218,7 +212,8 @@ namespace SR_PluginLoader
         
         public static void Save_Config()
         {
-            if (CONFIG_LOCK) return;
+            if (IN_LOADING_PHASE==true) return;
+
             try
             {
                 if (config_stream == null)
@@ -269,11 +264,6 @@ namespace SR_PluginLoader
             Loader.Save_Config();
         }
 
-        public static void Add_Notice(UI_Notification notice)
-        {
-            MainMenu.plugins_panel.Add_Notice(notice);
-        }
-
 
         public static void Setup_Assembly_Resolver()
         {
@@ -313,12 +303,12 @@ namespace SR_PluginLoader
             has_updates = Do_Update_Check();
             if(has_updates == true)
             {
-                Add_Notice(new UI_Notification()
+                new UI_Notification()
                 {
                     msg = "A new version of the plugin loader is available\nClick this box to update!",
                     title = "Update Available",
-                    onClick = delegate(){ Loader.Auto_Update(); }
-                });
+                    onClick = delegate () { Loader.Auto_Update(); }
+                };
             }
         }
 
@@ -342,66 +332,25 @@ namespace SR_PluginLoader
         /// </summary>
         private static bool Do_Update_Check()
         {
-            // Time to check with GitHub and see if there is a newer version of the plugin loader out!
-            try
+            var assembly_status = Git_Updater.instance.Get_Update_Status(Assembly.GetExecutingAssembly().Location, "Installer/SR_PluginLoader.dll");
+            if (assembly_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
             {
-                // Add a useragent string so GitHub doesnt return 403 and also so they can have a chat if they like.
-                web.Headers.Add("user-agent", "SR_Plugin_Loader on GitHub");
-                // Add a handler for SSL certs because mono doesnt have any trusted ones by default
-                ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
-
-                // Fetch repo information
-                string url = "https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1";
-                string jsonStr = web.DownloadString(url);
-                if (jsonStr == null || jsonStr.Length <= 0)
-                {
-                    DebugHud.Log("[AutoUpdater] Got a NULL or empty response from server!");
-                    return false;
-                }
-
-                // Parse the json response from GitHub
-                var git = SimpleJSON.JSON.Parse(jsonStr);
-                var tree = git["tree"].AsArray;
-
-                // Find the plugin loaders DLL installation file
-                foreach (JSONNode file in tree)
-                {
-                    if(String.Compare(file["path"], "Installer/SR_PluginLoader.dll") == 0)
-                    {
-                        // Compare the SHA1 hash for the dll on GitHub to the hash for the one currently installed
-                        string nSHA = file["sha"];
-                        string cSHA = Get_Current_Version_Sha();
-
-                        if (String.Compare(nSHA, cSHA) != 0)
-                        {
-                            // ok they don't match, now let's just make double sure that it isn't because we are using an unreleased developer version
-                            // First find the url for the file on GitHub
-                            string tmpurl = file["url"];
-                            // now we want to replace it's hash with ours and check if it exists!
-                            tmpurl = tmpurl.Replace(nSHA, cSHA);
-                            string jStr = "";
-                            
-                            // Try and download the file info for the currently installed loaders sha1 hash
-                            try
-                            {
-                                jStr = web.DownloadString(tmpurl);
-                            }
-                            catch
-                            {
-                                // A file for this hash does not exhist on the github repo. So this must be a Dev version.
-                                return false;
-                            }
-                            
-                            return true;
-                        }
-                    }
-                }
+                //the assembly is out of date!
+                DebugHud.Log("[AutoUpdate] The plugin loader is out of date!");
+                return true;
             }
-            catch(Exception ex)
+
+
+            string installer_path = String.Format("{0}\\SR_PluginLoader_Installer.exe", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+            var installer_status = Git_Updater.instance.Get_Update_Status(installer_path, "Installer/SR_PluginLoader_Installer.exe");
+            if (installer_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
             {
-                DebugHud.Log(ex);
+                //the installer is out of date!
+                DebugHud.Log("[AutoUpdate] The installer is out of date!");
+                return true;
             }
-            return false;//no update
+
+            return false;
         }
 
         public static Plugin GetPluginByHash(string hash)
@@ -414,21 +363,7 @@ namespace SR_PluginLoader
         /// <returns></returns>
         private static string Get_Current_Version_Sha()
         {
-            string file = Assembly.GetExecutingAssembly().Location;
-            var buf = File.ReadAllBytes(file);
-            string data = Encoding.ASCII.GetString(buf);
-            data = ("blob" + data.Length + "\0" + data);
-
-            System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
-            byte[] hash = sha1.ComputeHash( Encoding.ASCII.GetBytes(data));
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++)
-            {
-                sb.Append(hash[i].ToString("x2"));
-            }
-
-            return sb.ToString();
+            return Utility.Get_File_Sha1( Assembly.GetExecutingAssembly().Location );
         }
 
 

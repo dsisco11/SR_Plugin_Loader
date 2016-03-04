@@ -112,6 +112,7 @@ namespace SR_PluginLoader
             System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
 
             DebugHud.log_file.Write(bytes, 0, bytes.Length);
+            DebugHud.log_file.Flush();
         }
 
         private static void write_log(string format, params object[] args)

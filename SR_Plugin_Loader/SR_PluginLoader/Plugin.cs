@@ -15,6 +15,20 @@ namespace SR_PluginLoader
         private int _id = 0;
         public int id { get { return this._id; } }
         public string Hash { get { return Utility.SHA(String.Format("{0}.{1}", this.data.AUTHOR, this.data.NAME)); } }
+
+        /// <summary>
+        /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to other plugin dll's
+        /// </summary>
+        private string _cached_dll_hash = null;
+        public string DLL_Hash {
+            get
+            {
+                if (!File.Exists(file)) return null;
+                if (_cached_dll_hash == null) _cached_dll_hash = Utility.Get_File_Sha1(file);
+
+                return _cached_dll_hash;
+            }
+        }
         public bool IsInstalled { get { return (Loader.GetPluginByHash(Hash) != null); } }
 
 
@@ -117,50 +131,27 @@ namespace SR_PluginLoader
                 DebugHud.Log(ex);
             }
         }
-
-        /// <summary>
-        /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to the one the developer given
-        /// </summary>
-        /// <returns></returns>
-        public string Get_Version_Sha()
-        {
-            var buf = File.ReadAllBytes(file);
-            string data = Encoding.ASCII.GetString(buf);
-            data = ("blob" + data.Length + "\0" + data);
-
-            System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
-            byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data));
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++)
-            {
-                sb.Append(hash[i].ToString("x2"));
-            }
-
-            return sb.ToString();
-        }
+        
 
         private void Add_Error(string format, params object[] args)
         {
             string str = DebugHud.Format_Log(format, 1, args);
             this.errors.Add(str);
-            DebugHud.Log("[<b>{0}</b>] {1}", this.dll_name, str);
+            DebugHud.Log("[ <b>{0}</b> ] {1}", this.dll_name, str);
         }
 
         private void Add_Error(Exception ex)
         {
             string str = DebugHud.Format_Log(ex.Message, 1);
             this.errors.Add(str);
-            DebugHud.Log("[<b>{0}</b>] {1}", this.dll_name, str);
+            DebugHud.Log("[ <b>{0}</b> ] {1}", this.dll_name, str);
         }
 
         private bool Load_DLL()
         {
             try
             {
-                //DebugHud.Log("Load_Assembly()");
                 this.dll = this.load_assembly(this.dll != null);
-                //DebugHud.Log("Searching assembly...");
 
                 //find the static SR_Plugin class amongst however many namespaces this library has.
                 foreach (Type ty in dll.GetExportedTypes())
@@ -178,7 +169,6 @@ namespace SR_PluginLoader
                     this.Add_Error("Unable to locate a static 'SR_Plugin' class in the loaded library.");
                     return false;
                 }
-                //DebugHud.Log("Found plugin class.");
 
 
                 this.load_funct = this.pluginClass.GetMethod("Load", BindingFlags.Static | BindingFlags.Public);
@@ -304,30 +294,36 @@ namespace SR_PluginLoader
 
         public void Enable()
         {
-            if(this.has_dependency_issues == true)
+            this.enabled = false;//default it and if we successfully load THEN we can make it true.
+            if (this.has_dependency_issues == true)
             {
                 this.enabled = false;
                 return;
             }
 
-            this.enabled = true;
             try
             {
                 if (this.load_funct != null)
                 {
                     this.load_funct.Invoke(null, null);
+                    this.enabled = true;
                     Loader.Plugin_Status_Change(this, this.enabled);
                 }
             }
             catch(Exception ex)
             {
                 this.Add_Error(ex);
+                //let's try and unload the things it might have loaded
+                if (this.unload_funct != null)
+                {
+                    this.unload_funct.Invoke(null, null);
+                }
             }
         }
 
         public void Disable()
         {
-            this.enabled = false;
+            this.enabled = false;// Unloading doesnt follow the same rules as loading, the assume it's unloaded for the user's sake.
             try
             {
                 if (this.unload_funct != null)
