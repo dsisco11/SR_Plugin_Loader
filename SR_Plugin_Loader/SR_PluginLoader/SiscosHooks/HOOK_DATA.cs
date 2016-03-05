@@ -40,7 +40,7 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Vac_Can_Capture, method = "Vacuumable.canCapture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Vac_Capture, method = "Vacuumable.capture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, method = "WeaponVacuum.Update" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.PreEntitySpawn, method = "DirectedActorSpawner.Spawn" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Entity_Spawn, method = "DirectedActorSpawner.Spawn" },
             new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, method = "DirectedActorSpawner.Start" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_LoseEnergy, method = "PlayerState.SpendEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_SetEnergy, method = "PlayerState.SetEnergy" },
