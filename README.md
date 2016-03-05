@@ -26,6 +26,12 @@ If you would like to help support me then you can <a href="https://www.paypal.co
 # FAQ
 ### "An event I need isn't implemented yet!"
 File an issue on this project github page and I'll see what I can do about it.
+  
+### "My anti-virus thinks the installer is a virus!"  
+Good, it's doing it's job, and while my installer isn't really a virus it does change the code in some game files and that might certainly look like a virus to some AV's.  
+This issue isn't unique to my mod installer either, it's an issue with a lot of code changing mods because they alter your game files.  
+The truth is that there is no magical program which can tell you without a doubt if something is a virus and always be 100% correct. Sometimes they get things wrong and at this point you have to make your own decisions on what you trust.  If you choose to trust my installer then I thank you, but if you don't then nothing anyone can say will convince you. Just always be safe guys!  
+
 
 ## ScreenShot
 <img src="http://i.imgur.com/oXmJ1oc.jpg" />
