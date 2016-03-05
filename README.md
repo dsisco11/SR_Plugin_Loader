@@ -32,6 +32,9 @@ Good, it's doing it's job, and while my installer isn't really a virus it does c
 This issue isn't unique to my mod installer either, it's an issue with a lot of code changing mods because they alter your game files.  
 The truth is that there is no magical program which can tell you without a doubt if something is a virus and always be 100% correct. Sometimes they get things wrong and at this point you have to make your own decisions on what you trust.  If you choose to trust my installer then I thank you, but if you don't then nothing anyone can say will convince you. Just always be safe guys!  
 
+### "Why can't I see the code for your installer?"  
+Because it's my own proprietary creation and I have choosen to protect it.  
+If I open sourced it then it would be too easy for certain developers of other games who are very opposed to mods to alter their game in a way that might prevent it from working with that game in the future. Needless to say im very very opposed to being told how I can and cant play my own games and so should you be.  
 
 ## ScreenShot
 <img src="http://i.imgur.com/oXmJ1oc.jpg" />
