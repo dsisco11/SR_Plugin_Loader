@@ -8,8 +8,9 @@ namespace SR_PluginLoader
     /// </summary>
     /// <param name="sender">the triggering functions 'this' instance.</param>
     /// <param name="args">reference to the triggering functions args list.</param>
+    /// <param name="return_value">reference to the value currently set to be returned by the function that fired this event.</param>
     /// <returns></returns>
-    public delegate Sisco_Return Sisco_Hook_Delegate(ref object sender, ref object[] args);
+    public delegate Sisco_Return Sisco_Hook_Delegate(ref object sender, ref object[] args, ref object return_value);
 
     /// <summary>
     /// yeah I named it after myself, wanna fight about it? Tough guy?!?
@@ -18,8 +19,9 @@ namespace SR_PluginLoader
     {
         private static Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>> events = new Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>>();
         private static Dictionary<object, List<Sisco_Hook_Ref>> tracker = new Dictionary<object, List<Sisco_Hook_Ref>>();
+
         
-        public static _hook_result call(HOOK_ID hook, ref object sender, params object[] args)
+        private static _hook_result call(HOOK_ID hook, object sender, ref object returnValue, params object[] args)
         {
             _hook_result result = new _hook_result(false, args);
             try
@@ -33,15 +35,9 @@ namespace SR_PluginLoader
                 {
                     try
                     {
-                        Sisco_Return ret = act(ref sender, ref result.args);
+                        Sisco_Return ret = act(ref sender, ref result.args, ref returnValue);
                         if (ret != null)
                         {
-                            if (ret.has_custom_return == true)
-                            {
-                                result.has_custom_return = true;
-                                result.return_value = ret.return_value;
-                            }
-
                             if (ret.abort)
                             {
                                 break;//cancel all other events
@@ -202,21 +198,6 @@ namespace SR_PluginLoader
         {
             string tag = "[SiscosHooks]";
             SR_PluginLoader.DebugHud.Log(String.Format("{0} {1}", tag, format), args);
-        }
-
-        public static _hook_result Example()
-        {
-            try
-            {
-                object nRef = null;
-                var result = call(HOOK_ID.Pre_Load_Game, ref nRef, null);
-                return result;
-            }
-            catch(Exception ex)
-            {
-                DebugHud.Log(ex);
-            }
-            return new _hook_result() { };
         }
     }
 }

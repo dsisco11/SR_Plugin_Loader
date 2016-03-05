@@ -9,38 +9,42 @@ namespace SR_PluginLoader
     I WILL NOT BE DOCUMENTING THIS AREA
     */
 
-    public class InjectionSite
+    public class Hook_Dbg_Data
     {
         public HOOK_ID hook = HOOK_ID.NONE;
         public int id { get { return (int)hook; } set { this.hook = (HOOK_ID)value; } }
         public string method = null;
         public int offset = 0;
 
-        public InjectionSite()
+        public Hook_Dbg_Data()
         {
         }
     }
 
-    public static class Injects
+
+    /// <summary>
+    /// Contains a list of all hooks and their method translations for debugging purposes
+    /// </summary>
+    public static class HOOKS
     {
-        public static InjectionSite[] HooksList = new InjectionSite[] {
-            new InjectionSite() { hook = HOOK_ID.Pre_Save_Game, method = "GameData.Save", offset = 0 },
-            new InjectionSite() { hook = HOOK_ID.Pre_Load_Game, method = "GameData.Load", offset = 0 },
-            new InjectionSite() { hook = HOOK_ID.Get_Available_Saves, method = "GameData.AvailableGames", offset = 0 },
-            new InjectionSite() { hook = HOOK_ID.Get_Save_Directory, method = "GameData.ToPath", offset = 0 },
-            new InjectionSite() { hook = HOOK_ID.Player_CanGetUpgrade, method = "PlayerState.CanGetUpgrade", offset=-1 },
-            new InjectionSite() { hook = HOOK_ID.Player_ApplyUpgrade, method="PlayerState.ApplyUpgrade", offset=-1 },
-            new InjectionSite() { hook = HOOK_ID.Player_Damaged, method = "PlayerState.Damage" },
-            new InjectionSite() { hook = HOOK_ID.Vac_Can_Capture, method = "Vacuumable.canCapture" },
-            new InjectionSite() { hook = HOOK_ID.Vac_Capture, method = "Vacuumable.capture" },
-            new InjectionSite() { hook = HOOK_ID.VacPak_Think, method = "WeaponVacuum.Update" },
-            new InjectionSite() { hook = HOOK_ID.PreEntitySpawn, method = "DirectedActorSpawner.Spawn" },
-            new InjectionSite() { hook = HOOK_ID.EntitySpawner_Init, method = "DirectedActorSpawner.Start" },
-            new InjectionSite() { hook = HOOK_ID.Player_LoseEnergy, method = "PlayerState.SpendEnergy" },
-            new InjectionSite() { hook = HOOK_ID.Player_SetEnergy, method = "PlayerState.SetEnergy" },
-            new InjectionSite() { hook = HOOK_ID.EconomyInit, method = "EconomyDirector.InitForLevel", offset=-1 },
-            new InjectionSite() { hook = HOOK_ID.CellDirector_Pre_Update, method = "CellDirector.Update", offset = 0 },
-            new InjectionSite() { hook = HOOK_ID.CellDirector_Post_Update, method = "CellDirector.Update", offset = -1 },
+        public static Hook_Dbg_Data[] HooksList = new Hook_Dbg_Data[] {
+            new Hook_Dbg_Data() { hook = HOOK_ID.CellDirector_Pre_Update, method = "CellDirector.Update", offset = 0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.CellDirector_Post_Update, method = "CellDirector.Update", offset = -1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_CanGetUpgrade, method = "PlayerState.CanGetUpgrade", offset=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Save_Game, method = "GameData.Save", offset = 0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Load_Game, method = "GameData.Load", offset = 0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Get_Available_Saves, method = "GameData.AvailableGames", offset = 0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Get_Save_Directory, method = "GameData.ToPath", offset = 0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_ApplyUpgrade, method="PlayerState.ApplyUpgrade", offset=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_Damaged, method = "PlayerState.Damage" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Vac_Can_Capture, method = "Vacuumable.canCapture" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Vac_Capture, method = "Vacuumable.capture" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, method = "WeaponVacuum.Update" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.PreEntitySpawn, method = "DirectedActorSpawner.Spawn" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, method = "DirectedActorSpawner.Start" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_LoseEnergy, method = "PlayerState.SpendEnergy" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_SetEnergy, method = "PlayerState.SetEnergy" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.EconomyInit, method = "EconomyDirector.InitForLevel", offset=-1 },
         };
     }
 }

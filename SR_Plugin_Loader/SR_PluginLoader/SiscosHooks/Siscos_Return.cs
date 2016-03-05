@@ -13,11 +13,11 @@
         /// <summary>
         /// a value to return from the calling function (make sure it's the correct Type or you might crash the game)
         /// </summary>
-        public object return_value = null;
+        //public object return_value = null;
         /// <summary>
         /// Set this to TRUE if you want to make the calling function to return a specific value
         /// </summary>
-        public bool has_custom_return = false;
+        //public bool has_custom_return = false;
 
 
 
