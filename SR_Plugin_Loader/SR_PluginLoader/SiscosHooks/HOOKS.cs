@@ -7,7 +7,7 @@
     {
         NONE = 0,
         VacPak_Think,
-        PreEntitySpawn,
+        Pre_Entity_Spawn,
         EntitySpawner_Init,
         EconomyInit,
         Player_ApplyUpgrade,
