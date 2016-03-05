@@ -36,5 +36,6 @@ The truth is that there is no magical program which can tell you without a doubt
 Because it's my own proprietary creation and I have choosen to protect it.  
 If I open sourced it then it would be too easy for certain developers of other games who are very opposed to mods to alter their game in a way that might prevent it from working with that game in the future. Needless to say im very very opposed to being told how I can and cant play my own games and so should you be.  
 
+
 ## ScreenShot
 <img src="http://i.imgur.com/oXmJ1oc.jpg" />
