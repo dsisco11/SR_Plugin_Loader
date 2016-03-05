@@ -1,0 +1,5 @@
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\ExtraControls\ExtraControls\bin\Debug\ExtraControls.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\ExtraControls\ExtraControls\bin\Debug\ExtraControls.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\ExtraControls\ExtraControls\obj\Debug\ExtraControls.csprojResolveAssemblyReference.cache
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\ExtraControls\ExtraControls\obj\Debug\ExtraControls.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\ExtraControls\ExtraControls\obj\Debug\ExtraControls.pdb

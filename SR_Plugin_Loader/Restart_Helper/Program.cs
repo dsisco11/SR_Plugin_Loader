@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 
 namespace Restart_Helper
 {
@@ -24,6 +26,9 @@ namespace Restart_Helper
             proc.Kill();
             Console.WriteLine("Waiting for exit.");
             proc.WaitForExit();
+            Console.WriteLine("Reinstalling the plugin loader");
+            var installer = Process.Start(String.Format("{0}/SR_PluginLoader_Installer.exe", Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location) ));
+            installer.WaitForExit();
             Console.WriteLine("Restarting");
 
             proc.StartInfo.FileName = target_exe;

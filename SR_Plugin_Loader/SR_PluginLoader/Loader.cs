@@ -34,6 +34,7 @@ namespace SR_PluginLoader
         private static bool IN_LOADING_PHASE = false;
         private static WebClient web = new WebClient();
         private static string update_helper_file = null;
+        private static List<string> available_updates= new List<string>();// This isn't for plugin updates (yet)
 
 
         private static MainMenu menu = null;
@@ -314,15 +315,19 @@ namespace SR_PluginLoader
 
         public static void Auto_Update()
         {
-            DebugHud.Log("Updating plugin loader...");
-            byte[] buf = web.DownloadData("https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer/SR_PluginLoader.dll");
-            string file = Assembly.GetExecutingAssembly().Location;
-            string new_file = String.Format("{0}.tmp", file);
-            string old_file = String.Format("{0}.old", file);
-            
-            File.WriteAllBytes(new_file, buf);
-            if (File.Exists(old_file)) File.Delete(old_file);
-            File.Replace(new_file, file, old_file);
+            foreach(var fn in available_updates)
+            {
+                DebugHud.Log("Updating plugin loader...");
+                string url = String.Format("https://raw.github.com/dsisco11/SR_Plugin_Loader/master/{0}", fn);
+                byte[] buf = web.DownloadData(url);
+                string file = Assembly.GetExecutingAssembly().Location;
+                string new_file = String.Format("{0}.tmp", file);
+                string old_file = String.Format("{0}.old", file);
+
+                File.WriteAllBytes(new_file, buf);
+                if (File.Exists(old_file)) File.Delete(old_file);
+                File.Replace(new_file, file, old_file);
+            }
             // We have to restart the game for this to take effect.
             Restart_App();
         }
@@ -332,9 +337,11 @@ namespace SR_PluginLoader
         /// </summary>
         private static bool Do_Update_Check()
         {
-            var assembly_status = Git_Updater.instance.Get_Update_Status(Assembly.GetExecutingAssembly().Location, "Installer/SR_PluginLoader.dll");
+            string assembly_file = "Installer/SR_PluginLoader.dll";
+            var assembly_status = Git_Updater.instance.Get_Update_Status(Assembly.GetExecutingAssembly().Location, assembly_file);
             if (assembly_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
             {
+                available_updates.Add(assembly_file);
                 //the assembly is out of date!
                 DebugHud.Log("[AutoUpdate] The plugin loader is out of date!");
                 return true;
@@ -342,9 +349,11 @@ namespace SR_PluginLoader
 
 
             string installer_path = String.Format("{0}\\SR_PluginLoader_Installer.exe", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            var installer_status = Git_Updater.instance.Get_Update_Status(installer_path, "Installer/SR_PluginLoader_Installer.exe");
+            string installer_file = "Installer/SR_PluginLoader_Installer.exe";
+            var installer_status = Git_Updater.instance.Get_Update_Status(installer_path, installer_file);
             if (installer_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
             {
+                available_updates.Add(installer_file);
                 //the installer is out of date!
                 DebugHud.Log("[AutoUpdate] The installer is out of date!");
                 return true;

@@ -38,12 +38,7 @@ namespace SR_PluginLoader
                         Sisco_Return ret = act(ref sender, ref result.args, ref returnValue);
                         if (ret != null)
                         {
-                            if (ret.early_return)
-                            {
-                                break;//cancel all other events
-                            }
-
-                            if (ret.handled == true) break;
+                            if (ret.handled == true) break;//cancel all other events
                         }
                     }
                     catch(Exception ex)
@@ -197,7 +192,14 @@ namespace SR_PluginLoader
         private static void Log(string format, params object[] args)
         {
             string tag = "[SiscosHooks]";
-            SR_PluginLoader.DebugHud.Log(String.Format("{0} {1}", tag, format), args);
+            DebugHud.Log(String.Format("{0} {1}", tag, format), args);
+        }
+
+        private static void Log(Exception ex)
+        {
+            string tag = "[SiscosHooks]";
+            string str = DebugHud.Format_Log(ex, 1);
+            DebugHud.Log("{0} {1}", tag, str);
         }
     }
 }
