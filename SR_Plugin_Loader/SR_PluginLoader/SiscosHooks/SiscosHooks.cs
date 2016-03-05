@@ -21,7 +21,7 @@ namespace SR_PluginLoader
         private static Dictionary<object, List<Sisco_Hook_Ref>> tracker = new Dictionary<object, List<Sisco_Hook_Ref>>();
 
         
-        private static _hook_result call(HOOK_ID hook, object sender, ref object returnValue, params object[] args)
+        public static _hook_result call(HOOK_ID hook, object sender, ref object returnValue, params object[] args)
         {
             _hook_result result = new _hook_result(false, args);
             try
