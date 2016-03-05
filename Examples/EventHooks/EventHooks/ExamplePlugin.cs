@@ -13,6 +13,7 @@ namespace EventHooks
             // seperating hooks into groups would allow us to unregister an entire group of hooks with a single function call (If we needed to)!
             SiscosHooks.register(this.gameObject, HOOK_ID.Player_Damaged, this.onPlayer_Damaged);
             SiscosHooks.register(this.gameObject, HOOK_ID.Get_Available_Saves, this.onGet_Available_Saves);
+            SiscosHooks.register(this.gameObject, HOOK_ID.Vac_Can_Capture, this.onVac_Can_Capture);
         }
         
         // Make the player invinceable
@@ -47,6 +48,23 @@ namespace EventHooks
 
             // Since this function isnt a POST hook in order for our value to actually be returned we need to tell the hooked function to return early.
             return new Sisco_Return() { early_return = true };
+        }
+
+        // Make it so slimes cant be sucked up if you're holding the ALT key.
+        private Sisco_Return onVac_Can_Capture(ref object sender, ref object[] args, ref object return_value)
+        {
+            if (!Input.GetKey(KeyCode.LeftAlt) && !Input.GetKey(KeyCode.RightAlt)) return null;
+            Vacuumable vac = (Vacuumable)sender;
+            SlimeFaceAnimator anim = vac.GetComponent<SlimeFaceAnimator>();
+            if (anim != null)
+            {
+                // Here we are telling the hook to make the root function which fired it, to return FALSE
+                // in this case returning false from said function tells the game that this object cannot be vacuumed up!
+                return_value = (object)false;
+                return new Sisco_Return() { early_return = true };
+            }
+
+            return null;
         }
 
     }

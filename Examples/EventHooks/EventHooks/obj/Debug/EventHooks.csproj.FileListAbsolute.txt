@@ -1,0 +1,5 @@
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\EventHooks\EventHooks\bin\Debug\EventHooks.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\EventHooks\EventHooks\bin\Debug\EventHooks.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\EventHooks\EventHooks\obj\Debug\EventHooks.csprojResolveAssemblyReference.cache
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\EventHooks\EventHooks\obj\Debug\EventHooks.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\Examples\EventHooks\EventHooks\obj\Debug\EventHooks.pdb
