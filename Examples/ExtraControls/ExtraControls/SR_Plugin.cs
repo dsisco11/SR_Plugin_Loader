@@ -19,27 +19,20 @@ namespace ExtraControls
         public static Plugin_Data PLUGIN_INFO = new Plugin_Data()
         {
 			AUTHOR = "Sisco++",
-            NAME = "ExtraControls",
+            NAME = "Extra Controls",
             DESCRIPTION = @"
-- Holding the ALT key will make the VacPak's suction ignore slimes.
 - Changes plort collectors so when using the vac-pak on them they will immediately suck out any loose plorts within their corral.
             ",
             VERSION = new Plugin_Version(0, 1)
         };
-        private static GameObject root;
 
-        public static void Load()
+        public static void Load(GameObject gmObj)
         {
-            SR_Plugin.root = new GameObject("ExtraControlsMod");
-            SR_Plugin.root.AddComponent<ExtraControls>();
-
-            UnityEngine.Object.DontDestroyOnLoad(SR_Plugin.root);
-            SR_Plugin.root.GetComponent<ExtraControls>().init();
+            gmObj.AddComponent<ExtraControls>();
         }
 
-        public static void Unload()
+        public static void Unload(GameObject gmObj)
         {
-            UnityEngine.Object.Destroy(SR_Plugin.root);
         }
 
     }
