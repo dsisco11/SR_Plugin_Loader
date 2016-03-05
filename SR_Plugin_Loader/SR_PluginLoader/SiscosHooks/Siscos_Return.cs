@@ -3,11 +3,11 @@
     public class Sisco_Return
     {
         /// <summary>
-        ///  should we abort the event? (if TRUE then the calling function, eg: weapon.update(), will return early and not perform the rest of it's logic. In addition no other event handlers registered for it will be called this time.)
+        ///  should the hooked function return immediately after calling it's hooks?
         /// </summary>
-        public bool abort = false;
+        public bool early_return = false;
         /// <summary>
-        /// should we stop calling other event handlers in the list?
+        /// should we STOP calling other event handlers in the list (Use this if you need to prevent other plugins from interfering with yours)?
         /// </summary>
         public bool handled = false;
         /// <summary>
@@ -23,7 +23,7 @@
 
         public Sisco_Return(bool custom_return = false, object return_value = null, bool _abort = false, bool _handled = false)
         {
-            this.abort = _abort;
+            this.early_return = _abort;
             this.handled = _handled;
         }
     }

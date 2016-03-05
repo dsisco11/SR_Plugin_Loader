@@ -31,6 +31,12 @@ namespace SR_PluginLoader
         }
         public bool IsInstalled { get { return (Loader.GetPluginByHash(Hash) != null); } }
 
+        /// <summary>
+        /// The game object assigned to manage this plugin.
+        /// </summary>
+        private GameObject root = null;
+        private string Unique_GameObject_Name { get { return String.Format("{0}.{1}", this.data.AUTHOR, this.data.NAME); } }
+
 
         public bool enabled = false;
         /// <summary>
@@ -301,12 +307,15 @@ namespace SR_PluginLoader
                 return;
             }
 
+            GameObject gmObj = new GameObject(this.Unique_GameObject_Name);
+            UnityEngine.GameObject.DontDestroyOnLoad(gmObj);
             try
             {
                 if (this.load_funct != null)
                 {
-                    this.load_funct.Invoke(null, null);
+                    this.load_funct.Invoke(null, new object[] { gmObj });
                     this.enabled = true;
+                    this.root = gmObj;
                     Loader.Plugin_Status_Change(this, this.enabled);
                 }
             }
@@ -316,24 +325,30 @@ namespace SR_PluginLoader
                 //let's try and unload the things it might have loaded
                 if (this.unload_funct != null)
                 {
-                    this.unload_funct.Invoke(null, null);
+                    this.unload_funct.Invoke(null, new object[] { gmObj });
                 }
+                UnityEngine.GameObject.Destroy(gmObj);
             }
         }
 
         public void Disable()
         {
-            this.enabled = false;// Unloading doesnt follow the same rules as loading, the assume it's unloaded for the user's sake.
+            this.enabled = false;// Unloading doesn't follow the same rules as loading, the assume it's unloaded for the user's sake.
             try
             {
                 if (this.unload_funct != null)
                 {
-                    this.unload_funct.Invoke(null, null);
+                    this.unload_funct.Invoke(null, new object[] { this.root });
                 }
             }
             catch (Exception ex)
             {
                 this.Add_Error(ex);
+            }
+            finally
+            {
+                if (this.root != null) UnityEngine.GameObject.Destroy(this.root);
+                this.root = null;
             }
         }
 

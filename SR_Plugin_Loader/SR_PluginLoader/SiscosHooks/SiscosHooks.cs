@@ -38,7 +38,7 @@ namespace SR_PluginLoader
                         Sisco_Return ret = act(ref sender, ref result.args, ref returnValue);
                         if (ret != null)
                         {
-                            if (ret.abort)
+                            if (ret.early_return)
                             {
                                 break;//cancel all other events
                             }
