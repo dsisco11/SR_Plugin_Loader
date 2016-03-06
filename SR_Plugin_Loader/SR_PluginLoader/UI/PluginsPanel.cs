@@ -14,13 +14,13 @@ namespace SR_PluginLoader
         private Vector2 scroll = Vector2.zero;
         private GUISkin skin = null;
         private GUIStyle title_style = null, screen_darkener = null, shadow_style = null, highlight_style = null, plugin_list_style = null;
-        private GUIStyle plugin_title_text = null, plugin_vers_text = null, plugin_desc_text = null;
+        private GUIStyle plugin_title_text = null, plugin_author_text=null, plugin_vers_text = null, plugin_desc_text = null;
         private Plugin selected = null;
         private List<PluginSelector> plugin_selectors = new List<PluginSelector>();
-        private GUIContent pl_title = new GUIContent(), pl_desc = new GUIContent(), pl_vers = new GUIContent();
+        private GUIContent pl_title = new GUIContent(), pl_author = new GUIContent(), pl_desc = new GUIContent(), pl_vers = new GUIContent();
         private Texture pl_thumb = null;
         private Rect screen_area, area, window_area, tb_area, tb_shadow_area, close_btn_area, install_btn_area, left_shadow_area, right_shadow_area, bottom_shadow_area;
-        private Rect pl_title_area, pl_desc_area, pl_vers_area, pl_thumb_area, pl_toggle_area;
+        private Rect pl_title_area, pl_auth_area, pl_desc_area, pl_vers_area, pl_thumb_area, pl_toggle_area;
         private Vector2 selected_plugin_info_scroll = Vector2.zero, plugin_list_scroll = Vector2.zero;
         private Rect selected_plugin_info_area, selected_plugin_info_inner_area;
         private Rect plugin_list_area, plugin_list_inner_area;
@@ -101,6 +101,13 @@ namespace SR_PluginLoader
             plugin_vers_text.fontSize = 12;
             plugin_vers_text.fontStyle = FontStyle.Bold;
             plugin_vers_text.normal.textColor = new Color(0.7f, 0.7f, 0.7f, 0.8f);
+
+            plugin_author_text = new GUIStyle();
+            plugin_author_text.wordWrap = true;
+            plugin_author_text.richText = true;
+            plugin_author_text.fontSize = 14;
+            plugin_author_text.fontStyle = FontStyle.Bold;
+            plugin_author_text.normal.textColor = new Color32(240, 90, 90, 200);
 
 
             plugin_desc_text = new GUIStyle();
@@ -206,7 +213,8 @@ namespace SR_PluginLoader
 
             plugin_title_text.Draw(this.pl_title_area, this.pl_title, false, false, false, false);
             plugin_vers_text.Draw(this.pl_vers_area, this.pl_vers, false, false, false, false);
-            
+            plugin_author_text.Draw(this.pl_auth_area, this.pl_author, false, false, false, false);
+
             plugin_desc_text.Draw(this.pl_desc_area, this.pl_desc, false, false, false, false);
             if(this.pl_thumb != null) GUI.DrawTexture(this.pl_thumb_area, this.pl_thumb);
             
@@ -368,6 +376,7 @@ namespace SR_PluginLoader
             if (p == null || p.data == null)
             {
                 this.pl_title.text = "";
+                this.pl_author.text = "";
                 this.pl_desc.text = "";
                 this.pl_vers.text = "";
                 this.pl_thumb = Loader.tex_unknown;
@@ -375,6 +384,7 @@ namespace SR_PluginLoader
             else
             {
                 this.pl_title.text = p.data.NAME;
+                this.pl_author.text = String.Format("<color=#808080ff>Author:</color> {0}", p.data.AUTHOR);
                 this.pl_desc.text = p.data.DESCRIPTION;
                 this.pl_vers.text = p.data.VERSION.ToString();
                 this.pl_thumb = p.thumbnail;
@@ -397,7 +407,9 @@ namespace SR_PluginLoader
 
             this.pl_title_area = this.calcTextRect(list_pad, pl_toggle_area.yMax + 15f, this.pl_title, plugin_title_text);
             this.pl_vers_area = this.calcTextRect(pl_title_area.xMax+5f, pl_title_area.y, content_width, this.pl_vers, plugin_vers_text);
-            this.pl_desc_area = this.calcTextRect(list_pad, this.pl_title_area.yMax + 10f, content_width, this.pl_desc, plugin_desc_text);
+            this.pl_auth_area = this.calcTextRect(list_pad, this.pl_title_area.yMax + 2f, content_width, this.pl_author, plugin_author_text);
+
+            this.pl_desc_area = this.calcTextRect(list_pad, this.pl_auth_area.yMax + 10f, content_width, this.pl_desc, plugin_desc_text);
 
 
             this.selected_plugin_info_area = new Rect(area.xMin + plugin_list_width, area.yMin + title_bar_height, width, (this.close_btn_area.yMin - 3f) - (this.window_area.yMin + title_bar_height));

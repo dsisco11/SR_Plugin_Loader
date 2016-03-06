@@ -23,18 +23,18 @@ namespace SR_PluginLoader
         
         public static _hook_result call(HOOK_ID hook, object sender, ref object returnValue, params object[] args)
         {
-            _hook_result result = new _hook_result(false, args);
             try
             {
+                _hook_result result = new _hook_result(args);
                 List<Sisco_Hook_Delegate> cb_list;
                 bool r = SiscosHooks.events.TryGetValue(hook, out cb_list);
-                if (r == false) return result;//no abort
+                if (r == false) return new _hook_result();//no abort
 
-                
                 foreach (Sisco_Hook_Delegate act in cb_list)
                 {
                     try
                     {
+                        if (act == null) continue;
                         Sisco_Return ret = act(ref sender, ref result.args, ref returnValue);
                         if (ret != null)
                         {
@@ -44,17 +44,20 @@ namespace SR_PluginLoader
                     catch(Exception ex)
                     {
                         Log(ex.Message);
+                        Log(ex.StackTrace);
                         return new _hook_result();
                     }
                 }
+                
+                return result;
             }
             catch(Exception ex)
             {
                 Log(ex.Message);
+                Log(ex.StackTrace);
                 return new _hook_result();
             }
-
-            return result;//no abort
+            return new _hook_result();//no abort
         }
 
         /// <summary>

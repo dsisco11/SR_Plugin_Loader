@@ -22,7 +22,9 @@
         Get_Available_Saves,
         Get_Save_Directory,
         Pre_Save_Game,
-        Pre_Load_Game
+        Post_Save_Game,
+        Pre_Load_Game,
+        Post_Load_Game
     }
 
 }
