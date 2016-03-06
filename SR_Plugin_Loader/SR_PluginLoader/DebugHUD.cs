@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -32,20 +33,22 @@ namespace SR_PluginLoader
                 UnityEngine.Object.DontDestroyOnLoad(DebugHud.hud);
             }
         }
-        public static void Log(string format, params object[] args)
+
+        public static void Log(string format)
         {
-            string str = String.Format(format, args);
+            string str = DebugHud.Tag_String(format, 1);
             DebugHud.Add_Line(str);
         }
 
-        public static void Log(string str)
+        public static void Log(string format, params object[] args)
         {
+            string str = DebugHud.Format_Log(format, 1, args);
             DebugHud.Add_Line(str);
         }
 
         public static void Log(Exception ex)
         {
-            string str = DebugHud.Format_Log(ex);
+            string str = DebugHud.Format_Log(ex, 1);
             DebugHud.Add_Line(str);
         }
 
@@ -53,7 +56,7 @@ namespace SR_PluginLoader
 
         public static void LogSilent(string format, params object[] args)
         {
-            string str = DebugHud.Format_Log(format, 0, args);
+            string str = DebugHud.Format_Log(format, 1, args);
             DebugHud.write_log(str);
         }
 
@@ -67,32 +70,7 @@ namespace SR_PluginLoader
             string str = DebugHud.Format_Log(ex, 0);
             DebugHud.write_log(str);
         }
-
-        public static void tally(string str)
-        {
-            if (DebugHud.hud != null) DebugHud.hud.Add_Tally(str);
-
-            if (DebugHud.hud != null)
-            {
-                if (DebugHud.stacks.Count > 0)
-                {
-                    foreach (KeyValuePair<string, int> kv in DebugHud.stacks)
-                    {
-                        DebugHud.hud.Add_Tally(kv.Key, kv.Value);
-                    }
-                    DebugHud.stacks.Clear();
-                }
-                DebugHud.hud.Add_Tally(str);
-            }
-            else
-            {
-                int tmp = 0;
-                if(!DebugHud.stacks.TryGetValue(str, out tmp)) DebugHud.stacks[str] = 0;
-
-                DebugHud.stacks[str]++;
-            }
-        }
-
+        
         private static void open_log_stream()
         {
             if (DebugHud.log_file != null) DebugHud.log_file.Close();
@@ -123,25 +101,46 @@ namespace SR_PluginLoader
 
         public static string Format_Log(Exception ex, int stack_offset = 0)
         {
-            string str = String.Format("{0}\n{1}", ex.Message, ex.StackTrace);
+            var trace = new StackTrace(ex, stack_offset, true);
+            string str = String.Format("{0}\n{1}", ex.Message, trace.ToString());
+            //string str = String.Format("{0}\n{1}", ex.Message, StackTraceUtility.ExtractStackTrace());
 
             if (ex.InnerException != null)
             {
                 str = String.Format("{0}\n{1}", str, ex.InnerException.Message);
             }
 
-            return DebugHud.Format_Log(str, 1);//reformat our exception string with an additional stack offset of 1 to make it skip past the function that called THIS format function.
+            return DebugHud.Format_Log(str, 2);//reformat our exception string with an additional stack offset of 1 to make it skip past the function that called THIS format function.
+        }
+
+        public static string Tag_String(string str, int stack_offset=0)
+        {
+            int idx = 0;
+            string class_name = null;
+            StackFrame frame = null;
+
+            // Search upwards through the callstack to find the first classname that isnt DebugHud. USUALLY this will only loop once and cost us no more time then the old method I used to use. 
+            // But this one will catch those odd cases where this function gets called from a big hierarchy of DebugHud functions and STILL give us the plugin name we so want!
+            while(class_name==null || String.Compare("DebugHud", class_name)==0)
+            {
+                // pre incrementing makes idx = 1 on the first loop
+                frame = new StackFrame(++idx + stack_offset, false);
+                class_name = frame.GetMethod().DeclaringType.Name;
+            }
+
+            string plugin_name = frame.GetMethod().Module.ScopeName;
+            return String.Format("[<b>{0}</b>] {1}", plugin_name, str);
         }
 
         public static string Format_Log(string format, int stack_offset = 0, params object[] args)
         {
-            StackFrame frame = new StackFrame(2 + stack_offset, true);
-            string meth = frame.GetMethod().ReflectedType.Name;
+            StackFrame frame = new StackFrame(1 + stack_offset, true);
+            string meth = frame.GetMethod().ReflectedType.FullName;
             string funct = frame.GetMethod().Name;
             int line = frame.GetFileLineNumber();
 
             string str = String.Format(format, args);
-            str = String.Format("{0}  [Function: {1}::{2} @ Line: {3}]", str, meth, funct, line);
+            str = DebugHud.Tag_String(String.Format("{0}  [Function: {1}::{2} @ Line: {3}]", str, meth, funct, line), 1);
 
             return str;
         }
