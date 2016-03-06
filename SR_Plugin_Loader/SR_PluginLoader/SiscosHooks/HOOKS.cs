@@ -24,7 +24,8 @@
         Pre_Save_Game,
         Post_Save_Game,
         Pre_Load_Game,
-        Post_Load_Game
+        Post_Load_Game,
+        Spawn_Player_Upgrades_UI
     }
 
 }

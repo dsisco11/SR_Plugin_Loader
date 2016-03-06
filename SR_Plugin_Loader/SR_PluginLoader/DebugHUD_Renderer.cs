@@ -143,7 +143,15 @@ namespace SR_PluginLoader
                 {
                     this.new_count = 0;
                 }
+                this.onVisibility_Change(this.open);
             }
+        }
+
+        private void onVisibility_Change(bool is_vis)
+        {
+            var timeDir = SRSingleton<GameContext>.Instance.TimeDirector;
+            if (is_vis == true) timeDir.Pause();
+            else timeDir.Unpause();
         }
 
 

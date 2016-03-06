@@ -42,7 +42,7 @@ namespace SR_PluginLoader
 
         public static void Log(string format, params object[] args)
         {
-            string str = DebugHud.Format_Log(format, 1, args);
+            string str = DebugHud.Tag_String(String.Format(format, args), 1);
             DebugHud.Add_Line(str);
         }
 
