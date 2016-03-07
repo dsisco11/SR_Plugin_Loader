@@ -64,9 +64,9 @@ namespace SR_PluginLoader
             int updates = 0;
             foreach(Plugin plugin in Loader.plugins.Values)
             {
-                if(plugin.data.UPDATEURL != null)
+                if(plugin.data.UPDATES_URL != null)
                 {
-                    WWW update = new WWW(plugin.data.UPDATEURL);
+                    WWW update = new WWW(plugin.data.UPDATES_URL);
 
                     while (!update.isDone)
                         yield return new WaitForSeconds(0.1f);

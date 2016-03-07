@@ -11,7 +11,8 @@ namespace SR_PluginLoader
     public class Git_Updater : Updater_Base
     {
         private static readonly Git_Updater _instance = new Git_Updater();
-        public static Git_Updater instance { get { return _instance;  }  }
+        public static Git_Updater instance { get { return _instance;  } }
+        public static readonly UPDATER_TYPE type = UPDATER_TYPE.GIT;
 
         private static WebClient web = new WebClient();
         private static JSONArray repo_cache = null;

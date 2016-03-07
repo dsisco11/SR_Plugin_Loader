@@ -17,6 +17,7 @@ namespace SR_PluginLoader
         private static List<string> lines = new List<string>();
         private static Dictionary<string, int> stacks = new Dictionary<string, int>();
         private static FileStream log_file = null;
+        private static string[] html_tags = null;
 
 
         public static void Init()
@@ -32,6 +33,17 @@ namespace SR_PluginLoader
                 DebugHud.hud = DebugHud.hud_root.AddComponent<DebugHUD_Renderer>();
                 UnityEngine.Object.DontDestroyOnLoad(DebugHud.hud);
             }
+
+            string[] tags = new string[] { "b", "size", "color" };
+            List<string> tmp = new List<string>();
+
+            foreach(string tag in tags)
+            {
+                tmp.Add(String.Format("<{0}>", tag));
+                tmp.Add(String.Format("</{0}>", tag));
+            }
+
+            html_tags = tmp.ToArray();
         }
 
         public static void Log(string format)
@@ -49,7 +61,7 @@ namespace SR_PluginLoader
         public static void Log(Exception ex)
         {
             string str = DebugHud.Format_Log(ex, 1);
-            DebugHud.Add_Line(str);
+            DebugHud.Add_Line(str, true);
         }
 
 
@@ -68,7 +80,16 @@ namespace SR_PluginLoader
         public static void LogSilent(Exception ex)
         {
             string str = DebugHud.Format_Log(ex, 0);
-            DebugHud.write_log(str);
+            DebugHud.write_log(str, true);
+        }
+
+        private static string strip_html_tags(string str)
+        {
+            foreach(string tag in html_tags)
+            {
+                str = str.Replace(tag, "");
+            }
+            return str;
         }
         
         private static void open_log_stream()
@@ -79,12 +100,13 @@ namespace SR_PluginLoader
             DebugHud.log_file = new FileStream(logPath, FileMode.Create);
         }
 
-        private static void write_log(string str)
+        private static void write_log(string str, bool write_to_unity=false)
         {
             if (DebugHud.log_file == null) DebugHud.open_log_stream();
 
             if (!str.EndsWith("\n")) str += "\n";
-            UnityEngine.Debug.Log(str);
+            str = DebugHud.strip_html_tags(str);
+            if(write_to_unity) UnityEngine.Debug.Log(str);
 
             byte[] bytes = new byte[str.Length * sizeof(char)];
             System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
@@ -145,9 +167,9 @@ namespace SR_PluginLoader
             return str;
         }
 
-        private static void Add_Line(string str)
+        private static void Add_Line(string str, bool write_to_unity=false)
         {
-            DebugHud.write_log(str);
+            DebugHud.write_log(str, write_to_unity);
 
             if (DebugHud.hud == null)
             {

@@ -270,10 +270,10 @@ namespace SR_PluginLoader
 
         public void Process_Dependencys()
         {
-            if (this.data.DEPENDENCYS.Count <= 0) return;
+            if (this.data.DEPENDENCIES.Count <= 0) return;
             this.unmet_dependencys.Clear();
             Dictionary<Plugin_Dependency, PLUGIN_DEP_COMPARISON_FLAG> met_depends = new Dictionary<Plugin_Dependency, PLUGIN_DEP_COMPARISON_FLAG>();
-            foreach(var dep in data.DEPENDENCYS)
+            foreach(var dep in data.DEPENDENCIES)
             {
                 met_depends[dep] = PLUGIN_DEP_COMPARISON_FLAG.FALSE;
             }
@@ -281,7 +281,7 @@ namespace SR_PluginLoader
             foreach(KeyValuePair<string, Plugin> kv in Loader.plugins)
             {
                 if (kv.Value == this) continue;
-                foreach (Plugin_Dependency dep in data.DEPENDENCYS)
+                foreach (Plugin_Dependency dep in data.DEPENDENCIES)
                 {
                     var cmp_res = dep.Compare(kv.Value);
                     if (cmp_res != PLUGIN_DEP_COMPARISON_FLAG.FALSE)

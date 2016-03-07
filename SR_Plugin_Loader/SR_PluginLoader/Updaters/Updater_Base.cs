@@ -5,6 +5,13 @@ using System.Text;
 
 namespace SR_PluginLoader
 {
+    public enum UPDATER_TYPE
+    {
+        NONE = 0,
+        JSON,
+        GIT
+    }
+
     public enum FILE_UPDATE_STATUS
     {
         /// <summary>

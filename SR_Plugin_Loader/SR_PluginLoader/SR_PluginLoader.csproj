@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="DebugHUD.cs" />
     <Compile Include="DebugHUD_Renderer.cs" />
+    <Compile Include="Plugin Classes\Plugin_Update_Method.cs" />
     <Compile Include="Updaters\Git_Updater.cs" />
     <Compile Include="Singleton.cs" />
     <Compile Include="UI\Notice_Manager.cs" />
@@ -62,15 +63,15 @@
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="MainMenu.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="Plugin Classes\Plugin.cs" />
     <Compile Include="UI\PluginSelector.cs" />
     <Compile Include="UI\PluginsDownloadPanel.cs" />
     <Compile Include="UI\PluginsPanel.cs" />
-    <Compile Include="Plugin_Dependency.cs" />
-    <Compile Include="Plugin_Download_Data.cs" />
-    <Compile Include="Plugin_Info.cs" />
+    <Compile Include="Plugin Classes\Plugin_Dependency.cs" />
+    <Compile Include="Plugin Classes\Plugin_Download_Data.cs" />
+    <Compile Include="Plugin Classes\Plugin_Info.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Plugin_Version.cs" />
+    <Compile Include="Plugin Classes\Plugin_Version.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -107,7 +108,9 @@
     <PostBuildEvent>COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetFileName)" /Y
 COPY "$(TargetPath)" "$(TargetDir)/../../../../Installer/$(TargetFileName)" /Y
 CD "$(TargetDir)/../../../"
-7za.exe a "./../Installer.zip" -w "./../Installer/"</PostBuildEvent>
+7za.exe a "./../Installer.zip" -w "./../Installer/"
+CD "./../Installer/"
+@REM START SR_PluginLoader_Installer.exe -fast</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

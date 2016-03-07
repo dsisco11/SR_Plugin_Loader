@@ -2,6 +2,8 @@
 {
     /// <summary>
     /// List of available hooks.
+    /// Naming scheme is as follows: (Pre_/Post_)ClassName_Event
+    /// ClassName may be shortened when appropriate to keep hook names intuitive.
     /// </summary>
     public enum HOOK_ID
     {

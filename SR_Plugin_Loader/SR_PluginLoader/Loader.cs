@@ -19,7 +19,7 @@ namespace SR_PluginLoader
         public static string TITLE { get { return String.Format("[Sisco++'s Plugin Loader] {0}", Loader.VERSION); } }
         public static string DOWNLOADTITLE { get { return String.Format("Download Plugins"); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
-        public static Plugin_Version VERSION = new Plugin_Version(0, 2);// even though really this isnt a plugin, I guess if we ever do major changes a plugin could specify the loader as a requirement and set a specific version.
+        public static Plugin_Version VERSION = new Plugin_Version(0, 3);// even though really this isnt a plugin, I guess if we ever do major changes a plugin could specify the loader as a requirement and set a specific version.
 
         private static GameObject root = null;
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
@@ -39,7 +39,7 @@ namespace SR_PluginLoader
 
         private static MainMenu menu = null;
 
-        public static void init()
+        public static void init(string hash)
         {
             if (Loader.config_stream != null) return;
             if (!Loader.Load_Config_Stream()) return;
@@ -51,11 +51,14 @@ namespace SR_PluginLoader
 
                 DebugHud.Init();
                 Loader.menu = Loader.root.AddComponent<MainMenu>();
+                
+                Setup_Update_Helper();
+                Load_Assets();
+                bool ok = Verify_PluginLoader_Hash(hash);
+                if (!ok) return;
 
                 IN_LOADING_PHASE = true;
-                Setup_Update_Helper();
                 Setup_Plugin_Dir();
-                Load_Assets();
                 Check_For_Updates();
 
                 Setup_Assembly_Resolver();
@@ -67,6 +70,33 @@ namespace SR_PluginLoader
             {
                 DebugHud.Log(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Checks the given hash against the current dll files hash to make sure the proper version is installed
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        private static bool Verify_PluginLoader_Hash(string hash)
+        {
+            string dll_hash = Utility.Get_File_Sha1(Assembly.GetExecutingAssembly().Location);
+            bool ok = (String.Compare(dll_hash, hash) == 0);
+
+            if(!ok)
+            {
+                new UI_Notification()
+                {
+                    msg = "The current loader's hash does not match the hash of the one that was installed, click here to install this version.",
+                    title = "Version Mismatch",
+                    icon = Loader.tex_alert,
+                    onClick = () =>
+                    {
+                        Restart_App();
+                    }
+                };
+            }
+
+            return ok;
         }
 
         private static void Setup_Update_Helper()
