@@ -16,7 +16,7 @@ namespace SR_PluginLoader
     {
         public static GameObject mainmenu = null;
         private static GameObject plugins_panel_root = null;
-        public static PluginsPanel plugins_panel = null;
+        public static PluginsMenu plugins_panel = null;
         public static PluginsDownloadPanel plugins_download_panel = null;
         private static bool _active = false;
         public static bool Active { get { return MainMenu._active; } }
@@ -111,7 +111,7 @@ namespace SR_PluginLoader
         private void TrySpawnPluginPanel()
         {
             MainMenu.plugins_panel_root = new GameObject("PluginsPanel");
-            MainMenu.plugins_panel = MainMenu.plugins_panel_root.AddComponent<PluginsPanel>();
+            MainMenu.plugins_panel = MainMenu.plugins_panel_root.AddComponent<PluginsMenu>();
             //MainMenu.plugins_download_panel = MainMenu.plugins_panel_root.AddComponent<PluginsDownloadPanel>();
             UnityEngine.Object.DontDestroyOnLoad(MainMenu.plugins_panel_root);
         }

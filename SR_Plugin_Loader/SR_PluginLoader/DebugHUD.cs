@@ -151,7 +151,7 @@ namespace SR_PluginLoader
             }
 
             string plugin_name = frame.GetMethod().Module.ScopeName;
-            return String.Format("[<b>{0}</b>] {1}", plugin_name, str);
+            return String.Format("<b>{0}</b>  {1}", plugin_name, str);
         }
 
         public static string Format_Log(string format, int stack_offset = 0, params object[] args)

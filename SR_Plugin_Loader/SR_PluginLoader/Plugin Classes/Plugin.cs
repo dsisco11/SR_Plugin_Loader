@@ -307,6 +307,13 @@ namespace SR_PluginLoader
                 return;
             }
 
+            var dupe = GameObject.Find(Unique_GameObject_Name);
+            if(dupe != null)
+            {
+                GameObject.DestroyImmediate(dupe);
+                DebugHud.Log("Destroyed pre-existing plugin manager GameObject instance!");
+            }
+
             GameObject gmObj = new GameObject(this.Unique_GameObject_Name);
             UnityEngine.GameObject.DontDestroyOnLoad(gmObj);
             try

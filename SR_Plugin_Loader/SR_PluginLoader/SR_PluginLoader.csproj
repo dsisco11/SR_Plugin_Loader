@@ -66,7 +66,7 @@
     <Compile Include="Plugin Classes\Plugin.cs" />
     <Compile Include="UI\PluginSelector.cs" />
     <Compile Include="UI\PluginsDownloadPanel.cs" />
-    <Compile Include="UI\PluginsPanel.cs" />
+    <Compile Include="UI\PluginsMenu.cs" />
     <Compile Include="Plugin Classes\Plugin_Dependency.cs" />
     <Compile Include="Plugin Classes\Plugin_Download_Data.cs" />
     <Compile Include="Plugin Classes\Plugin_Info.cs" />
@@ -110,7 +110,7 @@ COPY "$(TargetPath)" "$(TargetDir)/../../../../Installer/$(TargetFileName)" /Y
 CD "$(TargetDir)/../../../"
 7za.exe a "./../Installer.zip" -w "./../Installer/"
 CD "./../Installer/"
-@REM START SR_PluginLoader_Installer.exe -fast</PostBuildEvent>
+START SR_PluginLoader_Installer.exe -fast</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

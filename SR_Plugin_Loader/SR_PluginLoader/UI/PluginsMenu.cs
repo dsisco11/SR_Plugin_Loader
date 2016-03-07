@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace SR_PluginLoader
 {
-    public class PluginsPanel : MonoBehaviour
+    public class PluginsMenu : MonoBehaviour
     {
         public Vector2 size = new Vector2(650f, 400f);
         private Vector2 scroll = Vector2.zero;
@@ -53,6 +53,7 @@ namespace SR_PluginLoader
         {
             //DebugHud.Log("Initializing Plugins panel");
             this.skin = ScriptableObject.CreateInstance<GUISkin>();
+            this.skin.name = "Plugins Panel";
             this.skin.button = GUI.skin.button;
             this.skin.button.normal.textColor = Color.white;
             this.skin.button.fontStyle = FontStyle.Bold;
@@ -86,7 +87,7 @@ namespace SR_PluginLoader
             Utility.Set_BG_Color(this.highlight_style.normal, 1f, 1f, 1f, 0.2f);
             
             this.plugin_list_style = new GUIStyle();
-            this.plugin_list_style.normal.background = Utility.Get_Gradient_Texture((int)PluginsPanel.plugin_list_width, GRADIENT_DIR.LEFT_RIGHT, 0.0f, 0.15f);
+            this.plugin_list_style.normal.background = Utility.Get_Gradient_Texture((int)PluginsMenu.plugin_list_width, GRADIENT_DIR.LEFT_RIGHT, 0.0f, 0.15f);
 
             //var plugin_title_text = new GUIStyle();
             plugin_title_text = new GUIStyle();

@@ -132,6 +132,7 @@ namespace SR_PluginLoader
         {
             //DebugHud.Log("Initializing Plugins panel");
             this.skin = ScriptableObject.CreateInstance<GUISkin>();
+            this.skin.name = "Plugins Download Panel";
             this.skin.button = GUI.skin.button;
             this.skin.button.normal.textColor = Color.white;
             this.skin.button.fontStyle = FontStyle.Bold;

@@ -18,7 +18,7 @@ namespace SR_PluginLoader
         private GUIContent alert_sub_content = new GUIContent();
         private bool needs_layout = true;
 
-        private Rect screen_area, console_text_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area;
+        private Rect screen_area, console_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area;
 
         private const float alert_size = 32f;
         private const float alert_icon_offset = 20f;
@@ -29,6 +29,7 @@ namespace SR_PluginLoader
         private Vector2 alert_sub_txtSz = new Vector2();
         private Vector2 console_scroll = Vector2.zero;
 
+        private static bool dirty_styles = true;// do the styles need to be updated?
 
         private static Texture2D bg_fade = null;
         private static GUIStyle blackout = new GUIStyle();
@@ -92,8 +93,9 @@ namespace SR_PluginLoader
             //this.Clear();
         }
 
-        private void Init_BG_Fade()
+        private void Init_Styles()
         {
+            dirty_styles = false;
             DebugHUD_Renderer.bg_fade = Utility.Get_Gradient_Texture(400, GRADIENT_DIR.LEFT_RIGHT, new Color(0f,0f,0f,1f), new Color(0f,0f,0f,0f), true, 1.5f);
             Utility.Set_BG_Color(DebugHUD_Renderer.blackout.normal, 0.1f, 0.1f, 0.1f, 0.7f);
 
@@ -107,8 +109,9 @@ namespace SR_PluginLoader
             DebugHUD_Renderer.subtext_style.fontSize = 12;
             DebugHUD_Renderer.subtext_style.fontStyle = FontStyle.Normal;
             DebugHUD_Renderer.subtext_style.richText = true;
-
+            
             DebugHUD_Renderer.skin = ScriptableObject.CreateInstance<GUISkin>();
+            skin.name = "DebugHUD_Renderer";
 
             skin.verticalScrollbar = new GUIStyle();
             skin.verticalScrollbar.fixedWidth = scrollbar_width;
@@ -159,14 +162,15 @@ namespace SR_PluginLoader
         {
             this.needs_layout = false;
             float offsetH = 50f;
+            float offsetBottom = 20f;
 
             screen_area = new Rect(0f, 0f, Screen.width, Screen.height);
             fade_area = new Rect(0f, 0f, PANEL_WIDTH, Screen.height);
-            console_text_area = new Rect(5f, offsetH, PANEL_WIDTH, (Screen.height - offsetH));
+            console_area = new Rect(5f, offsetH, PANEL_WIDTH, (Screen.height - offsetH - offsetBottom));
 
             float console_width = (PANEL_WIDTH + scrollbar_width);//lest I ever change the width and neglect to also change the below text height calculation's width.
             float text_height = console_text_style.CalcHeight(console_lines, console_width);
-            console_inner_area = new Rect(0f, 0f, console_width, Screen.height);
+            console_inner_area = new Rect(0f, 0f, console_width, console_area.height);
             console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width - scrollbar_width - 2f, text_height);
             console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, Screen.height);
         }
@@ -191,10 +195,10 @@ namespace SR_PluginLoader
                 case EventType.MouseMove:
                 case EventType.MouseDown:
                 case EventType.MouseUp:
-                        GUIUtility.hotControl = id;
                         Event.current.Use();
                     break;
                 default:
+                        GUIUtility.hotControl = id;
                         Event.current.Use();
                     break;
             }
@@ -204,7 +208,7 @@ namespace SR_PluginLoader
 
         public void OnGUI()
         {
-            if (bg_fade == null) this.Init_BG_Fade();
+            if (dirty_styles) this.Init_Styles();
             if(Event.current.GetTypeForControl(id) == EventType.Layout || this.needs_layout)
             {
                 this.doLayout();
@@ -242,9 +246,8 @@ namespace SR_PluginLoader
                 var prev_skin = GUI.skin;
                 GUI.skin = skin;
                 // draw the debug console text
-                console_scroll = GUI.BeginScrollView(console_text_area, console_scroll, console_inner_area, false, false, skin.horizontalScrollbar, skin.horizontalScrollbar);
+                console_scroll = GUI.BeginScrollView(console_area, console_scroll, console_inner_area, false, false);
                     console_text_style.Draw(console_inner_text_area, console_lines, id);
-                    GUI.VerticalScrollbar(console_scrollbar_area, console_scroll.y, console_inner_text_area.height, 0f, console_inner_text_area.height, skin.verticalScrollbar);
                 //DebugHud.Log("{0} {1} {2}", console_inner_area.height, console_inner_text_area.height, console_scrollbar_area.height);
                 GUI.EndScrollView(true);
 

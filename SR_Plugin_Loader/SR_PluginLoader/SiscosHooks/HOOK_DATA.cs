@@ -47,6 +47,8 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, method = "DirectedActorSpawner.Start" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_LoseEnergy, method = "PlayerState.SpendEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_SetEnergy, method = "PlayerState.SetEnergy" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_MoneyChanged, method = "PlayerState.AddCurrency" },
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Economy_Init, method = "EconomyDirector.InitForLevel", offset=0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Economy_Init, method = "EconomyDirector.InitForLevel", offset=-1 },
         };

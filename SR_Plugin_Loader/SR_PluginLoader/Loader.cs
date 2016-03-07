@@ -291,6 +291,7 @@ namespace SR_PluginLoader
 
         public static void Plugin_Status_Change(Plugin p, bool enabled)
         {
+            if (IN_LOADING_PHASE) return;
             DebugHud.LogSilent("Plugin_Status_Change: Saving config...");
             Loader.Save_Config();
         }

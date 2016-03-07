@@ -17,7 +17,7 @@
         public _hook_result(object[] args)
         {
             this.args = args;
-            if (this.args == null) this.args = new object[0];
+            //if (this.args == null) this.args = new object[0];
         }
     }
 }
