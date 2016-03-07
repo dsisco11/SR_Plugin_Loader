@@ -28,8 +28,8 @@ namespace SR_PluginLoader
     public static class HOOKS
     {
         public static Hook_Dbg_Data[] HooksList = new Hook_Dbg_Data[] {
-            new Hook_Dbg_Data() { hook = HOOK_ID.CellDirector_Pre_Update, method = "CellDirector.Update", offset = 0 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.CellDirector_Post_Update, method = "CellDirector.Update", offset = -1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Update, method = "CellDirector.Update", offset = 0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Update, method = "CellDirector.Update", offset = -1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Player_Upgrades_UI, method = "PersonalUpgradeUI.CreatePurchaseUI", offset=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_CanGetUpgrade, method = "PlayerState.CanGetUpgrade", offset=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Save_Game, method = "GameData.Save", offset = 0 },

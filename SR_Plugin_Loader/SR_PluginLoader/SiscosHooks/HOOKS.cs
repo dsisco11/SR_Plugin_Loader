@@ -91,8 +91,8 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Player_SetEnergy = new HOOK_ID();
         public static readonly HOOK_ID Player_MoneyChanged = new HOOK_ID();
 
-        public static readonly HOOK_ID CellDirector_Pre_Update = new HOOK_ID();
-        public static readonly HOOK_ID CellDirector_Post_Update = new HOOK_ID();
+        public static readonly HOOK_ID Pre_Region_Update = new HOOK_ID();
+        public static readonly HOOK_ID Post_Region_Update = new HOOK_ID();
 
         public static readonly HOOK_ID Get_Available_Saves = new HOOK_ID();
         public static readonly HOOK_ID Get_Save_Directory = new HOOK_ID();
