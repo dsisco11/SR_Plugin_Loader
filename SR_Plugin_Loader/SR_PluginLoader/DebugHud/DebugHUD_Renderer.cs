@@ -170,9 +170,9 @@ namespace SR_PluginLoader
 
             float console_width = (PANEL_WIDTH + scrollbar_width);//lest I ever change the width and neglect to also change the below text height calculation's width.
             float text_height = console_text_style.CalcHeight(console_lines, console_width);
-            console_inner_area = new Rect(0f, 0f, console_width, console_area.height);
+            console_inner_area = new Rect(0f, 0f, console_width, text_height);
             console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width - scrollbar_width - 2f, text_height);
-            console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, Screen.height);
+            //console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, Screen.height);
         }
         /// <summary>
         /// Uses all of the system mouse movement, hover, and input events so we can prevent all controls under this one from getting them.

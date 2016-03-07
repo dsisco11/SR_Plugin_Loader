@@ -40,8 +40,9 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Save_Directory, method = "GameData.ToPath", offset = 0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_ApplyUpgrade, method="PlayerState.ApplyUpgrade", offset=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_Damaged, method = "PlayerState.Damage" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Vac_Can_Capture, method = "Vacuumable.canCapture" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Vac_Capture, method = "Vacuumable.capture" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Can_Capture, method = "Vacuumable.canCapture" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, method = "Vacuumable.capture" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Consume, method = "WeaponVacuum.ConsumeVacItem" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, method = "WeaponVacuum.Update" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Entity_Spawn, method = "DirectedActorSpawner.Spawn" },
             new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, method = "DirectedActorSpawner.Start" },
@@ -51,6 +52,12 @@ namespace SR_PluginLoader
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Economy_Init, method = "EconomyDirector.InitForLevel", offset=0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Economy_Init, method = "EconomyDirector.InitForLevel", offset=-1 },
+
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Input, method = "SiloCatcher.OnTriggerEnter", offset=0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Input, method = "SiloCatcher.OnTriggerEnter", offset=-1 },
+
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Output, method = "SiloCatcher.OnTriggerStay", offset=0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Output, method = "SiloCatcher.OnTriggerStay", offset=-1 },
         };
     }
 }

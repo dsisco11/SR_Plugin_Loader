@@ -9,7 +9,6 @@ namespace SR_PluginLoader
     /// Naming scheme is as follows: (Pre_/Post_)ClassName_Event
     /// ClassName may be shortened when appropriate to keep hook names intuitive.
     /// </summary>
-    /// 
     public class HOOK_ID
     {
 #region BLAH BLAH
@@ -75,8 +74,9 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID NONE = new HOOK_ID();
                 
         public static readonly HOOK_ID VacPak_Think = new HOOK_ID();
-        public static readonly HOOK_ID Vac_Can_Capture = new HOOK_ID();
-        public static readonly HOOK_ID Vac_Capture = new HOOK_ID();
+        public static readonly HOOK_ID VacPak_Can_Capture = new HOOK_ID();
+        public static readonly HOOK_ID VacPak_Capture = new HOOK_ID();
+        public static readonly HOOK_ID VacPak_Consume = new HOOK_ID();
 
         public static readonly HOOK_ID Pre_Entity_Spawn = new HOOK_ID();
         public static readonly HOOK_ID EntitySpawner_Init = new HOOK_ID();
@@ -96,12 +96,20 @@ namespace SR_PluginLoader
 
         public static readonly HOOK_ID Get_Available_Saves = new HOOK_ID();
         public static readonly HOOK_ID Get_Save_Directory = new HOOK_ID();
+
         public static readonly HOOK_ID Pre_Save_Game = new HOOK_ID();
         public static readonly HOOK_ID Post_Save_Game = new HOOK_ID();
+
         public static readonly HOOK_ID Pre_Load_Game = new HOOK_ID();
         public static readonly HOOK_ID Post_Load_Game = new HOOK_ID();
 
         public static readonly HOOK_ID Spawn_Player_Upgrades_UI = new HOOK_ID();
+
+        public static readonly HOOK_ID Pre_Silo_Input = new HOOK_ID();
+        public static readonly HOOK_ID Post_Silo_Input = new HOOK_ID();
+
+        public static readonly HOOK_ID Pre_Silo_Output = new HOOK_ID();
+        public static readonly HOOK_ID Post_Silo_Output = new HOOK_ID();
 
     }
 
