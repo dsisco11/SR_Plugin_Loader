@@ -28,6 +28,11 @@ namespace SR_PluginLoader
     public static class HOOKS
     {
         public static Hook_Dbg_Data[] HooksList = new Hook_Dbg_Data[] {
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Consume, method = "WeaponVacuum.ConsumeVacItem" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Can_Capture, method = "Vacuumable.canCapture" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, method = "Vacuumable.capture" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, method = "WeaponVacuum.Update" },
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Update, method = "CellDirector.Update", offset = 0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Update, method = "CellDirector.Update", offset = -1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Player_Upgrades_UI, method = "PersonalUpgradeUI.CreatePurchaseUI", offset=-1 },
@@ -38,12 +43,10 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Load_Game, method = "GameData.Load", offset = -1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Available_Saves, method = "GameData.AvailableGames", offset = 0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Save_Directory, method = "GameData.ToPath", offset = 0 },
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_ApplyUpgrade, method="PlayerState.ApplyUpgrade", offset=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_Damaged, method = "PlayerState.Damage" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Can_Capture, method = "Vacuumable.canCapture" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, method = "Vacuumable.capture" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Consume, method = "WeaponVacuum.ConsumeVacItem" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, method = "WeaponVacuum.Update" },
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Entity_Spawn, method = "DirectedActorSpawner.Spawn" },
             new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, method = "DirectedActorSpawner.Start" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_LoseEnergy, method = "PlayerState.SpendEnergy" },
