@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
+using UnityEngine;
 
 namespace SR_PluginLoader
 {
@@ -33,13 +34,13 @@ namespace SR_PluginLoader
                 List<Sisco_Hook_Delegate> cb_list;
                 bool r = SiscosHooks.events.TryGetValue((HOOK_ID)hook, out cb_list);
                 if (r == false) return new _hook_result();//no abort
-                
+
                 foreach (Sisco_Hook_Delegate act in cb_list)
                 {
                     try
                     {
                         if (act == null) continue;
-                        Sisco_Return ret = act(ref sender, ref result.args, ref returnValue);
+                        Sisco_Return ret = act(ref sender, ref result.args, ref returnValue);                        
                         if (ret != null)
                         {
                             if (ret.early_return) result.abort = true;
@@ -261,7 +262,7 @@ namespace SR_PluginLoader
 
         #endregion
 
-        private static string Get_Arg_String(object[] args)
+        public static string Get_Arg_String(object[] args)
         {
             if (args != null)
             {
@@ -269,7 +270,7 @@ namespace SR_PluginLoader
                 foreach (object arg in args)
                 {
                     if(arg == null) argStr = String.Format("{0}, null", argStr);
-                    else argStr = String.Format("{0}, {1}", argStr, SerializeObject(arg));
+                    else argStr = String.Format("{0}, {1}", argStr, arg.ToString());
                 }
                 return argStr.TrimEnd(new char[] { ',', ' ' });
             }
@@ -309,10 +310,19 @@ namespace SR_PluginLoader
 
         #endregion
 
-        public static void Example()
+        public static void Example(GameObject gameObj, ref int slimesInVac, ref List<LiquidSource> currLiquids)
         {
             object num = 0;
-            call(HOOK_ID.Player_Damaged, null, ref num, null);
+            _hook_result hook_result = SiscosHooks.call(HOOK_ID.VacPak_Consume, null, ref num, new object[]
+            {
+                (object) gameObj,
+		        (object) slimesInVac,
+                (object) currLiquids
+            });
+
+            gameObj = (GameObject)hook_result.args[0];
+            slimesInVac = (int)hook_result.args[1];
+            currLiquids = (List<LiquidSource>)hook_result.args[2];
         }
     }
 }
