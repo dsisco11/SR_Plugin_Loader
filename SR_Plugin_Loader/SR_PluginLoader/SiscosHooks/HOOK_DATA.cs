@@ -50,9 +50,6 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, name = "Vacuumable.capture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, name = "WeaponVacuum.Update" },
 
-            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Update, name = "CellDirector.Update", pos = 0 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Update, name = "CellDirector.Update", pos = -1 },
-
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Save_Game, name = "GameData.Save", pos = 0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Save_Game, name = "GameData.Save", pos = -1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Load_Game, name = "GameData.Load", pos = 0 },
@@ -69,6 +66,9 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_LoseEnergy, name = "PlayerState.SpendEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_SetEnergy, name = "PlayerState.SetEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_MoneyChanged, name = "PlayerState.AddCurrency" },
+
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Start },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Player_Upgrades_UI, name = "PersonalUpgradeUI.CreatePurchaseUI", pos=-1 },
 
