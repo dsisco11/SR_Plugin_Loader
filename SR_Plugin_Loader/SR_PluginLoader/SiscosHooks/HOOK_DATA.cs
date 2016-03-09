@@ -49,11 +49,10 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Can_Capture, name = "Vacuumable.canCapture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, name = "Vacuumable.capture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, name = "WeaponVacuum.Update" },
-
-            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Save_Game, name = "GameData.Save", pos = 0 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Save_Game, name = "GameData.Save", pos = -1 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Load_Game, name = "GameData.Load", pos = 0 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Load_Game, name = "GameData.Load", pos = -1 },
+            
+            new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Save", pos = -1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Game_Loaded, name = "GameData.Load", pos = 0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Game_Loaded, name = "GameData.Load", pos = -1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Available_Saves, name = "GameData.AvailableGames", pos = 0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Save_Directory, name = "GameData.ToPath", pos = 0 },
 
@@ -80,6 +79,16 @@ namespace SR_PluginLoader
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Output, name = "SiloCatcher.OnTriggerStay", pos=-1, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Output, name = "SiloCatcher.OnTriggerStay", pos=-1, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },
+
+            new Hook_Dbg_Data() { hook = HOOK_ID.ResourcePatch_Init, name = "SpawnResource.Start", pos=-1 },
+
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Garden_Init, name = "GardenCatcher.Awake", pos=0 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Garden_Init, name = "GardenCatcher.Awake", pos=-1 },
+            
+            //new Hook_Dbg_Data() { hook = HOOK_ID.Garden_Got_Input, name = "GardenCatcher.OnTriggerEnter" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Garden_Got_Input, name = "GardenCatcher.OnTriggerEnter", pos=1, method = debug_positioning.Cond_Branch_Exit },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Garden_Set_Type, name = "GardenCatcher.OnTriggerEnter", pos=-2, method = debug_positioning.Cond_Branch_Start },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Garden_Set_Type, name = "GardenCatcher.OnTriggerEnter", pos=-2, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },
         };
     }
 }

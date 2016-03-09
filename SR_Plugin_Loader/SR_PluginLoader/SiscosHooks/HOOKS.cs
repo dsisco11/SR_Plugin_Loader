@@ -97,11 +97,10 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Get_Available_Saves = new HOOK_ID();
         public static readonly HOOK_ID Get_Save_Directory = new HOOK_ID();
 
-        public static readonly HOOK_ID Pre_Save_Game = new HOOK_ID();
-        public static readonly HOOK_ID Post_Save_Game = new HOOK_ID();
+        public static readonly HOOK_ID Game_Saved = new HOOK_ID();
 
-        public static readonly HOOK_ID Pre_Load_Game = new HOOK_ID();
-        public static readonly HOOK_ID Post_Load_Game = new HOOK_ID();
+        public static readonly HOOK_ID Pre_Game_Loaded = new HOOK_ID();
+        public static readonly HOOK_ID Post_Game_Loaded = new HOOK_ID();
 
         public static readonly HOOK_ID Spawn_Player_Upgrades_UI = new HOOK_ID();
 
@@ -110,6 +109,15 @@ namespace SR_PluginLoader
 
         public static readonly HOOK_ID Pre_Silo_Output = new HOOK_ID();
         public static readonly HOOK_ID Post_Silo_Output = new HOOK_ID();
+        
+        public static readonly HOOK_ID ResourcePatch_Init = new HOOK_ID();
+
+        public static readonly HOOK_ID Pre_Garden_Init = new HOOK_ID();
+        public static readonly HOOK_ID Post_Garden_Init = new HOOK_ID();
+
+        public static readonly HOOK_ID Garden_Got_Input = new HOOK_ID();
+        public static readonly HOOK_ID Pre_Garden_Set_Type = new HOOK_ID();
+        public static readonly HOOK_ID Post_Garden_Set_Type = new HOOK_ID();
 
     }
 

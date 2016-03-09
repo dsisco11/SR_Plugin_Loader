@@ -22,9 +22,27 @@ namespace SR_PluginLoader
     /// </summary>
     public static class SiscosHooks
     {
+        /// <summary>
+        /// This is a table that tracks the number of hooks each event id has, this allows us the most efficient way to determine if an early abort on event firing is possible by limiting instructions at the had of the 'Call' function.
+        /// </summary>
+        private static int[] EventCounter = null;
         private static Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>> events = new Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>>();
         private static Dictionary<object, List<Sisco_Hook_Ref>> tracker = new Dictionary<object, List<Sisco_Hook_Ref>>();
 
+        public static void init()
+        {
+            int max = 0;
+            foreach(var hook in HOOKS.HooksList)
+            {
+                max = Math.Max(max, hook.id);
+            }
+
+            EventCounter = new int[max+1];
+            for(int i=0; i<EventCounter.Length; i++)
+            {
+                EventCounter[i] = 0;
+            }
+        }
         
         public static _hook_result call(HOOK_ID hook, object sender, ref object returnValue, object[] args)
         {
@@ -80,6 +98,7 @@ namespace SR_PluginLoader
                 Log(ex.StackTrace);
                 return new _hook_result();
             }
+
             return new _hook_result();//no abort
         }
 
@@ -110,6 +129,7 @@ namespace SR_PluginLoader
                 // create the callback list for this hook type if it doesn't exist.
                 List<Sisco_Hook_Delegate> cb_list;
                 if (!SiscosHooks.events.TryGetValue(hook, out cb_list)) SiscosHooks.events[hook] = new List<Sisco_Hook_Delegate>();
+                EventCounter[(int)hook] = SiscosHooks.events[hook].Count;
 
                 // create this registrar's hooks list if it doesn't exist.
                 List<Sisco_Hook_Ref> hooks_list;
@@ -163,6 +183,7 @@ namespace SR_PluginLoader
                 }
 
                 bool hk_success = SiscosHooks.events[hook].Remove(cb);
+                EventCounter[(int)hook] = SiscosHooks.events[hook].Count;
                 if (!hk_success)
                 {
                     Log("Failed to remove hook from hooks list. Sender({0})", registrar);

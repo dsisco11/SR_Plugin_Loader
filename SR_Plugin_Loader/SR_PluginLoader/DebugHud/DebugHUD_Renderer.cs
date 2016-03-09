@@ -18,12 +18,14 @@ namespace SR_PluginLoader
         private GUIContent alert_sub_content = new GUIContent();
         private GUIContent watermark_content = new GUIContent();
         private GUIContent watermark_text_content = new GUIContent();
+        private GUIContent player_pos_text = new GUIContent();
+        
         private bool needs_layout = true;
 
-        private Rect screen_area, console_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area, watermark_text_area, watermark_area;
+        private Rect screen_area, console_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area, watermark_text_area, watermark_area, player_pos_area;
 
         private const float alert_size = 32f;
-        private const float alert_icon_offset = 15f;
+        private const float alert_icon_offset = 10f;
         private Rect alertPos = new Rect(alert_icon_offset, alert_icon_offset, alert_size, alert_size);
         private Rect alert_txtPos = new Rect(0f, 0f, 0f, 0f);
         private Rect alert_sub_txtPos = new Rect(0f, 0f, 0f, 0f);
@@ -73,13 +75,6 @@ namespace SR_PluginLoader
             string msg = String.Format("{0} new log{1}", this.new_count, this.new_count>1 ? "s" : "");
             alert_content.text = msg;
             alert_sub_content.text = String.Format("<i>Press <b>{0}</b> to open the plugins console.</i>", this.OPEN_KEY);
-
-            alert_txtSz = DebugHUD_Renderer.text_style.CalcSize(alert_content);
-            alert_txtPos = new Rect(alertPos.x + alertPos.width + 3f, alertPos.y + (alertPos.height * 0.5f) - (alert_txtSz.y * 0.5f), alert_txtSz.x, alert_txtSz.y);
-
-            alert_sub_txtSz = DebugHUD_Renderer.subtext_style.CalcSize(alert_sub_content);
-            alert_sub_txtPos = new Rect(alert_txtPos.xMin, alert_txtPos.yMax+3f, alert_sub_txtSz.x, alert_sub_txtSz.y);
-
             this.needs_layout = true;
         }
 
@@ -148,7 +143,12 @@ namespace SR_PluginLoader
         
         private void Update()
         {
-            if(Input.GetKeyUp(KeyCode.BackQuote) || Input.GetKeyUp(KeyCode.Tab) || (Input.GetKeyUp(KeyCode.Escape) && this.open))
+            if (Player.gameObject != null)
+            {
+                update_player_pos_display();
+            }
+
+            if (Input.GetKeyUp(KeyCode.BackQuote) || Input.GetKeyUp(KeyCode.Tab) || (Input.GetKeyUp(KeyCode.Escape) && this.open))
             {
                 this.open = (!this.open);
                 if (this.open)
@@ -159,14 +159,25 @@ namespace SR_PluginLoader
             }
         }
 
+        private void update_player_pos_display()
+        {
+            var pos = Player.gameObject.transform.position;
+            player_pos_text.text = String.Format("Player: {0}, {1}, {2}", pos.x, pos.y, pos.z);
+
+            float X = 2f;
+            float Y = 2f;
+
+            Vector2 posSz = console_text_style.CalcSize(player_pos_text);
+            player_pos_area = new Rect(X, Y, posSz.x, posSz.y);
+        }
+
         private void onVisibility_Change(bool is_vis)
         {
             var timeDir = SRSingleton<GameContext>.Instance.TimeDirector;
             if (is_vis == true) timeDir.Pause();
             else timeDir.Unpause();
         }
-
-
+        
         private void doLayout()
         {
             this.needs_layout = false;
@@ -184,7 +195,15 @@ namespace SR_PluginLoader
             console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width - scrollbar_width - 2f, text_height);
             //console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, Screen.height);
 
-            
+
+            alertPos = new Rect(alert_icon_offset, alert_icon_offset, alert_size, alert_size);
+
+            alert_txtSz = DebugHUD_Renderer.text_style.CalcSize(alert_content);
+            alert_txtPos = new Rect(alertPos.x + alertPos.width + 3f, alertPos.y + (alertPos.height * 0.5f) - (alert_txtSz.y * 0.5f), alert_txtSz.x, alert_txtSz.y);
+            alert_sub_txtSz = DebugHUD_Renderer.subtext_style.CalcSize(alert_sub_content);
+            alert_sub_txtPos = new Rect(alert_txtPos.xMin, alert_txtPos.yMax + 3f, alert_sub_txtSz.x, alert_sub_txtSz.y);
+
+
             float hw = (Screen.width / 2f);
             var txtSZ = watermark_style.CalcSize(watermark_text_content);
 
@@ -196,6 +215,7 @@ namespace SR_PluginLoader
             
             watermark_area = new Rect(X, Y, logo_size, logo_size);
             watermark_text_area = new Rect(watermark_area.xMax + 1f, watermark_area.yMax - (txtSZ.y - 2f), 300f, 25f);
+
         }
         /// <summary>
         /// Uses all of the system mouse movement, hover, and input events so we can prevent all controls under this one from getting them.
@@ -277,6 +297,8 @@ namespace SR_PluginLoader
 
                 GUI.depth = prev_depth;
                 GUI.skin = prev_skin;
+
+                console_text_style.Draw(player_pos_area, player_pos_text, false, false, false, false);
             }
         }
 

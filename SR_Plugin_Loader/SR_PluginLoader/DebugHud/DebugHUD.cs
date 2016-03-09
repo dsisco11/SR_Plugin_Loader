@@ -64,6 +64,11 @@ namespace SR_PluginLoader
             DebugHud.Add_Line(str, true);
         }
 
+        public static void Log(GameObject obj)
+        {
+            Log("GameObject<{0}>  {1}", obj.GetInstanceID(), GameObject_Components_ToString(obj));
+        }
+
 
 
         public static void LogSilent(string format, params object[] args)
@@ -193,6 +198,14 @@ namespace SR_PluginLoader
                 }
                 DebugHud.hud.Add_Line(str);
             }
+        }
+
+        public static string GameObject_Components_ToString(GameObject obj)
+        {
+            Component[] comps = obj.GetComponents<Component>();
+            string str = "";
+            foreach (var c in comps) str = String.Format("{0}, {1}", str, c.GetType());
+            return str;
         }
 
 

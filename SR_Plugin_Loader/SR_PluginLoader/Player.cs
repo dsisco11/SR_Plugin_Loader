@@ -12,6 +12,7 @@ namespace SR_PluginLoader
         private static PlayerState player { get { return SRSingleton<GameContext>.Instance.PlayerState; } }
         private static GameObject pObj { get { return SRSingleton<GameContext>.Instance.Player; } }
 
+        public static GameObject gameObject { get { return pObj; } }
         public static PlayerState state { get { return player; } }
         public static WeaponVacuum Weapon { get { return pObj.GetComponentInChildren<WeaponVacuum>(); } }
         public static EnergyJetpack Jetpack { get { return pObj.GetComponent<EnergyJetpack>(); } }

@@ -316,6 +316,7 @@ namespace SR_PluginLoader
 
             GameObject gmObj = new GameObject(this.Unique_GameObject_Name);
             UnityEngine.GameObject.DontDestroyOnLoad(gmObj);
+
             try
             {
                 if (this.load_funct != null)

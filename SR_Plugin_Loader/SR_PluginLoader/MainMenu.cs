@@ -157,6 +157,13 @@ namespace SR_PluginLoader
 
                     //Setup our buttons click logic
                     var btn = PluginsButton.GetComponent<Button>();
+                    /*
+                    ColorBlock clr = PluginsButton.GetComponent<Button>().colors;
+                    clr.normalColor = blue_clr;
+                    btn.image.color = blue_clr;
+                    PluginsButton.GetComponent<Button>().colors = clr;
+                    */
+
                     btn.onClick.RemoveAllListeners();
                     btn.onClick.SetPersistentListenerState(0, UnityEventCallState.Off);
                     btn.onClick.AddListener(new UnityAction(this.OnClick));
