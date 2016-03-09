@@ -16,12 +16,14 @@ namespace SR_PluginLoader
         private GUIContent console_lines = new GUIContent();
         private GUIContent alert_content = new GUIContent();
         private GUIContent alert_sub_content = new GUIContent();
+        private GUIContent watermark_content = new GUIContent();
+        private GUIContent watermark_text_content = new GUIContent();
         private bool needs_layout = true;
 
-        private Rect screen_area, console_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area;
+        private Rect screen_area, console_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area, watermark_text_area, watermark_area;
 
         private const float alert_size = 32f;
-        private const float alert_icon_offset = 20f;
+        private const float alert_icon_offset = 15f;
         private Rect alertPos = new Rect(alert_icon_offset, alert_icon_offset, alert_size, alert_size);
         private Rect alert_txtPos = new Rect(0f, 0f, 0f, 0f);
         private Rect alert_sub_txtPos = new Rect(0f, 0f, 0f, 0f);
@@ -36,7 +38,9 @@ namespace SR_PluginLoader
         private static GUIStyle text_style = new GUIStyle();
         private static GUIStyle subtext_style = new GUIStyle();
         private static GUIStyle console_text_style = new GUIStyle();
-        
+        private static GUIStyle watermark_style = new GUIStyle();
+
+
 
         private const float scrollbar_width = 6f;
 
@@ -87,12 +91,6 @@ namespace SR_PluginLoader
             this.stacks[str] += cnt;
         }
 
-        private void OnLevelWasLoaded(int lvl)
-        {
-            //on second thought, it makes no sense to clear the debug log just because we loaded a new level...
-            //this.Clear();
-        }
-
         private void Init_Styles()
         {
             dirty_styles = false;
@@ -134,9 +132,20 @@ namespace SR_PluginLoader
             DebugHUD_Renderer.console_text_style.fontSize = 14;
             DebugHUD_Renderer.console_text_style.fontStyle = FontStyle.Normal;
             DebugHUD_Renderer.console_text_style.richText = true;
+
+
+            watermark_style = new GUIStyle(GUI.skin.GetStyle("label"));
+            watermark_style.normal.textColor = new Color(1f, 1f, 1f, 0.6f);
+            watermark_style.fontSize = 16;
+            watermark_style.fontStyle = FontStyle.Bold;
+            //title_style.normal.textColor = this.blue_clr;
+            watermark_style.padding = new RectOffset(3, 3, 3, 3);
+            watermark_style.normal.background = null;
+
+            watermark_text_content.text = Loader.TITLE;
+            watermark_content = new GUIContent(Loader.tex_logo);
         }
         
-
         private void Update()
         {
             if(Input.GetKeyUp(KeyCode.BackQuote) || Input.GetKeyUp(KeyCode.Tab) || (Input.GetKeyUp(KeyCode.Escape) && this.open))
@@ -163,16 +172,30 @@ namespace SR_PluginLoader
             this.needs_layout = false;
             float offsetH = 50f;
             float offsetBottom = 20f;
+            float cPad = 5f;
 
             screen_area = new Rect(0f, 0f, Screen.width, Screen.height);
-            fade_area = new Rect(0f, 0f, PANEL_WIDTH, Screen.height);
-            console_area = new Rect(5f, offsetH, PANEL_WIDTH, (Screen.height - offsetH - offsetBottom));
+            fade_area = new Rect(0f, 0f, Screen.width, Screen.height);
+            console_area = new Rect(cPad, offsetH, Screen.width - (cPad*2f), (Screen.height - offsetH - offsetBottom));
 
-            float console_width = (PANEL_WIDTH + scrollbar_width);//lest I ever change the width and neglect to also change the below text height calculation's width.
+            float console_width = (console_area.width + scrollbar_width);//lest I ever change the width and neglect to also change the below text height calculation's width.
             float text_height = console_text_style.CalcHeight(console_lines, console_width);
             console_inner_area = new Rect(0f, 0f, console_width, text_height);
             console_inner_text_area = new Rect(console_inner_area.x+scrollbar_width+3f, console_inner_area.y, console_inner_area.width - scrollbar_width - 2f, text_height);
             //console_scrollbar_area = new Rect(0f, 0f, scrollbar_width, Screen.height);
+
+            
+            float hw = (Screen.width / 2f);
+            var txtSZ = watermark_style.CalcSize(watermark_text_content);
+
+            float logo_size = 36f;
+
+            float pad = 2f;
+            float X = pad;
+            float Y = (Screen.height - (logo_size+pad));
+            
+            watermark_area = new Rect(X, Y, logo_size, logo_size);
+            watermark_text_area = new Rect(watermark_area.xMax + 1f, watermark_area.yMax - (txtSZ.y - 2f), 300f, 25f);
         }
         /// <summary>
         /// Uses all of the system mouse movement, hover, and input events so we can prevent all controls under this one from getting them.
@@ -206,7 +229,7 @@ namespace SR_PluginLoader
             return true;
         }
 
-        public void OnGUI()
+        private void OnGUI()
         {
             if (dirty_styles) this.Init_Styles();
             if(Event.current.GetTypeForControl(id) == EventType.Layout || this.needs_layout)
@@ -215,6 +238,7 @@ namespace SR_PluginLoader
                 return;
             }
 
+            this.Render_Loader_Watermark();
             if (!this.open)
             {
                 if (this.new_count > 0)
@@ -254,6 +278,21 @@ namespace SR_PluginLoader
                 GUI.depth = prev_depth;
                 GUI.skin = prev_skin;
             }
+        }
+
+        private void Render_Loader_Watermark()
+        {
+            var prevClr = GUI.color;
+            GUI.color = watermark_style.normal.textColor;
+            GUI.DrawTexture(watermark_area, Loader.tex_logo, ScaleMode.ScaleToFit);
+            GUI.color = prevClr;
+            //watermark_style.Draw(watermark_area, watermark_content, false, false, false, false);
+            watermark_style.Draw(watermark_text_area, watermark_text_content, false, false, false, false);
+        }
+        
+        private void OnLevelLoaded(int lvl)
+        {
+            Loader.atMainMenu = Levels.isSpecial();
         }
     }
 }

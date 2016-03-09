@@ -16,6 +16,7 @@ namespace SR_PluginLoader
     {
         public static string DOWNLOADURL { get { return "http://satycreations.com/developer.json"; } }
 
+        public static bool atMainMenu = true;
         public static string TITLE { get { return String.Format("[Sisco++'s Plugin Loader] {0}", Loader.VERSION); } }
         public static string DOWNLOADTITLE { get { return String.Format("Download Plugins"); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
@@ -25,8 +26,11 @@ namespace SR_PluginLoader
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
         private static string pluginDir = null;
         public static int _plugin_id = 0;
+        
         public static Texture2D tex_unknown = new Texture2D(1, 1);
         public static Texture2D tex_alert = new Texture2D(1, 1);
+        public static Texture2D tex_logo = new Texture2D(1, 1);
+
         public static bool has_updates = false;
 
         public static string[] INCLUDE_DIRS = new string[] {  };
@@ -57,6 +61,7 @@ namespace SR_PluginLoader
                 bool ok = Verify_PluginLoader_Hash(hash);
                 if (!ok) return;
 
+
                 IN_LOADING_PHASE = true;
                 Setup_Plugin_Dir();
                 Check_For_Updates();
@@ -68,7 +73,8 @@ namespace SR_PluginLoader
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex.Message);
+                DebugHud.Log("Exception during PluginLoader initialization!");
+                DebugHud.Log(ex);
             }
         }
 
@@ -112,6 +118,7 @@ namespace SR_PluginLoader
         {
             Loader.TryLoadAsset(ref Loader.tex_unknown, "unknown.png");
             Loader.TryLoadAsset(ref Loader.tex_alert, "alert.png");
+            Loader.TryLoadAsset(ref Loader.tex_logo, "logo.png");
         }
 
         public static void TryLoadAsset(ref Texture2D tex, string asset)

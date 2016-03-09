@@ -178,34 +178,6 @@ namespace SR_PluginLoader
         private void OnGUI()
         {
             if (MainMenu.mainmenu == null) return;
-
-            MainMenu.Render_Menu_Splash();
-        }
-
-        private static void Render_Menu_Splash()
-        {
-            if (MainMenu.title_style == null)
-            {
-                MainMenu.title_style = new GUIStyle(GUI.skin.GetStyle("label"));
-                MainMenu.title_style.fontSize = 16;
-                MainMenu.title_style.fontStyle = FontStyle.Bold;
-                //MainMenu.title_style.normal.textColor = Color.white;
-                //MainMenu.title_style.normal.textColor = this.blue_clr;
-                MainMenu.title_style.padding = new RectOffset(3, 3, 3, 3);
-                MainMenu.title_style.normal.background = null;
-            }
-            
-            float hw = (Screen.width / 2f);
-            var txtSZ = MainMenu.title_style.CalcSize(title_content);
-            float X = 5f;// (hw - (txtSZ.x / 2f));
-            //float Y = (Screen.height - 95f);
-            float Y = (Screen.height - 25f);
-
-            float pad = 3f;
-            float pad2 = (pad * 2.0f);
-            Rect pos = new Rect(X, Y, 300f, 25f);
-
-            GUI.Label(pos, title_content, MainMenu.title_style);
         }
     }
 }

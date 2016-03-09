@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define USING_VANILLA // This turns off any references to methods that arent available when using a "vanilla" assembly-csharp file, eg: one that hasnt had the installer run on it.
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,7 @@ namespace SR_PluginLoader
         /// <returns></returns>
         public static int Get_Inv_Item_Count(Identifiable.Id id)
         {
+#if !USING_VANILLA
             for (int s = 0; s< player.Ammo.slotCount; s++)
             {
                 Identifiable.Id sid = player.Ammo.GetSlotName(s);
@@ -29,7 +31,35 @@ namespace SR_PluginLoader
                     return player.Ammo.GetSlotCount(s);
                 }
             }
+#endif
             return 0;
+        }
+
+        /// <summary>
+        /// Returns an array of GameObject which are currently being sucked in by the players weapon.
+        /// </summary>
+        /// <returns></returns>
+        public static List<Identifiable> Get_Captive_Items()
+        {
+            List<Identifiable> ret = new List<Identifiable>();
+#if !USING_VANILLA
+            foreach (Joint joint in Player.Weapon.Get_Joints())
+            {
+                if (joint == null || joint.connectedBody == null) continue;
+
+                Identifiable ident = joint.connectedBody.GetComponent<Identifiable>();
+                if (ident != null)
+                {
+                    ret.Add(ident);
+                }
+            }
+#endif
+            return ret;
+        }
+
+        public static int Get_Captive_Item_Count(Identifiable.Id id)
+        {
+            return Get_Captive_Items().Count(o => o.id == id);
         }
         
     }

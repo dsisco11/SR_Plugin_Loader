@@ -123,16 +123,22 @@ namespace SR_PluginLoader
 
         public static string Format_Log(Exception ex, int stack_offset = 0)
         {
-            var trace = new StackTrace(ex, stack_offset, true);
-            string str = String.Format("{0}\n{1}", ex.Message, trace.ToString());
-            //string str = String.Format("{0}\n{1}", ex.Message, StackTraceUtility.ExtractStackTrace());
-
-            if (ex.InnerException != null)
+            string str = null;
+            try
             {
-                str = String.Format("{0}\n{1}", str, ex.InnerException.Message);
+                var trace = new StackTrace(ex, stack_offset, true);
+                str = String.Format("{0}\n{1}", ex.Message, trace.ToString());
+            }
+            catch(Exception e)
+            {
+                write_log("{0}\n{1}", e.Message, e.StackTrace);
+                str = String.Format("{0}\n{1}", ex.Message, StackTraceUtility.ExtractStackTrace());
             }
 
+            if (ex.InnerException != null) str = String.Format("{0}\n{1}", str, ex.InnerException.Message);
+
             return DebugHud.Format_Log(str, 2);//reformat our exception string with an additional stack offset of 1 to make it skip past the function that called THIS format function.
+            //return DebugHud.Tag_String(str, stack_offset);
         }
 
         public static string Tag_String(string str, int stack_offset=0)

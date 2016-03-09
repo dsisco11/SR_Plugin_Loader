@@ -14,32 +14,42 @@ namespace SR_PluginLoader
         public static Git_Updater instance { get { return _instance;  } }
         public static readonly UPDATER_TYPE type = UPDATER_TYPE.GIT;
 
-        private static WebClient web = new WebClient();
+        private static WebClient webClient = new WebClient();
         private static JSONArray repo_cache = null;
 
         private static JSONArray Cache_Git_Repo()
         {
             if (repo_cache != null) return repo_cache;
 
-            // Add a useragent string so GitHub doesnt return 403 and also so they can have a chat if they like.
-            web.Headers.Add("user-agent", USER_AGENT);
-            // Add a handler for SSL certs because mono doesnt have any trusted ones by default
-            ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
-
-            // Fetch repo information
-            string url = "https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1";
-            string jsonStr = web.DownloadString(url);
-            if (jsonStr == null || jsonStr.Length <= 0)
+            try
             {
-                return null;
+                if (webClient == null) webClient = new WebClient();
+                // Add a useragent string so GitHub doesnt return 403 and also so they can have a chat if they like.
+                webClient.Headers.Add("user-agent", USER_AGENT);
+                // Add a handler for SSL certs because mono doesnt have any trusted ones by default
+                ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+
+                // Fetch repo information
+                string url = "https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1";
+                string jsonStr = webClient.DownloadString(url);
+                if (jsonStr == null || jsonStr.Length <= 0)
+                {
+                    return null;
+                }
+
+                // Parse the json response from GitHub
+                var git = SimpleJSON.JSON.Parse(jsonStr);
+                var tree = git["tree"].AsArray;
+                repo_cache = tree;
+
+                return tree;
+            }
+            catch(WebException ex)
+            {
+                DebugHud.Log(ex);
             }
 
-            // Parse the json response from GitHub
-            var git = SimpleJSON.JSON.Parse(jsonStr);
-            var tree = git["tree"].AsArray;
-            repo_cache = tree;
-
-            return tree;
+            return null;
         }
 
         public FILE_UPDATE_STATUS Get_Update_Status(string local_file, string remote_file)
@@ -97,6 +107,11 @@ namespace SR_PluginLoader
         {
             HttpWebResponse response = null;
             var request = (HttpWebRequest)WebRequest.Create(url);
+            if(request == null)
+            {
+                DebugHud.Log("Unable to create an instance of HttpWebRequest!");
+                return false;
+            }
             request.Headers[HttpRequestHeader.UserAgent] = USER_AGENT;
             request.Method = "HEAD";
 
