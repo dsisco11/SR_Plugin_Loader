@@ -1,0 +1,18 @@
+{
+	"plugins": [
+		"BeyondSlimes.Sisco++": {
+			"name": "BeyondSlimes",
+			"author": "Sisco++",
+			"description": "",
+			"icon": "",
+			"url": ""
+		},
+		"Slimefilter.Sisco++": {
+			"name": "SlimeFilter",
+			"author": "Sisco++",
+			"description": "",
+			"icon": "",
+			"url": ""
+		}
+	]
+}
