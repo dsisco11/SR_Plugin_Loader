@@ -5,7 +5,7 @@
 			"author": "Sisco++",
 			"description": "",
 			"icon": "",
-			"update_method": "GIT",
+			"update_method": "git",
 			"url": "",
 			"hash": ""
 		},
@@ -14,8 +14,8 @@
 			"author": "Sisco++",
 			"description": "",
 			"icon": "",
-			"update_method": "GIT",
-			"url": "https://dl.dropboxusercontent.com/u/5801699/SlimeFilter.dll",
+			"update_method": "git",
+			"url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SlimeFilter.dll",
 			"hash": ""
 		}
 	]
