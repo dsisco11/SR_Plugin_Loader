@@ -1,14 +1,20 @@
 {
 	"plugins": [
 		"BeyondSlimes.Sisco++": {
-			"name": "BeyondSlimes",
-			"author": "Sisco++",
-			"description": "",
-			"icon": "",
-			"update_method": "git",
-			"url": "",
-			"hash": ""
-		},
+	 		"name": "BeyondSlimes",
+	 		"author": "Sisco++",
+	 		"description": "- Increases VacPak firing speed.
+- Increases VacPak suction strength.
+- Increases the force of the vac-pak's pulse-wave.
+- Allows slimes to be sold.
+- Reduces value of all plorts.
+- Increases damage dealt by slimes.
+- Reduces the amount of food that spawns(everywhere) and increases respawn time for said food.
+            ",
+	 		"update_method": "GIT",
+	 		"url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/BeyondSlimes.dll",
+	 		"hash": "e7d7f25a93a9a35734941d9b60f148778505d17a"
+	 	},
 		"Slimefilter.Sisco++": {
 			"name": "SlimeFilter",
 			"author": "Sisco++",
