@@ -15,9 +15,7 @@ namespace SR_PluginLoader
     class MainMenu : MonoBehaviour
     {
         public static GameObject mainmenu = null;
-        private static GameObject plugins_panel_root = null;
-        public static PluginsMenu plugins_panel = null;
-        public static PluginsDownloadPanel plugins_download_panel = null;
+        public static PluginManager plugin_manager = null;
         private static bool _active = false;
         public static bool Active { get { return MainMenu._active; } }
         private static GUIContent title_content = null;
@@ -31,12 +29,7 @@ namespace SR_PluginLoader
             title_content = new GUIContent(Loader.NAME);
             this.TrySpawnPluginPanel();
         }
-
-        private void Start()
-        {
-            this.TrySpawnPluginMenu();
-        }
-
+        
         private void Update()
         {
             if (Levels.isSpecial(Application.loadedLevelName))
@@ -51,69 +44,11 @@ namespace SR_PluginLoader
         private void OnLevelWasLoaded(int lvl)
         {
             MainMenu.mainmenu = null;
-            return;
-
-            if(Levels.isSpecial(Application.loadedLevelName))
-            {
-                StartCoroutine(CheckForPluginUpdates());
-            }
-        }
-
-        private IEnumerator CheckForPluginUpdates()
-        {
-            int updates = 0;
-            foreach(Plugin plugin in Loader.plugins.Values)
-            {
-                if(plugin.data.UPDATES_URL != null)
-                {
-                    WWW update = new WWW(plugin.data.UPDATES_URL);
-
-                    while (!update.isDone)
-                        yield return new WaitForSeconds(0.1f);
-
-                    JSONNode data = JSON.Parse(update.text);
-                    if(data != null && data["plugin_hash"] != null && data["plugin_version"] != null && data["plugin_download"] != null)
-                    {
-                        if(String.Compare(plugin.DLL_Hash, data["plugin_hash"])!=0 || String.Compare(plugin.data.VERSION.ToString(), data["plugin_version"])!=0)
-                        {
-                            WWW download = new WWW(data["plugin_download"]);
-
-                            while (!download.isDone)
-                                yield return new WaitForSeconds(0.1f);
-
-                            if (download.bytes.Length > 0)
-                            {
-                                string file = plugin.file;
-                                string new_file = String.Format("{0}.tmp", file);
-                                string old_file = String.Format("{0}.old", file);
-
-                                File.WriteAllBytes(new_file, download.bytes);
-                                if (File.Exists(old_file)) File.Delete(old_file);
-                                File.Replace(new_file, file, old_file);
-                                updates++;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if(updates > 0)
-            {
-                new UI_Notification()
-                {
-                    msg = updates + " Plugins have been Updated.\nClick this box to restart!",
-                    title = updates + " Plugins Updated",
-                    onClick = delegate () { Loader.Restart_App(); }
-                };
-            }
         }
 
         private void TrySpawnPluginPanel()
         {
-            MainMenu.plugins_panel_root = new GameObject("PluginsPanel");
-            MainMenu.plugins_panel = MainMenu.plugins_panel_root.AddComponent<PluginsMenu>();
-            //MainMenu.plugins_download_panel = MainMenu.plugins_panel_root.AddComponent<PluginsDownloadPanel>();
-            UnityEngine.Object.DontDestroyOnLoad(MainMenu.plugins_panel_root);
+            MainMenu.plugin_manager = uiControl.Create<PluginManager>();
         }
 
         private void TrySpawnPluginMenu()
@@ -147,7 +82,9 @@ namespace SR_PluginLoader
                     PluginsButton.transform.SetParent(MenuUI);
                     // Add more height to the main menu UI panel so we can fit our fancy button in!
                     RectTransform menuSize = MenuUI.GetComponent<RectTransform>();
-                    MenuUI.GetComponent<RectTransform>().sizeDelta = new Vector2(menuSize.sizeDelta.x, menuSize.sizeDelta.y + 50f);
+                    //MenuUI.GetComponent<RectTransform>().sizeDelta = new Vector2(menuSize.sizeDelta.x, menuSize.sizeDelta.y + 50f);
+                    MenuUI.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+                    MenuUI.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width, Screen.height);
 
                     PluginsButton.transform.localPosition = new Vector2(btnPos.localPosition.x, (btnPos.localPosition.y + btnSize.rect.height));
 
@@ -176,10 +113,11 @@ namespace SR_PluginLoader
 
         private void OnClick()
         {
-            MainMenu._active = true;
+            MainMenu._active = false;
             MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
             MainMenu.mainmenu.SetActive(false);
-            MainMenu.plugins_panel.active = true;
+            //MainMenu.plugins_panel.active = true;
+            MainMenu.plugin_manager.Show();
         }
 
         private void OnGUI()

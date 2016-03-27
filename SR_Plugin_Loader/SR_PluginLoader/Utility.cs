@@ -16,14 +16,23 @@ namespace SR_PluginLoader
     public enum GRADIENT_DIR
     {
         LEFT_RIGHT,
-        RIGHT_LEFT,
-        TOP_BOTTOM,
-        BOTTOM_TOP
+        TOP_BOTTOM
     }
 
 
     public static class Utility
     {
+        public static WebClient Get_Web_Client()
+        {
+            var webClient = new WebClient();
+            // Add a useragent string so GitHub doesnt return 403 and also so they can have a chat if they like.
+            webClient.Headers.Add("user-agent", Updater_Base.USER_AGENT);
+            // Add a handler for SSL certs because mono doesnt have any trusted ones by default
+            ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+
+            return webClient;
+        }
+
         public static string SHA(string data)
         {
             System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
@@ -55,12 +64,13 @@ namespace SR_PluginLoader
 
         public static string Get_File_Sha1(string file)
         {
+            if (!File.Exists(file)) return null;
             var buf = File.ReadAllBytes(file);
             string data = Encoding.ASCII.GetString(buf);
-            data = ("blob" + data.Length + "\0" + data);
+            string data_str = String.Format("blob {0}\0{1}", data.Length, data);
 
             System.Security.Cryptography.SHA1 sha1 = System.Security.Cryptography.SHA1.Create();
-            byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data));
+            byte[] hash = sha1.ComputeHash(Encoding.ASCII.GetBytes(data_str));
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < hash.Length; i++)
@@ -135,9 +145,7 @@ namespace SR_PluginLoader
 
             return buf;
         }
-
-
-
+        
         public static void Set_BG_Color(GUIStyleState style, float R, float G, float B, float A = 1.0f)
         {
             Set_BG_Color(style, new Color(R, G, B, A));
@@ -146,16 +154,19 @@ namespace SR_PluginLoader
         public static void Set_BG_Color(GUIStyleState style, Color clr)
         {
             if (style == null) return;
-            if (style.background == null) style.background = new Texture2D(1, 1);
 
+            style.background = null;
+            style.background = new Texture2D(1, 1);
             style.background.SetPixel(0, 0, clr);
             style.background.Apply();
         }
 
         public static float Lerp(float a, float b, float f)
         {
-            return (a * (f)) + (b * (1f - f));
+            float fv = Math.Abs(f);
+            return (a * fv) + (b * (1f - fv));
         }
+        
         /// <summary>
         /// Create a gradient texture from with a base color other then white-black
         /// </summary>
@@ -185,7 +196,7 @@ namespace SR_PluginLoader
         {
             int xsz = 1;
             int ysz = 1;
-            if (dir == GRADIENT_DIR.BOTTOM_TOP || dir == GRADIENT_DIR.TOP_BOTTOM) ysz = pixels;
+            if (dir == GRADIENT_DIR.TOP_BOTTOM) ysz = pixels;
             else xsz = pixels;
 
             var texture = new Texture2D(xsz, ysz, TextureFormat.RGBA32, true);
@@ -194,7 +205,7 @@ namespace SR_PluginLoader
             {
                 float t = ((float)i / (float)pixels);
                 if (exponential) t = (float)Math.Pow((double)t, exponent);
-                if (dir == GRADIENT_DIR.TOP_BOTTOM || dir == GRADIENT_DIR.RIGHT_LEFT) t = (1f - t);
+                if (dir == GRADIENT_DIR.TOP_BOTTOM) t = (1f - t);
 
                 var clr = Color.Lerp(clr1, clr2, t);
                 /*
@@ -207,7 +218,7 @@ namespace SR_PluginLoader
                 int x = 0;
                 int y = 0;
 
-                if (dir == GRADIENT_DIR.BOTTOM_TOP || dir == GRADIENT_DIR.TOP_BOTTOM) y = i;
+                if (dir == GRADIENT_DIR.TOP_BOTTOM) y = i;
                 else x = i;
 
                 texture.SetPixel(x, y, clr);
@@ -221,12 +232,83 @@ namespace SR_PluginLoader
         }
 
 
+        public delegate Color PixelColoringDelegate(int x, int y, int width, int height);
+        public static Texture2D Create_Texture(int width, int height, PixelColoringDelegate func)
+        {
+            var texture = new Texture2D(width, height, TextureFormat.RGBA32, true);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    texture.SetPixel(x, y, func(x, y, width, height));
+                }
+            }
+
+            texture.anisoLevel = 4;
+            texture.filterMode = FilterMode.Trilinear;
+            texture.Apply(true);
+            return texture;
+        }
+
+        public static Texture2D Create_Sheen_Texture(int size, Color tint)
+        {
+            return Utility.Create_Texture(1, size, (int x, int y, int w, int h) => {
+                float f = ((float)y / (float)h);
+                float g = Utility.Lerp(0.25f, 0.15f, f);
+                if (y >= (h - 35)) g += 0.25f;
+
+                return new Color(tint.r*g, tint.g*g, tint.b*g, tint.a);
+            });
+        }
+        
         public static void Set_BG_Gradient(GUIStyleState style, int pixels, GRADIENT_DIR dir, Color clr1, Color clr2, bool exponential = false, float exponent = 1f)
         {
             if (style == null) return;
             var tex = Get_Gradient_Texture(pixels, dir, clr1, clr2, exponential, exponent);
             style.background = tex;
         }
+
+        public static Texture2D Tint_Texture(Texture2D tex, Color clr)
+        {
+            for(int x=0; x<tex.width; x++)
+            {
+                for (int y = 0; y < tex.height; y++)
+                {
+                    Color p = tex.GetPixel(x, y);
+                    p *= clr;
+                    tex.SetPixel(x, y, p);
+                }
+            }
+
+            tex.Apply();
+            return tex;
+        }
+
+        public static bool floatEq(float a, float b, float epsilon = 0.001f)
+        {
+            float absA = Math.Abs(a);
+            float absB = Math.Abs(b);
+            float diff = Math.Abs(a - b);
+
+            if (a == b)
+            { // shortcut, handles infinities
+                return true;
+            }
+            else if (a == 0 || b == 0 || diff < float.Epsilon)
+            {
+                // a or b is zero or both are extremely close to it
+                // relative error is less meaningful here
+                return diff < (epsilon * float.Epsilon);
+            }
+            else { // use relative error
+                return diff / (absA + absB) < epsilon;
+            }
+        }
         
+        public static string JSON_Escape_String(string str)
+        {
+            return str.Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t");
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace SR_PluginLoader
         
         private bool needs_layout = true;
 
-        private Rect screen_area, console_area, console_inner_area, console_inner_text_area, console_scrollbar_area, fade_area, watermark_text_area, watermark_area, player_pos_area;
+        private Rect screen_area, console_area, console_inner_area, console_inner_text_area, fade_area, watermark_text_area, watermark_area, player_pos_area;
 
         private const float alert_size = 32f;
         private const float alert_icon_offset = 10f;
@@ -235,14 +235,15 @@ namespace SR_PluginLoader
                     return false;
                 case EventType.Repaint:
                     break;
+                case EventType.MouseDrag:
                 case EventType.MouseMove:
                 case EventType.MouseDown:
                 case EventType.MouseUp:
-                        Event.current.Use();
+                        //Event.current.Use();
+                    return false;
                     break;
                 default:
-                        GUIUtility.hotControl = id;
-                        Event.current.Use();
+                        //Event.current.Use();
                     break;
             }
 

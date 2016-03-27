@@ -178,8 +178,14 @@ namespace SR_PluginLoader
             return str;
         }
 
+        public static string AppendTimeStamp(string line)
+        {
+            return String.Format("[{0}] {1}", DateTime.Now.ToString("HH:mm:ss"), line);
+        }
+
         private static void Add_Line(string str, bool write_to_unity=false)
         {
+            str = DebugHud.AppendTimeStamp(str);
             DebugHud.write_log(str, write_to_unity);
 
             if (DebugHud.hud == null)

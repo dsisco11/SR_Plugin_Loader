@@ -58,8 +58,29 @@
   <ItemGroup>
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
+    <Compile Include="UI\Plugin_Update_Item.cs" />
+    <Compile Include="UI\uiCheckbox.cs" />
+    <Compile Include="UI\uiTextArea.cs" />
+    <Compile Include="UI\Plugin_Update_Viewer.cs" />
+    <Compile Include="UI\PluginManager.cs" />
+    <Compile Include="UI\PluginSelector.cs" />
+    <Compile Include="UI\uiScrollView.cs" />
+    <Compile Include="UI\uiToggle.cs" />
+    <Compile Include="UI\uiIcon.cs" />
+    <Compile Include="UI\ProgressBar_Element.cs" />
+    <Compile Include="UI\uiProgressBar.cs" />
+    <Compile Include="UI\Drawing.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Plugin Classes\Plugin_Update_Method.cs" />
+    <Compile Include="UI\uiTextbox.cs" />
+    <Compile Include="UI\Plugin_StoreItem.cs" />
+    <Compile Include="UI\PluginStore.cs" />
+    <Compile Include="UI\uiButton.cs" />
+    <Compile Include="UI\uiListView.cs" />
+    <Compile Include="UI\uiControl.cs" />
+    <Compile Include="UI\uiPanel.cs" />
+    <Compile Include="UI\uiText.cs" />
+    <Compile Include="UI\uiWindow.cs" />
     <Compile Include="Updaters\Git_Updater.cs" />
     <Compile Include="Singleton.cs" />
     <Compile Include="UI\Notice_Manager.cs" />
@@ -68,12 +89,9 @@
     <Compile Include="Loader.cs" />
     <Compile Include="MainMenu.cs" />
     <Compile Include="Plugin Classes\Plugin.cs" />
-    <Compile Include="UI\PluginSelector.cs" />
-    <Compile Include="UI\PluginsDownloadPanel.cs" />
-    <Compile Include="UI\PluginsMenu.cs" />
     <Compile Include="Plugin Classes\Plugin_Dependency.cs" />
     <Compile Include="Plugin Classes\Plugin_Download_Data.cs" />
-    <Compile Include="Plugin Classes\Plugin_Info.cs" />
+    <Compile Include="Plugin Classes\Plugin_Data.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Plugin Classes\Plugin_Version.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -90,6 +108,8 @@
     <Compile Include="Updaters\Updater_Base.cs" />
     <Compile Include="Utility.cs" />
     <Compile Include="SiscosHooks\_hook_result.cs" />
+    <Compile Include="Updaters\Web_Updater.cs" />
+    <Compile Include="Updaters\WebAsync.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -108,10 +128,16 @@
     <EmbeddedResource Include="Resources\Restart_Helper.exe" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="SR Utility\" />
+    <EmbeddedResource Include="Resources\checkbox.png" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\checkmark.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

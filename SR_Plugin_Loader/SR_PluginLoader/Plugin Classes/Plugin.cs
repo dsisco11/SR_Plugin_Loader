@@ -6,6 +6,7 @@ using System.Text;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 namespace SR_PluginLoader
 {
@@ -14,22 +15,22 @@ namespace SR_PluginLoader
         public Plugin_Data data = null;
         private int _id = 0;
         public int id { get { return this._id; } }
-        public string Hash { get { return Utility.SHA(String.Format("{0}.{1}", this.data.AUTHOR, this.data.NAME)); } }
+        public string Hash { get { return this.data.Hash; } }
+        protected Updater_Base Updater { get { return Updater_Base.Get(this.data.UPDATE_METHOD.METHOD); } }
 
         /// <summary>
         /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to other plugin dll's
         /// </summary>
-        private string _cached_dll_hash = null;
-        public string DLL_Hash {
+        private string _cached_data_hash = null;
+        public string Data_Hash {
             get
             {
                 if (!File.Exists(file)) return null;
-                if (_cached_dll_hash == null) _cached_dll_hash = Utility.Get_File_Sha1(file);
+                if (_cached_data_hash == null) _cached_data_hash = Utility.Get_File_Sha1(file);
 
-                return _cached_dll_hash;
+                return _cached_data_hash;
             }
         }
-        public bool IsInstalled { get { return (Loader.GetPluginByHash(Hash) != null); } }
 
         /// <summary>
         /// The game object assigned to manage this plugin.
@@ -37,7 +38,7 @@ namespace SR_PluginLoader
         private GameObject root = null;
         private string Unique_GameObject_Name { get { return String.Format("{0}.{1}", this.data.AUTHOR, this.data.NAME); } }
 
-
+        private bool is_update_available = false;
         public bool enabled = false;
         /// <summary>
         /// Does this plugin have dependencys that arent currently met?
@@ -410,6 +411,69 @@ namespace SR_PluginLoader
                 DebugHud.Log(ex);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Causes this plugin to check and see if it has any updates.
+        /// </summary>
+        public bool check_for_updates()
+        {
+            if (is_update_available) return true;
+
+            if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException("Plugin has no UPDATE_METHOD specified!");
+
+            var status = this.Updater.Get_Update_Status(this.data.UPDATE_METHOD.URL, this.file);
+            is_update_available = (status == FILE_UPDATE_STATUS.OUT_OF_DATE);
+            return is_update_available;
+        }
+
+        /// <summary>
+        /// Starts downloading the latest version of this plugin.
+        /// (Coroutine)
+        /// </summary>
+        /// <param name="prog">uiProgressBar instance which this function will use to display the current update progress.</param>
+        /// <returns></returns>
+        public IEnumerator download_update(uiProgressBar prog, Updater_File_Download_Completed download_complete_cb)
+        {
+            if (!this.check_for_updates())
+            {
+                DebugHud.Log("Plugin.download_update():  Already up to date!");
+                yield break;
+            }
+
+            yield return this.force_download(prog, download_complete_cb);
+        }
+
+        /// <summary>
+        /// Forces the plugin to download the latest version of itself.
+        /// (Coroutine)
+        /// </summary>
+        /// <param name="prog">uiProgressBar instance which this function will use to display the current update progress.</param>
+        /// <returns></returns>
+        public IEnumerator force_download(uiProgressBar prog, Updater_File_Download_Completed download_complete_cb)
+        {
+            if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException("Plugin has no UPDATE_METHOD specified!");
+            
+            IEnumerator iter = this.Updater.Download(this.data.UPDATE_METHOD.URL, this.file, null,
+               (int current, int total) =>
+               {//Download progress
+                    float f = (float)current / (float)total;
+
+                   if (prog != null)
+                   {
+                       float p = (float)current / (float)total;
+                       prog.progress = p;
+                   }
+               },
+               (string file) => 
+               {
+                   this.is_update_available = false;
+                   if (download_complete_cb != null) download_complete_cb(file);
+               });
+            // Run the download coroutine within this coroutine without starting a seperate instance.
+            while (iter.MoveNext()) yield return null;
+            
+            yield break;// Honestly probably not needed but I like to be safe because I still don't fully know the innerworkings of unity's coroutine system.
         }
     }
 }

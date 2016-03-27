@@ -3,75 +3,104 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityEngine.UI;
+
 
 namespace SR_PluginLoader
 {
-    public class PluginSelector : MonoBehaviour
+    public class PluginSelector : uiPanel
     {
-        private static GUIStyle style = null;
-        private static GUIStyle border_style = null;
-        private static GUIStyle status_style = null;
-        private static GUIStyle txt_style = null;
-        private static GUIStyle txt_style_title = null;
-        private static GUIStyle txt_style_vers = null;
-
+        public string Hash { get { if (this.plugin == null) { return null; } return this.plugin.Hash; } }
         private Plugin plugin = null;
-        private bool active = false;
-        private bool needs_layout = true;
-        public static float DEFAULT_HEIGHT = 50f;
-        private Vector2 size = new Vector2(190f, DEFAULT_HEIGHT);
+        private uiText pl_title = null, pl_version = null, pl_status = null;
+        private uiIcon pl_icon = null;
 
-        private Vector2 pos = Vector2.zero;
-        private Rect _position, plugin_title_pos, plugin_status_pos, plugin_version_pos;
-        public Rect position { get { return this._position; } }
-
-        private GUIContent plugin_title = new GUIContent();
-        private GUIContent plugin_status = new GUIContent();
-        private GUIContent plugin_version = new GUIContent();
-        private GUIContent plugin_icon = new GUIContent();
+        private bool plugin_state_init = false;
+        private bool last_plugin_en_state = false;
         
 
-        /// <summary>
-        /// Is the mouse clicking this control?
-        /// </summary>
-        private bool isDepressed = false;
-
-        /// <summary>
-        /// Is the mouse hovering over this control?
-        /// </summary>
-        private bool isHovering = false;
-
-        public void Set_Pos(float x, float y)
+        public PluginSelector()
         {
-            this.pos.x = x;
-            this.pos.y = y;
-            this.needs_layout = true;
+            this.Set_Size(200f, 50f);
+            this.margin = new RectOffset(5, 5, 2, 0);
+            this.padding = new RectOffset(2, 2, 2, 2);
+            this.border.normal = new uiBorderStyleState() { color = new Color32(40, 40, 40, 255), size = new RectOffset(1, 1, 1, 1) };
+            this.border.hover = new uiBorderStyleState() { color = new Color32(64, 64, 64, 255) };
+
+            float shade = 0.2f;
+            //set normal styles bg color
+            //local_style.normal.background = new Texture2D(1, 1);
+            //local_style.normal.background.SetPixel(0, 0, new Color(shade, shade, shade, 1f));
+            //local_style.normal.background.Apply();
+            
+            Utility.Set_BG_Color(this.local_style.normal, shade, shade, shade, 0.9f);
+            local_style.active.background = Utility.Get_Gradient_Texture(200, GRADIENT_DIR.TOP_BOTTOM, new Color(shade, shade, shade), new Color32(25, 99, 141, 255));
+
+            shade += 0.3f;
+            Utility.Set_BG_Color(local_style.hover, shade, shade, shade, 0.5f);
+
+
+            pl_icon = Create<uiIcon>();
+            this.Add("icon", pl_icon);
+
+            pl_title = Create<uiText>();
+            GUIStyle tSty = new GUIStyle();
+            tSty.normal.textColor = new Color(1f, 1f, 1f);
+            tSty.fontStyle = FontStyle.Bold;
+            tSty.fontSize = 16;
+            pl_title.Set_Style(tSty);
+            this.Add("title", pl_title);
+
+            pl_version = Create<uiText>();
+            GUIStyle vSty = new GUIStyle();
+            vSty.normal.textColor = new Color(0.7f, 0.7f, 0.7f, 0.9f);
+            vSty.fontStyle = FontStyle.Italic;
+            vSty.fontSize = 12;
+            pl_version.Set_Style(vSty);
+            this.Add("version", pl_version);
+
+            pl_status = Create<uiText>();
+            Utility.Set_BG_Color(pl_status.local_style.normal, 0f, 0f, 0f, 0.3f);
+            pl_status.selfPadding = new RectOffset(2, 2, 2, 2);
+            pl_status.local_style.fontStyle = FontStyle.Bold;
+            pl_status.local_style.fontSize = 12;
+            pl_status.local_style.alignment = TextAnchor.MiddleCenter;
+            //pl_status.local_style.normal.textColor = Color.red;// plugin is disabled
+            //pl_status.local_style.active.textColor = Color.green;// plugin is enabled
+            this.Add("status", pl_status);
         }
 
-        public void Set_Width(float f)
+        private void Update()
         {
-            this.size.x = f;
-            this.needs_layout = true;
+            if (plugin == null) return;
+            if (plugin.enabled != last_plugin_en_state || !plugin_state_init)
+            {
+                plugin_state_init = true;
+                last_plugin_en_state = plugin.enabled;
+                Plugin_State_Changed();
+            }
         }
 
-        public void Set_Height(float f)
+        private void Plugin_State_Changed()
         {
-            this.size.y = f;
-            this.needs_layout = true;
-        }
-        
-        private GUIContent CreateText(string str)
-        {
-            //DebugHud.Log("TryCreateContent: {0}", obj.ToString());
-            var txt = new GUIContent(str);
-
-            return txt;
+            this.pl_status.active = plugin.enabled;
+            this.pl_status.text = (plugin.enabled ? "Enabled" : "Disabled");
+            this.pl_status.local_style.normal.textColor = (plugin.enabled ? Color.green : Color.red);
         }
 
-        public void Set_Active(bool b)
+        public override void doLayout()
         {
-            this.active = b;
+            float icon_sz = this.inner_area.height;
+            pl_icon.Set_Pos(0, 0);
+            pl_icon.Set_Size(icon_sz, icon_sz);
+
+            const float xPad = 4f;
+            pl_title.moveRightOf(pl_icon, xPad);
+
+            pl_version.moveRightOf(pl_icon, xPad);
+            pl_version.moveBelow(pl_title);
+
+            pl_status.alignBottom();
+            pl_status.alignRightSide();
         }
 
         public Plugin Get_Plugin()
@@ -81,7 +110,7 @@ namespace SR_PluginLoader
 
         public void Set_Plugin(Plugin p)
         {
-            if(p == null)
+            if (p == null)
             {
                 DebugHud.Log(new Exception("Plugin is null!"));
                 return;
@@ -96,160 +125,20 @@ namespace SR_PluginLoader
                     return;
                 }
 
-                this.plugin_title.text = plugin.data.NAME;
-                this.plugin_version.text = plugin.data.VERSION.ToString();
+                this.pl_title.text = plugin.data.NAME;
+                this.pl_version.text = plugin.data.VERSION.ToString();
 
-                if (plugin.icon != null) this.plugin_icon = new GUIContent(plugin.icon);
-                else if (Loader.tex_unknown) this.plugin_icon = new GUIContent(Loader.tex_unknown);
-                else this.plugin_icon = GUIContent.none;
+                if (plugin.icon != null) this.pl_icon.image = plugin.icon;
+                else if (Loader.tex_unknown != null) this.pl_icon.image = Loader.tex_unknown;
+                else this.pl_icon.image = null;
+
+                this.plugin_state_init = false;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 DebugHud.Log(ex);
             }
         }
-        
-        private void Init_Style()
-        {
-            PluginSelector.style = new GUIStyle();
-            int border_sz = 2;
-            style.border = new RectOffset(border_sz, border_sz, border_sz, border_sz);
 
-            PluginSelector.border_style = new GUIStyle();
-            Utility.Set_BG_Color(PluginSelector.border_style.normal, new Color32(0, 0, 0, 255));
-            //Utility.Set_BG_Color(PluginSelector.border_style.hover, new Color32(128, 128, 128, 255));
-            //Utility.Set_BG_Color(PluginSelector.border_style.active, new Color32(200, 200, 200, 255));
-
-
-            PluginSelector.status_style = new GUIStyle();
-            Color bg_status_fade = new Color32(32, 32, 32, 100);
-            Utility.Set_BG_Color(PluginSelector.status_style.normal, bg_status_fade);
-            PluginSelector.status_style.normal.textColor = new Color32(220, 32, 32, 164);
-            Utility.Set_BG_Color(PluginSelector.status_style.active, bg_status_fade);
-            PluginSelector.status_style.active.textColor = new Color32(32, 170, 32, 180);
-            PluginSelector.status_style.fontStyle = FontStyle.Bold;
-            PluginSelector.status_style.fontSize = 12;
-            PluginSelector.status_style.alignment = TextAnchor.MiddleCenter;
-            
-            PluginSelector.txt_style = new GUIStyle();
-            PluginSelector.txt_style.normal.textColor = new Color(1f, 1f, 1f);
-            PluginSelector.txt_style.fontStyle = FontStyle.Italic;
-
-            PluginSelector.txt_style_title = new GUIStyle();
-            PluginSelector.txt_style_title.normal.textColor = new Color(1f, 1f, 1f);
-            PluginSelector.txt_style_title.fontStyle = FontStyle.Bold;
-            PluginSelector.txt_style_title.fontSize = 16;
-
-            PluginSelector.txt_style_vers = new GUIStyle();
-            PluginSelector.txt_style_vers.normal.textColor = new Color(0.7f, 0.7f, 0.7f, 0.9f);
-            PluginSelector.txt_style_vers.fontStyle = FontStyle.Italic;
-            PluginSelector.txt_style_vers.fontSize = 12;
-
-
-            float shade = 0.2f;
-            //set normal styles bg color
-            Utility.Set_BG_Color(PluginSelector.style.normal, shade, shade, shade, 0.9f);
-            PluginSelector.style.active.background = Utility.Get_Gradient_Texture(200, GRADIENT_DIR.TOP_BOTTOM, new Color(shade, shade, shade), new Color32(25, 99, 141, 255));
-
-            shade += 0.3f;
-            Utility.Set_BG_Color(style.hover, shade, shade, shade, 0.5f);
-        }
-
-        private void OnGUI()
-        {
-        }
-
-        public bool Display()
-        {
-            //if (plugin == null && this.plugin != null) plugin = this.plugin;
-            if (style == null) this.Init_Style();
-            if(this.needs_layout) this.doLayout();
-
-            
-            int id = GUIUtility.GetControlID(0, FocusType.Passive, _position);
-            var evt = Event.current.GetTypeForControl(id);
-            this.isHovering = this._position.Contains(Event.current.mousePosition);
-
-            switch (evt)
-            {
-                case EventType.MouseDown:
-                    if (this.isHovering)
-                    {
-                        GUIUtility.hotControl = id;
-                        Event.current.Use();
-                        this.isDepressed = true;
-                    }
-                    break;
-                case EventType.MouseUp:
-                    if (GUIUtility.hotControl == id)
-                    {
-                        GUIUtility.hotControl = 0;
-                        Event.current.Use();
-                        this.isDepressed = false;
-                        if (this.isHovering) return true;
-                    }
-                    return false;
-                case EventType.Repaint:
-                    bool focus = (GUIUtility.hotControl == id);
-                    bool isActive = (this.isDepressed || this.active);
-
-                    //PluginSelector.border_style.Draw(_position, GUIContent.none, this.isHovering, false, false, false);
-                    PluginSelector.style.Draw(_position, this.plugin_icon, this.isHovering || isActive, isActive, false, focus);
-                    GUI.BeginGroup(this._position);
-                        PluginSelector.txt_style_title.Draw(this.plugin_title_pos, this.plugin_title, this.isHovering, this.isDepressed, true, focus);
-                        PluginSelector.txt_style_vers.Draw(this.plugin_version_pos, this.plugin_version, this.isHovering, this.isDepressed, true, focus);
-                    GUI.EndGroup();
-
-                    this.Draw_Plugin_Status();
-                    break;
-            }
-
-            return false;
-        }
-
-        private void Draw_Plugin_Status()
-        {
-            const float status_inner_pad_x = 3f;
-            const float status_inner_pad_y = 1f;
-            const float status_outter_pad = 2f;
-            bool plugin_en = this.plugin.enabled;
-            var status_text = new GUIContent(plugin_en ? "Enabled" : "Disabled");
-            var sz = PluginSelector.status_style.CalcSize(status_text);
-            sz.x += (status_inner_pad_x*2f);
-            sz.y += (status_inner_pad_y*2f);
-
-            //plugin status is relative, like the title and version texts
-            this.plugin_status_pos = new Rect(this._position.xMax - (sz.x + status_outter_pad), this._position.yMax - (sz.y + status_outter_pad), sz.x, sz.y);
-
-            PluginSelector.status_style.Draw(this.plugin_status_pos, status_text, plugin_en, plugin_en, false, false);
-        }
-
-        private void doLayout()
-        {
-            this.needs_layout = false;
-
-            float width = this.size.x;
-            float height = this.size.y;
-
-            float content_width = (width - height - 5f);
-            float padding_y = 0f;
-            float padding_y2 = (padding_y * 2f);
-
-            float padding_x = 3f;
-            float padding_x2 = (padding_x * 2f);
-
-            float inner_width = (width - padding_y2);
-            float inner_height = (height - padding_y2);
-
-            float status_width = 60f;
-            float status_height = 20f;
-            float status_pad = 5f;
-
-            _position = new Rect(pos.x + padding_x, pos.y + padding_y, width - padding_x2, height - padding_y2);
-
-            plugin_title_pos = new Rect(55f, 10f, content_width, 15f);
-            plugin_status_pos = new Rect(width - (status_width + status_pad), height - (status_height + status_pad), status_width, status_height);
-            plugin_version_pos = new Rect(55f, 28f, content_width, 15f);
-        }
     }
 }
