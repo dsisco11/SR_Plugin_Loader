@@ -5,24 +5,21 @@
 	 		"author": "Sisco++",
 	 		"description": "- Increases VacPak firing speed.\n- Increases VacPak suction strength.\n- Increases the force of the vac-pak's pulse-wave.\n- Allows slimes to be sold.\n- Reduces value of all plorts.\n- Increases damage dealt by slimes.\n- Reduces the amount of food that spawns(everywhere) and increases respawn time for said food.",
 	 		"update_method": "GIT",
-	 		"url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/BeyondSlimes.dll",
-	 		"hash": "e7d7f25a93a9a35734941d9b60f148778505d17a"
+	 		"url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/BeyondSlimes.dll"
 	 	},
 	 	"SlimeFilter.Sisco++": {
 		 	"name": "SlimeFilter",
 			 "author": "Sisco++",
 			 "description": "- Holding the ALT key will make the VacPak's suction ignore slimes.",
 			 "update_method": "GIT",
-			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SlimeFilter.dll",
-			 "hash": "b0e418cde6e29a169a3126e2a2487b04cdb4aaef"
+			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SlimeFilter.dll"
 		 }
 		"SiloEnhancer.Sisco++": {
 			 "name": "SiloEnhancer",
 			 "author": "Sisco++",
 			 "description": "- Changes plort collectors so when using the vac-pak on them they will immediately suck out any loose plorts within their corral.\n- Alters silos so they dispense slightly faster.\n- Alters silos so they will not dispense more then the player can hold!\n- Garden timers can be refreshed by depositing another item of the same type into their canister.",
 			 "update_method": "GIT",
-			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SiloEnhancer.dll",
-			 "hash": "50908dd6e57077ba53cb21b91b2dd26b4fb1e9b0"
+			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SiloEnhancer.dll"
 	 	}
 	]
 }
