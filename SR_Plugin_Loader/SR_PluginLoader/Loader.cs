@@ -14,13 +14,11 @@ namespace SR_PluginLoader
 {
     public static class Loader
     {
-        public static string DOWNLOADURL { get { return "http://satycreations.com/developer.json"; } }
-
         public static bool atMainMenu = true;
         public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", Loader.VERSION); } }
         public static string DOWNLOADTITLE { get { return String.Format("Download Plugins"); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
-        public static Plugin_Version VERSION = new Plugin_Version(0, 3);// even though really this isnt a plugin, I guess if we ever do major changes a plugin could specify the loader as a requirement and set a specific version.
+        public static Plugin_Version VERSION = new Plugin_Version(0, 4);// even though really this isnt a plugin, I guess if we ever do major changes a plugin could specify the loader as a requirement and set a specific version.
 
         private static GameObject root = null;
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
@@ -29,7 +27,11 @@ namespace SR_PluginLoader
         
         public static Texture2D tex_unknown = new Texture2D(1, 1);
         public static Texture2D tex_alert = new Texture2D(1, 1);
+        public static Texture2D tex_close = new Texture2D(1, 1);
+        public static Texture2D tex_close_dark = new Texture2D(1, 1);
         public static Texture2D tex_logo = new Texture2D(1, 1);
+        public static Texture2D tex_checkbox = new Texture2D(1, 1);
+        public static Texture2D tex_checkmark = new Texture2D(1, 1);
 
         public static bool has_updates = false;
 
@@ -39,9 +41,9 @@ namespace SR_PluginLoader
         private static WebClient web = new WebClient();
         private static string update_helper_file = null;
         private static List<string> available_updates= new List<string>();// This isn't for plugin updates (yet)
-
-
+        
         private static MainMenu menu = null;
+
 
         public static void init(string hash)
         {
@@ -63,7 +65,6 @@ namespace SR_PluginLoader
                 bool ok = Verify_PluginLoader_Hash(hash);
                 if (!ok) return;
 
-
                 IN_LOADING_PHASE = true;
                 Setup_Plugin_Dir();
                 Check_For_Updates();
@@ -72,6 +73,8 @@ namespace SR_PluginLoader
                 Assemble_Plugin_List(); 
                 Load_Config();
                 IN_LOADING_PHASE = false;
+
+                uiControl.Create<Plugin_Update_Viewer>();// This control manages itself and is only able to become visible under certain conditions which it will control. Therefore it needs no var to track it.
             }
             catch(Exception ex)
             {
@@ -79,7 +82,7 @@ namespace SR_PluginLoader
                 DebugHud.Log(ex);
             }
         }
-
+        
         /// <summary>
         /// Checks the given hash against the current dll files hash to make sure the proper version is installed
         /// </summary>
@@ -120,7 +123,13 @@ namespace SR_PluginLoader
         {
             Loader.TryLoadAsset(ref Loader.tex_unknown, "unknown.png");
             Loader.TryLoadAsset(ref Loader.tex_alert, "alert.png");
+            Loader.TryLoadAsset(ref Loader.tex_close, "close.png");
+            Loader.TryLoadAsset(ref Loader.tex_close_dark, "close.png");
             Loader.TryLoadAsset(ref Loader.tex_logo, "logo.png");
+            Loader.TryLoadAsset(ref Loader.tex_checkbox, "checkbox.png");
+            Loader.TryLoadAsset(ref Loader.tex_checkmark, "checkmark.png");
+
+            Utility.Tint_Texture(Loader.tex_close_dark, new Color(1f, 1f, 1f, 0.5f));
         }
 
         public static void TryLoadAsset(ref Texture2D tex, string asset)
@@ -140,23 +149,38 @@ namespace SR_PluginLoader
             string[] files = Directory.GetFiles(pluginDir);
             foreach(string file in files)
             {
-                string ext = Path.GetExtension(file);
-                if (ext != ".dll") continue;
+                Add_Plugin_To_List(file);
+            }
+        }
 
-                Plugin plug = new Plugin(file);
+        public static bool Add_Plugin_To_List(string file)
+        {
+            string ext = Path.GetExtension(file);
+            if (ext != ".dll") return false;
 
-                string name = Path.GetFileNameWithoutExtension(file);
-                plugins[name] = plug;
+            Plugin plug = new Plugin(file);
 
-                try
+            string name = Path.GetFileNameWithoutExtension(file);
+            plugins[name] = plug;
+
+            try
+            {
+                plug.load();
+            }
+            catch (Exception ex)
+            {
+                DebugHud.Log(ex);
+                return false;
+            }
+
+            if(Loader.menu != null)
+            {
+                if(MainMenu.plugin_manager != null)
                 {
-                    plug.load();
-                }
-                catch (Exception ex)
-                {
-                    DebugHud.Log(ex);
+                    MainMenu.plugin_manager.Update_Plugins_List();
                 }
             }
+            return true;
         }
 
         public static void Setup_Plugin_Dir()
@@ -342,7 +366,7 @@ namespace SR_PluginLoader
         private static void Check_For_Updates()
         {
             has_updates = Do_Update_Check();
-            if(has_updates == true)
+            if (has_updates == true)
             {
                 new UI_Notification()
                 {
@@ -355,12 +379,12 @@ namespace SR_PluginLoader
 
         public static void Auto_Update()
         {
-            foreach(var fn in available_updates)
+            foreach(var url in available_updates)
             {
                 DebugHud.Log("Updating plugin loader...");
-                string url = String.Format("https://raw.github.com/dsisco11/SR_Plugin_Loader/master/{0}", fn);
                 byte[] buf = web.DownloadData(url);
-                string file = Assembly.GetExecutingAssembly().Location;
+
+                string file = String.Concat(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.GetFileName(url));
                 string new_file = String.Format("{0}.tmp", file);
                 string old_file = String.Format("{0}.old", file);
 
@@ -377,35 +401,61 @@ namespace SR_PluginLoader
         /// </summary>
         private static bool Do_Update_Check()
         {
-            string assembly_file = "Installer/SR_PluginLoader.dll";
-            var assembly_status = Git_Updater.instance.Get_Update_Status(Assembly.GetExecutingAssembly().Location, assembly_file);
-            if (assembly_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
+            try
             {
-                available_updates.Add(assembly_file);
-                //the assembly is out of date!
-                DebugHud.Log("[AutoUpdate] The plugin loader is out of date!");
-                return true;
+                string assembly_url = "https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer/SR_PluginLoader.dll";
+                var assembly_status = Git_Updater.instance.Get_Update_Status(assembly_url, Assembly.GetExecutingAssembly().Location);
+                if (assembly_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
+                {
+                    available_updates.Add(assembly_url);
+                    //the assembly is out of date!
+                    DebugHud.Log("[AutoUpdate] The plugin loader is out of date!");
+                }
+
+                string installer_path = String.Format("{0}\\SR_PluginLoader_Installer.exe", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
+                string installer_url = "https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer/SR_PluginLoader_Installer.exe";
+                var installer_status = Git_Updater.instance.Get_Update_Status(installer_url, installer_path);
+                if (installer_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
+                {
+                    available_updates.Add(installer_url);
+                    //the installer is out of date!
+                    DebugHud.Log("[AutoUpdate] The installer is out of date!");
+                }
+
+                return (available_updates.Count > 0);
             }
-
-
-            string installer_path = String.Format("{0}\\SR_PluginLoader_Installer.exe", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-            string installer_file = "Installer/SR_PluginLoader_Installer.exe";
-            var installer_status = Git_Updater.instance.Get_Update_Status(installer_path, installer_file);
-            if (installer_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
+            catch(Exception ex)
             {
-                available_updates.Add(installer_file);
-                //the installer is out of date!
-                DebugHud.Log("[AutoUpdate] The installer is out of date!");
-                return true;
+                DebugHud.Log(ex);
             }
 
             return false;
         }
-
-        public static Plugin GetPluginByHash(string hash)
+        
+        public static bool Is_Plugin_Installed(Plugin_Data data)
         {
+            return Is_Plugin_Installed(data.Hash);
+        }
+
+        public static bool Is_Plugin_Installed(string hash)
+        {
+            foreach (KeyValuePair<string, Plugin> kv in Loader.plugins)
+            {
+                if (String.Compare(kv.Value.Hash, hash) == 0) return true;
+            }
+            return false;
+        }
+
+        public static Plugin Get_Plugin(string name_hash)
+        {
+            foreach (KeyValuePair<string, Plugin> kv in Loader.plugins)
+            {
+                if (String.Compare(kv.Value.Hash, name_hash) == 0) return kv.Value;
+            }
+
             return null;
         }
+
         /// <summary>
         /// Gets the SHA1 hash for the currently installed version of the plugin loader so it can be compared to the one on github and updated if needed
         /// </summary>
@@ -464,16 +514,23 @@ namespace SR_PluginLoader
 
         public static void Restart_App()
         {
-            byte[] buf = Utility.Load_Resource("Restart_Helper.exe");
-            if (buf != null && buf.Length > 0)
+            try
             {
-                File.WriteAllBytes(update_helper_file, buf);
-                string args = String.Format("{0}", Process.GetCurrentProcess().Id);
-                Process.Start(update_helper_file, args);
+                byte[] buf = Utility.Load_Resource("Restart_Helper.exe");
+                if (buf != null && buf.Length > 0)
+                {
+                    File.WriteAllBytes(update_helper_file, buf);
+                    string args = String.Format("{0}", Process.GetCurrentProcess().Id);
+                    Process.Start(update_helper_file, args);
+                }
+                else
+                {
+                    DebugHud.Log("Failed to unpack the auto update helper!");
+                }
             }
-            else
+            catch(Exception ex)
             {
-                DebugHud.Log("Failed to unpack the auto update helper!");
+                DebugHud.Log(ex);
             }
         }
     }
