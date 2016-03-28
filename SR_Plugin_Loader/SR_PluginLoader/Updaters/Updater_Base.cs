@@ -29,7 +29,15 @@ namespace SR_PluginLoader
         /// <summary>
         /// This file seems to be a developer compiled one, there is no history record for it. (mostly returned from github updaters)
         /// </summary>
-        DEV_FILE
+        DEV_FILE,
+        /// <summary>
+        /// There was an error getting the file update status.
+        /// </summary>
+        ERROR,
+        /// <summary>
+        /// The remote file could not be located.
+        /// </summary>
+        NOT_FOUND
     }
 
     public delegate bool Updater_File_Type_Confirm(string ContentType);

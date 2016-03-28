@@ -163,9 +163,16 @@ namespace SR_PluginLoader
             int updates = 0;
             foreach (Plugin plugin in Loader.plugins.Values)
             {
-                bool has_update = plugin.check_for_updates();
-                if (has_update) updates++;
-                DebugHud.Log("Plugin[{0}] has_update = {1}", plugin.data.NAME, (has_update ? "TRUE" : "FALSE"));
+                try
+                {
+                    bool has_update = plugin.check_for_updates();
+                    if (has_update) updates++;
+                    //DebugHud.Log("Plugin[{0}] has_update = {1}", plugin.data.NAME, (has_update ? "TRUE" : "FALSE"));
+                }
+                catch(Exception ex)
+                {
+                    DebugHud.Log(ex);
+                }
             }
 
             if (updates <= 0) this.Hide();

@@ -13,11 +13,9 @@ namespace SR_PluginLoader
     public class Plugin 
     {
         public Plugin_Data data = null;
-        private int _id = 0;
-        public int id { get { return this._id; } }
         public string Hash { get { return this.data.Hash; } }
         protected Updater_Base Updater { get { return Updater_Base.Get_Instance(this.data.UPDATE_METHOD.METHOD); } }
-        public override string ToString() { return String.Format("{0}.{1}", data.NAME, data.AUTHOR); }
+        public override string ToString() { return String.Format("Plugin[{0}.{1}]", data.NAME, data.AUTHOR); }
 
         /// <summary>
         /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to other plugin dll's
@@ -27,7 +25,7 @@ namespace SR_PluginLoader
             get
             {
                 if (!File.Exists(file)) return null;
-                if (_cached_data_hash == null) _cached_data_hash = Utility.Get_File_Sha1(file);
+                if (_cached_data_hash == null) _cached_data_hash = Utility.Git_File_Sha1_Hash(file);
 
                 return _cached_data_hash;
             }
@@ -37,7 +35,7 @@ namespace SR_PluginLoader
         /// The game object assigned to manage this plugin.
         /// </summary>
         private GameObject root = null;
-        private string Unique_GameObject_Name { get { return String.Format("{0}.{1}", this.data.AUTHOR, this.data.NAME); } }
+        private string Unique_GameObject_Name { get { return this.ToString(); } }
 
         private bool is_update_available = false;
         public bool enabled = false;
@@ -66,7 +64,6 @@ namespace SR_PluginLoader
 
         public Plugin(string file, bool en = false)
         {
-            this._id = Loader._plugin_id++;
             this.file = file;
             this.dir = Path.GetDirectoryName(file);
             this.dll_name = Path.GetFileName(file);
@@ -431,12 +428,16 @@ namespace SR_PluginLoader
         {
             if (is_update_available) return true;
 
-            if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException("Plugin has no UPDATE_METHOD specified!");
+            if (this.data.UPDATE_METHOD == null)
+            {
+                DebugHud.Log("{0} Plugin has no UPDATE_METHOD specified!", this);
+                return false;
+            }
 
             var status = this.Updater.Get_Update_Status(this.data.UPDATE_METHOD.URL, this.file);
             is_update_available = (status == FILE_UPDATE_STATUS.OUT_OF_DATE);
 
-            DebugHud.Log("{0}  update_status: {1}", this, Enum.GetName(typeof(FILE_UPDATE_STATUS), status));
+            //DebugHud.Log("{0}  update_status: {1}", this, Enum.GetName(typeof(FILE_UPDATE_STATUS), status));
             return is_update_available;
         }
 
@@ -450,7 +451,7 @@ namespace SR_PluginLoader
         {
             if (!this.check_for_updates())
             {
-                DebugHud.Log("Plugin.download_update():  Already up to date!");
+                DebugHud.Log("{0} Plugin.download_update():  Already up to date!", this);
                 yield break;
             }
 
@@ -465,7 +466,7 @@ namespace SR_PluginLoader
         /// <returns></returns>
         public IEnumerator force_download(uiProgressBar prog, Updater_File_Download_Completed download_complete_cb)
         {
-            if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException("Plugin has no UPDATE_METHOD specified!");
+            if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException(String.Format("{0} Plugin has no UPDATE_METHOD specified!", this));
             
             IEnumerator iter = this.Updater.Download(this.data.UPDATE_METHOD.URL, this.file, null,
                (int current, int total) =>

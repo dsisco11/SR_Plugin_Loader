@@ -92,7 +92,7 @@ namespace SR_PluginLoader
         /// <returns></returns>
         private static bool Verify_PluginLoader_Hash(string hash)
         {
-            string dll_hash = Utility.Get_File_Sha1(Assembly.GetExecutingAssembly().Location);
+            string dll_hash = Utility.Git_File_Sha1_Hash(Assembly.GetExecutingAssembly().Location);
             bool ok = (String.Compare(dll_hash, hash) == 0);
 
             if(!ok)
@@ -484,17 +484,7 @@ namespace SR_PluginLoader
 
             return null;
         }
-
-        /// <summary>
-        /// Gets the SHA1 hash for the currently installed version of the plugin loader so it can be compared to the one on github and updated if needed
-        /// </summary>
-        /// <returns></returns>
-        private static string Get_Current_Version_Sha()
-        {
-            return Utility.Get_File_Sha1( Assembly.GetExecutingAssembly().Location );
-        }
-
-
+        
         private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             //Return true if the server certificate is ok

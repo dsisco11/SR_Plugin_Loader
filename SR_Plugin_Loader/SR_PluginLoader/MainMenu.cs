@@ -23,9 +23,9 @@ namespace SR_PluginLoader
 
         private static GUIStyle title_style = null;
         private static Color blue_clr = new Color32(55, 149, 237, 255);//Blue color from our old Killstreaks.tf TTT server
-        private static Color clr_gold_light = new Color32(251, 205, 95, 255);
-        private static Color clr_gold = new Color32(249, 181, 60, 255);
-        private static Color clr_brown = new Color32(44, 15, 1, 255);
+        private static Color clr_gold_light = new Color32(250, 194, 73, 255);
+        private static Color clr_gold = new Color32(206, 124, 37, 255);
+        private static Color clr_brown = new Color32(40, 12, 0, 255);
 
 
 
