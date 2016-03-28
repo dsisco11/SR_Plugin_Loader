@@ -303,7 +303,12 @@ namespace SR_PluginLoader
            (string filename) =>
            {
                bool success = Loader.Add_Plugin_To_List(filename);
-               if(success) Select_Plugin(selected_plugin);
+               if (success)
+               {
+                   Plugin pl = Loader.Get_Plugin(plData.Hash);
+                   if (pl != null) pl.Enable();//enable the plugin by default, since they JUST installed it and all.
+                   Select_Plugin(selected_plugin);
+               }
            }));
         }
     }
