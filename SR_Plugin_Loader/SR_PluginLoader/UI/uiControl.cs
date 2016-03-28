@@ -216,7 +216,7 @@ namespace SR_PluginLoader
     }
 
 
-    public abstract class uiControl : MonoBehaviour
+    public abstract class uiControl : SRBehaviour
     {
         #region VARIABLES
         protected int cached_id = 0;
@@ -1060,11 +1060,11 @@ namespace SR_PluginLoader
 
             GUI.DrawTexture(border_area, cached_borderStyle.texture);
         }
-
+        
         private void OnGUI()
         {
-            // Abort drawing the panel IF we are not currently visible
             if (!this.visible) return;//non-visible controls should also not get events, so don't...
+            // Abort drawing the panel IF we are not currently visible
             this.handleEvent_Base();
 
             if (cached_borderStyle == null || !cached_borderStyle.Equals(borderStyle))// If the border SIZE changed then update the controls area again

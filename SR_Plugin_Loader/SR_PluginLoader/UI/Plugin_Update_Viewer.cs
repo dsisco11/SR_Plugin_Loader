@@ -45,6 +45,7 @@ namespace SR_PluginLoader
             msg_instruct = Create<uiTextArea>(this);
             msg_instruct.margin = new RectOffset(3, 3, 3, 3);
             msg_instruct.text = "<b>Some of your plugins have updates available</b>\n<i><color=#BBBBBB>Select plugins to update then click the button at the bottom to begin!</color></i>";
+            
         }
 
         private void Btn_start_onClicked(uiControl c)
@@ -150,18 +151,15 @@ namespace SR_PluginLoader
                 }
             }
         }
-
-        private void OnLevelWasLoaded(int lvl)
+        
+        protected void Start()
         {
-            if (Levels.isSpecial(Application.loadedLevelName))
-            {
-                StartCoroutine(CheckForPluginUpdates());
-            }
+            StartCoroutine(this.CheckForUpdates());
         }
 
-        private IEnumerator CheckForPluginUpdates()
+        private IEnumerator CheckForUpdates()
         {
-            DebugHud.Log("Checking for plugin updates...");
+            //DebugHud.Log("Checking for plugin updates...");
             int updates = 0;
             foreach (Plugin plugin in Loader.plugins.Values)
             {
@@ -170,10 +168,8 @@ namespace SR_PluginLoader
                 DebugHud.Log("Plugin[{0}] has_update = {1}", plugin.data.NAME, (has_update ? "TRUE" : "FALSE"));
             }
 
-            if (updates > 0)
-            {
-                this.Show();
-            }
+            if (updates <= 0) this.Hide();
+            else this.Show();
 
             yield break;
         }

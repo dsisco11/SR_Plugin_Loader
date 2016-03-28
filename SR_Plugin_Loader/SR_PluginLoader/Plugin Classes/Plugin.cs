@@ -17,6 +17,7 @@ namespace SR_PluginLoader
         public int id { get { return this._id; } }
         public string Hash { get { return this.data.Hash; } }
         protected Updater_Base Updater { get { return Updater_Base.Get_Instance(this.data.UPDATE_METHOD.METHOD); } }
+        public override string ToString() { return String.Format("{0}.{1}", data.NAME, data.AUTHOR); }
 
         /// <summary>
         /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to other plugin dll's
@@ -434,6 +435,8 @@ namespace SR_PluginLoader
 
             var status = this.Updater.Get_Update_Status(this.data.UPDATE_METHOD.URL, this.file);
             is_update_available = (status == FILE_UPDATE_STATUS.OUT_OF_DATE);
+
+            DebugHud.Log("{0}  update_status: {1}", this, Enum.GetName(typeof(FILE_UPDATE_STATUS), status));
             return is_update_available;
         }
 

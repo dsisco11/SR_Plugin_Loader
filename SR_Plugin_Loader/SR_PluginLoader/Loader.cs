@@ -43,6 +43,7 @@ namespace SR_PluginLoader
         private static List<string> available_updates= new List<string>();// This isn't for plugin updates (yet)
         
         private static MainMenu menu = null;
+        private static Plugin_Update_Viewer plugin_updater = null;
 
 
         public static void init(string hash)
@@ -74,7 +75,8 @@ namespace SR_PluginLoader
                 Load_Config();
                 IN_LOADING_PHASE = false;
 
-                uiControl.Create<Plugin_Update_Viewer>();// This control manages itself and is only able to become visible under certain conditions which it will control. Therefore it needs no var to track it.
+                plugin_updater = uiControl.Create<Plugin_Update_Viewer>();// This control manages itself and is only able to become visible under certain conditions which it will control. Therefore it needs no var to track it.
+                plugin_updater.Show();
             }
             catch(Exception ex)
             {
