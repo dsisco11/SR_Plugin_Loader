@@ -161,6 +161,7 @@ namespace SR_PluginLoader
 
         private IEnumerator CheckForPluginUpdates()
         {
+            DebugHud.Log("Checking for plugin updates...");
             int updates = 0;
             foreach (Plugin plugin in Loader.plugins.Values)
             {
