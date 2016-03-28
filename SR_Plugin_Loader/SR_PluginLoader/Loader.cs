@@ -166,6 +166,33 @@ namespace SR_PluginLoader
             try
             {
                 plug.load();
+                foreach(KeyValuePair<string, Plugin> kv in plugins)
+                {
+                    if (String.Compare(name, kv.Key) == 0) continue;
+                    if(String.Compare(plug.Hash, kv.Value.Hash)==0)// These plugins are different files but are the same plugin according to their hash (not data hash, id hash so they might be differing versions of the same plugin).
+                    {//we need to unload, maybe delete one of them. figure out which one is the latest
+                        Plugin trash = null;
+
+                        if (plug.data.VERSION > kv.Value.data.VERSION) trash = kv.Value;
+                        else if (plug.data.VERSION < kv.Value.data.VERSION) trash = plug;
+                        else
+                        {
+                            if (trash == null)
+                            {
+                                if (plug.file_time > kv.Value.file_time) trash = plug;
+                                else trash = kv.Value;
+                            }
+                        }
+
+                        if (trash == null) DebugHud.Log("Found multiple instances of the same plugin and cannot determine which plugin file to ignore! Plugin: ", plug);
+                        else
+                        {
+                            DebugHud.Log("Multiple instances of the same plugin have been found, uninstalling file: {0}", trash.file);
+                            trash.Uninstall();
+                            return false;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {

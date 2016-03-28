@@ -9,7 +9,7 @@ namespace SR_PluginLoader
     public class Plugin_StoreItem : uiPanel
     {
         public static float DEFAULT_WIDTH = 180f;
-        public static float DEFAULT_HEIGHT = 45f;
+        public static float DEFAULT_HEIGHT = 42f;
         private string _plugin_hash = null;
         public string plugin_hash { get { return _plugin_hash; } }
         public uiProgressBar progress_bar = null;
@@ -69,7 +69,7 @@ namespace SR_PluginLoader
             name.area = new Rect(0f, 0f, area.width, name.style.lineHeight);
             auth.area = new Rect(10f, name.area.yMax, area.width, name.style.lineHeight);
 
-            prog.moveBelow(auth, 2f);
+            prog.moveBelow(auth, 0f);
             prog.Set_Size(area.width, 4f);
         }
     }

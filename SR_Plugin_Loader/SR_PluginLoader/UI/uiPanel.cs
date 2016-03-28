@@ -142,7 +142,7 @@ namespace SR_PluginLoader
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (children[i] == null) continue;
-                    children[i].handleEvent_Base();
+                    children[i].TryHandleEvent();
                 }
             //}
         }

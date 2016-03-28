@@ -47,6 +47,8 @@ namespace SR_PluginLoader
         public List<Plugin_Dependency> unmet_dependencys = new List<Plugin_Dependency>();
         
         public string file = null;
+        private DateTime? cached_file_time = null;
+        public DateTime file_time { get { if (!cached_file_time.HasValue) { cached_file_time = File.GetCreationTime(file); } return cached_file_time.Value; } }
         public string dir = null;
         private string dll_name = null;
 
@@ -373,6 +375,14 @@ namespace SR_PluginLoader
             }
         }
 
+        public void Uninstall()
+        {
+            this.Disable();
+
+            string name = Path.GetFileNameWithoutExtension(file);
+            Loader.plugins.Remove(name);
+            File.Delete(this.file);
+        }
         
         public byte[] Load_Resource(string name)
         {

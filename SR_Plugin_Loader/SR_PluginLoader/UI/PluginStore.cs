@@ -31,7 +31,7 @@ namespace SR_PluginLoader
 
         public PluginStore()
         {
-            this.title = "Install Plugins";
+            this.title = "Plugin Store";
             this.Set_Size(800, 600);
             this.Center();
 
@@ -81,11 +81,10 @@ namespace SR_PluginLoader
 
         public override void doLayout()
         {
-            lbl_pl_count.alignTop(5f);
             lbl_pl_count.alignLeftSide(5f);
+            lbl_pl_count.moveAbove(list, 5f);
 
             list.Set_Width(Plugin_StoreItem.DEFAULT_WIDTH);
-
 
             float xPad = 5f;
             lbl_search.alignTop(10f);
@@ -303,8 +302,8 @@ namespace SR_PluginLoader
             },
            (string filename) =>
            {
-               Loader.Add_Plugin_To_List(filename);
-               Select_Plugin(selected_plugin);
+               bool success = Loader.Add_Plugin_To_List(filename);
+               if(success) Select_Plugin(selected_plugin);
            }));
         }
     }

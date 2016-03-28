@@ -15,8 +15,7 @@ namespace SR_PluginLoader
         private uiText pl_title = null, pl_auth = null, pl_vers = null;
         private uiTextArea pl_desc = null;
         private uiIcon pl_thumb = null;
-        private uiButton btn_download = null, btn_copy_json = null;
-        private PluginStore plugin_store = null;
+        private uiButton btn_copy_json = null;
         private uiToggle pl_toggle = null;
 
 
@@ -28,19 +27,8 @@ namespace SR_PluginLoader
             this.onClosed += PluginManager_onClosed;
             this.onShown += PluginManager_onShown;
 
-            plugin_store = Create<PluginStore>();
-            plugin_store.onClosed += Plugin_store_onClosed;
-
             list = Create<uiListView>(this);
             list.Set_Width(200f);
-
-            btn_download = Create<uiButton>(this);
-            btn_download.text = "Download Plugins";
-            btn_download.Set_Width(200f);
-            btn_download.local_style.fontSize = 16;
-            btn_download.local_style.fontStyle = FontStyle.Bold;
-            btn_download.margin = new RectOffset(3, 3, 0, 0);
-            btn_download.onClicked += Btn_download_onClicked;
 
             info_panel = Create<uiScrollView>();
             info_panel.margin = new RectOffset(2, 2, 2, 2);
@@ -72,9 +60,8 @@ namespace SR_PluginLoader
         public override void doLayout()
         {
             base.doLayout();
-
-            btn_download.alignTop(2f);
-            list.moveBelow(btn_download, 2f);
+            
+            list.alignTop(2f);
             list.floodY(2f);
 
             Vector2 isz = new Vector2((inner_area.width - list.area.width), inner_area.height);
@@ -122,18 +109,7 @@ namespace SR_PluginLoader
             string json_str = String.Format("\"{0}.{1}\": {{\n\t\t \"name\": \"{0}\",\n\t\t\t \"author\": \"{1}\",\n\t\t\t \"description\": \"{2}\",\n\t\t\t \"update_method\": \"{3}\",\n\t\t\t \"url\": \"{4}\"\n\t\t }}", pl.data.NAME, pl.data.AUTHOR, Utility.JSON_Escape_String(pl.data.DESCRIPTION), Enum.GetName(typeof(UPDATER_TYPE), pl.data.UPDATE_METHOD.METHOD), pl.data.UPDATE_METHOD.URL);
             GUIUtility.systemCopyBuffer = json_str;//copy this text to the clipboard
         }
-
-        private void Plugin_store_onClosed(uiControl c)
-        {
-            this.Show();
-        }
-
-        private void Btn_download_onClicked(uiControl c)
-        {
-            this.Hide();
-            plugin_store.Show();
-        }
-
+        
         private void PluginManager_onShown(uiControl c)
         {
             this.Update_Plugins_List();

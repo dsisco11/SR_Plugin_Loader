@@ -16,18 +16,24 @@ namespace SR_PluginLoader
     {
         public static GameObject mainmenu = null;
         public static PluginManager plugin_manager = null;
+        public static PluginStore plugin_store = null;
         private static bool _active = false;
         public static bool Active { get { return MainMenu._active; } }
         private static GUIContent title_content = null;
 
         private static GUIStyle title_style = null;
-        private static Color blue_clr = new Color(255f / 55f, 255f / 149f, 255f / 237f);//Blue color from our old Killstreaks.tf TTT server
+        private static Color blue_clr = new Color32(55, 149, 237, 255);//Blue color from our old Killstreaks.tf TTT server
+        private static Color clr_gold_light = new Color32(251, 205, 95, 255);
+        private static Color clr_gold = new Color32(249, 181, 60, 255);
+        private static Color clr_brown = new Color32(44, 15, 1, 255);
+
 
 
         private void Awake()
         {
             title_content = new GUIContent(Loader.NAME);
-            this.TrySpawnPluginPanel();
+            this.TrySpawn_PluginPanel();
+            this.TrySpawn_PluginStore();
         }
         
         private void Update()
@@ -36,7 +42,7 @@ namespace SR_PluginLoader
             {
                 if (MainMenu.mainmenu == null)
                 {
-                    this.TrySpawnPluginMenu();
+                    this.Extend_MainMenu();
                 }
             }
         }
@@ -46,20 +52,36 @@ namespace SR_PluginLoader
             MainMenu.mainmenu = null;
         }
 
-        private void TrySpawnPluginPanel()
+        private void TrySpawn_PluginPanel()
         {
+            if (MainMenu.plugin_manager != null) return;
             MainMenu.plugin_manager = uiControl.Create<PluginManager>();
+            MainMenu.plugin_manager.onClosed += (uiWindow w) => { this.Show_MainMenu(); };
+            MainMenu.plugin_manager.onShown += (uiWindow w) => { this.Hide_MainMenu(); };
         }
 
-        private void TrySpawnPluginMenu()
+        private void TrySpawn_PluginStore()
+        {
+            if (MainMenu.plugin_store != null) return;
+            MainMenu.plugin_store = uiControl.Create<PluginStore>();
+            MainMenu.plugin_store.onClosed += (uiWindow w)=> { this.Show_MainMenu(); };
+            MainMenu.plugin_store.onShown += (uiWindow w) => { this.Hide_MainMenu(); };
+        }
+
+        private void Extend_MainMenu()
+        {
+            if(MainMenu.mainmenu == null) MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
+            Add_Button("Plugins", "PluginsMenu", new UnityAction(this.Show_PluginManager));
+            Add_Button("Plugin Store", "PluginStore", new UnityAction(this.Show_PluginStore), clr_gold_light, clr_gold, clr_brown);
+        }
+
+        private void Add_Button(string text, string name, UnityAction onclick_handler, Color? color=null, Color? hl_clr=null, Color? text_clr=null)
         {
             var menu = UnityEngine.Object.FindObjectOfType<MainMenuUI>();
-            //check if we are at the main menu and if we already have a gameobject instance with a MainMenuUI attached.
             if (Levels.isSpecial(Application.loadedLevelName) && menu != null)
             {
                 Transform MenuUI = menu.transform.GetChild(0);
-                //does the main menu already have a plugin button?
-                if (MenuUI.FindChild("PluginsMenu") == null)
+                if (MenuUI.FindChild(name) == null)
                 {
                     //push all the buttons (excluding the play button) down by their own height, to make room for OUR button
                     for (int i = 1; i < MenuUI.childCount; i++)
@@ -78,46 +100,57 @@ namespace SR_PluginLoader
                     RectTransform btnSize = btnPos.GetComponent<RectTransform>();
 
                     // Create a copy of the play button that we can alter to do our bidding. (We want to make a copy so we don't need to re-apply all the same styling and whatnot, thus ensuring it won't break in the future)
-                    GameObject PluginsButton = UnityEngine.Object.Instantiate<GameObject>(btnPos.gameObject);
-                    PluginsButton.transform.SetParent(MenuUI);
+                    GameObject newButton = UnityEngine.Object.Instantiate<GameObject>(btnPos.gameObject);
+                    newButton.transform.SetParent(MenuUI);
                     // Add more height to the main menu UI panel so we can fit our fancy button in!
                     RectTransform menuSize = MenuUI.GetComponent<RectTransform>();
-                    //MenuUI.GetComponent<RectTransform>().sizeDelta = new Vector2(menuSize.sizeDelta.x, menuSize.sizeDelta.y + 50f);
                     MenuUI.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
                     MenuUI.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width, Screen.height);
 
-                    PluginsButton.transform.localPosition = new Vector2(btnPos.localPosition.x, (btnPos.localPosition.y + btnSize.rect.height));
+                    newButton.transform.localPosition = new Vector2(btnPos.localPosition.x, (btnPos.localPosition.y + btnSize.rect.height));
 
                     // Set the plugins button text.
-                    PluginsButton.name = "PluginsMenu";
-                    PluginsButton.GetComponentInChildren<Text>().text = "Plugins";
+                    newButton.name = name;
+                    newButton.GetComponentInChildren<Text>().text = text;
 
                     //Setup our buttons click logic
-                    var btn = PluginsButton.GetComponent<Button>();
-                    /*
-                    ColorBlock clr = PluginsButton.GetComponent<Button>().colors;
-                    clr.normalColor = blue_clr;
-                    btn.image.color = blue_clr;
-                    PluginsButton.GetComponent<Button>().colors = clr;
-                    */
-
+                    Button btn = newButton.GetComponent<Button>();
+                    
                     btn.onClick.RemoveAllListeners();
                     btn.onClick.SetPersistentListenerState(0, UnityEventCallState.Off);
-                    btn.onClick.AddListener(new UnityAction(this.OnClick));
-
-
-                    MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
+                    btn.onClick.AddListener(onclick_handler);
+                    
+                    
+                    var styler = newButton.AddComponent<ButtonStyler_Overrider>();
+                    if (color.HasValue) styler.normalColor = color.Value;
+                    if (hl_clr.HasValue) { styler.highlightedColor = hl_clr.Value; styler.pressedColor = hl_clr.Value; }
+                    if(text_clr.HasValue) styler.normalText = text_clr.Value;
                 }
             }
         }
 
-        private void OnClick()
+        private void Show_MainMenu()
         {
-            MainMenu._active = false;
-            MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
+            //MainMenu._active = true;
+            MainMenu.mainmenu.SetActive(true);
+            //MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
+        }
+
+        private void Hide_MainMenu()
+        {
+            //MainMenu._active = false;
             MainMenu.mainmenu.SetActive(false);
-            //MainMenu.plugins_panel.active = true;
+            //MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
+        }
+
+        private void Show_PluginManager()
+        {
             MainMenu.plugin_manager.Show();
+        }
+
+        private void Show_PluginStore()
+        {
+            MainMenu.plugin_store.Show();
         }
 
         private void OnGUI()

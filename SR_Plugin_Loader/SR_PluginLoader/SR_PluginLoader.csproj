@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
     <Compile Include="UI\uiVarText.cs" />

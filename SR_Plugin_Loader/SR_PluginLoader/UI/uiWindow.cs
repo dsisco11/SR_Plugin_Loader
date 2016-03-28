@@ -22,7 +22,7 @@ namespace SR_PluginLoader
         /// Specifies weather or not this window can be moved around by the player.
         /// </summary>
         public bool draggable = true;
-        public string title { get { return content.text; } set { content.text = value; needs_layout = true; } }
+        public string title { get { return content.text; } set { content.text = String.Format("<b>{0}</b>", value); needs_layout = true; } }
         public override Rect content_area { get { return content_panel.content_area; } }
         protected override Rect inner_area { get { return content_panel.Get_Inner_Area(); } }
 
@@ -35,9 +35,11 @@ namespace SR_PluginLoader
         {
             autosize = false;
             this.visible = false;//hidden by default
-
-            //selfPadding = new RectOffset(0, 0, title_bar_height, 0);
             title = "Window";
+            //selfPadding = new RectOffset(0, 0, title_bar_height, 0);
+            local_style.fontStyle = FontStyle.Bold;
+
+
             closeBtn = Create<uiButton>();
             GUIStyle sty = new GUIStyle();
             sty.normal.background = Loader.tex_close_dark;

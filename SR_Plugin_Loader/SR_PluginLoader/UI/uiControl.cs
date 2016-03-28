@@ -966,6 +966,12 @@ namespace SR_PluginLoader
         {
         }
 
+        public void TryHandleEvent()
+        {
+            if (!visible) return;
+            this.handleEvent_Base();
+        }
+
         protected void handleLayout()
         {
             this.doLayout();
@@ -982,9 +988,7 @@ namespace SR_PluginLoader
         /// </summary>
         public virtual void handleEvent_Base()
         {
-            //if (evt == EventType.MouseDown && GUIUtility.hotControl != 0) return false;
-            // XXX:  Problem, if we allow parented controls to process their own mouse events they will not take into acount their parent containers scroll offset -
-            // We need to make absArea account for parent scrolling.
+            if (!visible) return;
 
             Event evt = Event.current;
             EventType et = evt.GetTypeForControl(this.id);
