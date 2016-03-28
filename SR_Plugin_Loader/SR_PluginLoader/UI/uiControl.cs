@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SR_PluginLoader
 {
     public enum uiBorderType { NONE = 0, LINE, GLOW, LINE_GLOW }
-    public enum cPosDir { NONE = 0, ABOVE, BELOW, LEFT, RIGHT, TOP_OF, BOTTOM_OF, LEFT_SIDE_OF, RIGHT_SIDE_OF, CENTER_X, CENTER_Y }
+    public enum cPosDir { NONE = 0, ABOVE, BELOW, LEFT, RIGHT, TOP_OF, BOTTOM_OF, LEFT_SIDE_OF, RIGHT_SIDE_OF, CENTER_X, CENTER_Y, SIT_ABOVE, SIT_BELOW, SIT_LEFT_OF, SIT_RIGHT_OF }
     public enum uiControlType
     {
         Generic=0,
@@ -161,19 +161,15 @@ namespace SR_PluginLoader
             {
                 case cPosDir.ABOVE:
                     control.moveAbove(target, offset);
-                    //target.Reposition_horizontal();
                     break;
                 case cPosDir.BELOW:
                     control.moveBelow(target, offset);
-                    //target.Reposition_horizontal();
                     break;
                 case cPosDir.LEFT:
                     control.moveLeftOf(target, offset);
-                    //target.Reposition_vertical();
                     break;
                 case cPosDir.RIGHT:
                     control.moveRightOf(target, offset);
-                    //target.Reposition_vertical();
                     break;
                 case cPosDir.TOP_OF:
                     control.alignTop(offset);
@@ -193,12 +189,29 @@ namespace SR_PluginLoader
                 case cPosDir.CENTER_Y:
                     control.CenterY();
                     break;
+                case cPosDir.SIT_ABOVE:
+                    control.sitAbove(target, offset);
+                    break;
+                case cPosDir.SIT_BELOW:
+                    control.sitBelow(target, offset);
+                    break;
+                case cPosDir.SIT_LEFT_OF:
+                    control.sitLeftOf(target, offset);
+                    break;
+                case cPosDir.SIT_RIGHT_OF:
+                    control.sitRightOf(target, offset);
+                    break;
             }
         }
 
         public bool Equals(uiControl targ, float off, cPosDir d)
         {
             return (this.target == targ && Utility.floatEq(this.offset, off) && this.dir == d);
+        }
+
+        public override string ToString()
+        {
+            return String.Format("[ControlPositioner] DIR: {0}  OFFSET: {1}  TARGET: {2}", Enum.GetName(typeof(cPosDir), dir), offset, target);
         }
     }
 
@@ -665,6 +678,11 @@ namespace SR_PluginLoader
         {
             if (horizontal_positioner != null) horizontal_positioner.Apply(this);
         }
+
+        public void print_positioners()
+        {
+            DebugHud.Log("{0}  {1}", this.vertical_positioner, this.horizontal_positioner);
+        }
         #endregion
         #region Positioning Helpers
         private bool maybeUpdate_Pos(Vector2 new_pos)
@@ -707,6 +725,48 @@ namespace SR_PluginLoader
             this.maybeUpdate_Pos(new Vector2(targ.area.xMin - this.area.width - xOff, _area.position.y));
             if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.LEFT);
         }
+        
+        /// <summary>
+        /// Adjusts X & Y position of the control so it sites directly above another given control.
+        /// </summary>
+        public void sitAbove(uiControl targ, float yOff = 0f)
+        {
+            this.maybeUpdate_Pos(new Vector2(targ.area.xMin, targ.area.yMin - this.area.height - yOff));
+            horizontal_positioner = null;
+            if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.ABOVE)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_ABOVE);
+        }
+
+        /// <summary>
+        /// Adjusts X & Y position of the control so it sites directly below another given control.
+        /// </summary>
+        public void sitBelow(uiControl targ, float yOff = 0f)
+        {
+            this.maybeUpdate_Pos(new Vector2(targ.area.xMin, targ.area.yMax + yOff));
+            horizontal_positioner = null;
+            if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.BELOW)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_BELOW);
+        }
+
+
+        /// <summary>
+        /// Adjusts X & Y position of the control so it sites directly to the right of another given control.
+        /// </summary>
+        public void sitRightOf(uiControl targ, float xOff = 0f)
+        {
+            this.maybeUpdate_Pos(new Vector2(targ.area.xMax + xOff, targ.area.yMin));
+            vertical_positioner = null;
+            if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.RIGHT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_RIGHT_OF);
+        }
+
+        /// <summary>
+        /// Adjusts X & Y position of the control so it sites directly to the left of another given control.
+        /// </summary>
+        public void sitLeftOf(uiControl targ, float xOff = 0f)
+        {
+            this.maybeUpdate_Pos(new Vector2(targ.area.xMin - this.area.width - xOff, targ.area.position.y));
+            vertical_positioner = null;
+            if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_LEFT_OF);
+        }
+
 
         public void alignTop(float yOff = 0f)
         {

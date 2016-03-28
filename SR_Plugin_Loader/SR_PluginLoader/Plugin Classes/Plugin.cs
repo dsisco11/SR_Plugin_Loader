@@ -16,7 +16,7 @@ namespace SR_PluginLoader
         private int _id = 0;
         public int id { get { return this._id; } }
         public string Hash { get { return this.data.Hash; } }
-        protected Updater_Base Updater { get { return Updater_Base.Get(this.data.UPDATE_METHOD.METHOD); } }
+        protected Updater_Base Updater { get { return Updater_Base.Get_Instance(this.data.UPDATE_METHOD.METHOD); } }
 
         /// <summary>
         /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to other plugin dll's

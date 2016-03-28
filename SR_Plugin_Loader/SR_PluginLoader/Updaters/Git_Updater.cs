@@ -1,5 +1,6 @@
 ﻿using SimpleJSON;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,14 +17,14 @@ namespace SR_PluginLoader
         public static Git_Updater instance { get { return _instance; } }
         public static readonly UPDATER_TYPE type = UPDATER_TYPE.GIT;
 
+        public delegate void Git_Updater_Repo_Result(JSONArray arr);
+
         private static WebClient _webClient = null;
         private static WebClient webClient { get { if (_webClient == null) { _webClient = GetClient(); } return _webClient; }  }
-        private static JSONArray repo_cache = null;
-        private static Dictionary<string, byte[]> remote_file_cache = new Dictionary<string, byte[]>();
 
         private bool host_is_github(string host)
         {
-            var reg = new Regex(@"^\w+\.github\.com$");
+            var reg = new Regex(@"^(\w+\.)*github\.com$");
             Match match = reg.Match(host);
             return match.Success;
         }
@@ -67,44 +68,73 @@ namespace SR_PluginLoader
 
         private static JSONArray Cache_Git_Repo(string repo_url)
         {
-            if (repo_cache != null) return repo_cache;
-            try
+            //EXAMPLE:  https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1
+            string url = String.Format("{0}/git/trees/master?recursive=1", repo_url.TrimEnd(new char[] { '\\', '/' }));
+
+            byte[] buf = null;
+            string jsonStr = null;
+
+            if (!remote_file_cache.TryGetValue(url, out buf))
             {
-                //  https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1
-                string url = String.Format("{0}/git/trees/master?recursive=1", repo_url.TrimEnd(new char[] { '\\', '/' }));
+                // Fetch repo information
+                jsonStr = webClient.DownloadString(url);
+                if (jsonStr == null || jsonStr.Length <= 0) return null;
+
+                remote_file_cache[url] = Encoding.ASCII.GetBytes(jsonStr);
+                DebugHud.LogSilent("Cached repository: {0}", repo_url);
+            }
+            else jsonStr = Encoding.ASCII.GetString(remote_file_cache[url]);
+            
+            // Parse the json response from GitHub
+            var git = SimpleJSON.JSON.Parse(jsonStr);
+            var tree = git["tree"].AsArray;
+
+            return tree;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="repo_url"></param>
+        /// <returns>JSONArray holding all of the repository master branch entries</returns>
+        private static IEnumerator Cache_Git_Repo_Async(string repo_url)
+        {
+            //EXAMPLE:  https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1
+            string url = String.Format("{0}/git/trees/master?recursive=1", repo_url.TrimEnd(new char[] { '\\', '/' }));
                 
-                byte[] buf = null;
-                string jsonStr = null;
+            byte[] buf = null;
+            string jsonStr = null;
 
-                if (remote_file_cache.TryGetValue(url, out buf))
-                {
-                    jsonStr = Encoding.ASCII.GetString(buf);
-                }
-                else
-                {
-                    // Fetch repo information
-                    jsonStr = webClient.DownloadString(url);
-                    if (jsonStr == null || jsonStr.Length <= 0)
-                    {
-                        return null;
-                    }
-                    remote_file_cache[url] = Encoding.ASCII.GetBytes(jsonStr);
-                    DebugHud.LogSilent("Cached repository: {0}", repo_url);
-                }
-
-                // Parse the json response from GitHub
-                var git = SimpleJSON.JSON.Parse(jsonStr);
-                var tree = git["tree"].AsArray;
-                repo_cache = tree;
-
-                return tree;
-            }
-            catch(WebException ex)
+            if (!remote_file_cache.TryGetValue(url, out buf))
             {
-                DebugHud.Log(ex);
-            }
+                // Fetch repo information
+                //jsonStr = webClient.DownloadString(url);
+                IEnumerator iter = Updater_Base.Get(url);
+                while (iter.MoveNext()) yield return null;
 
-            return null;
+                buf = iter.Current as byte[];
+                if (buf == null || buf.Length <= 0)
+                {
+                    yield return null;
+                    yield break;
+                }
+
+                jsonStr = Encoding.ASCII.GetString(buf);
+                if (jsonStr == null || jsonStr.Length <= 0)
+                {
+                    yield return null;
+                    yield break;
+                }
+
+                remote_file_cache[url] = Encoding.ASCII.GetBytes(jsonStr);
+                DebugHud.LogSilent("Cached repository: {0}", repo_url);
+            }
+            else jsonStr = Encoding.ASCII.GetString(remote_file_cache[url]);
+
+            // Parse the json response from GitHub
+            var git = SimpleJSON.JSON.Parse(jsonStr);
+            var tree = git["tree"].AsArray;
+                
+            yield return tree;
         }
 
         public override FILE_UPDATE_STATUS Get_Update_Status(string remote_path, string local_file)
@@ -117,7 +147,7 @@ namespace SR_PluginLoader
             // Time to check with GitHub and see if there is a newer version of the plugin loader out!
             try
             {
-                var repo = Cache_Git_Repo(repo_url);
+                JSONArray repo = Cache_Git_Repo(repo_url);
                 if (repo == null)
                 {
                     DebugHud.Log("[AutoUpdater] Unable to cache git repository!");
@@ -181,19 +211,29 @@ namespace SR_PluginLoader
             return FILE_UPDATE_STATUS.UP_TO_DATE;//no update
         }
 
-        public FileStream Cache_And_Open_File(string remote_file)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns>FileStream for the requested file.</returns>
+        public IEnumerator Cache_And_Open_File(string url)
         {
-            string repo_url = Extract_Repository_URL_From_Github_URL(remote_file);
-            var repo = Cache_Git_Repo(repo_url);
-            string local_file = String.Format("{0}\\{1}", UnityEngine.Application.dataPath, Path.GetFileName(remote_file));
-            var update_status = Get_Update_Status(local_file, remote_file);
+            string repo_url = Extract_Repository_URL_From_Github_URL(url);
+            var iter = Cache_Git_Repo_Async(repo_url);
+            while (iter.MoveNext()) yield return null;
+
+            JSONArray repo = iter.Current as JSONArray;
+
+            string local_file = String.Format("{0}\\{1}", UnityEngine.Application.dataPath, Path.GetFileName(url));
+            
+            var update_status = Get_Update_Status(url, local_file);
             if (update_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
             {
-                byte[] data = webClient.DownloadData(remote_file);
-                File.WriteAllBytes(local_file, data);
+                var it = this.Download(url, local_file);
+                while (it.MoveNext()) yield return null;
             }
-
-            return File.OpenRead(local_file);
+            
+            yield return File.OpenRead(local_file);
         }
 
         /*

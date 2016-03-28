@@ -35,10 +35,12 @@ namespace SR_PluginLoader
     public delegate bool Updater_File_Type_Confirm(string ContentType);
     public delegate void Updater_File_Download_Progress(int read, int total_bytes);
     public delegate void Updater_File_Download_Completed(string filename);
+    public delegate void Updater_Cache_Or_Open_File_Callback(FileStream stream);
+    public delegate void Updater_Get_Result(byte[] buf);
 
     public abstract class Updater_Base
     {
-        public static Updater_Base Get(UPDATER_TYPE ty)
+        public static Updater_Base Get_Instance(UPDATER_TYPE ty)
         {
             switch (ty)
             {
@@ -51,6 +53,7 @@ namespace SR_PluginLoader
             return null;
         }
         public static readonly string USER_AGENT = "SR_Plugin_Loader  on GitHub";
+        protected static Dictionary<string, byte[]> remote_file_cache = new Dictionary<string, byte[]>();
 
         // This function is used by plugins, they pass their given update info url and the path to their current .dll file
         // How these are interpreted varies for each updater type.
@@ -123,14 +126,80 @@ namespace SR_PluginLoader
                 yield return null;// yield execution until next frame
             }
 
-            // It's good practice when overwriting files to write th enew version to a temporary location and then copy it overtop of the original.
+            // It's good practice when overwriting files to write the new version to a temporary location and then copy it overtop of the original.
             string temp_file = String.Format("{0}.temp", local_file);
             File.WriteAllBytes(temp_file, buf);
             File.Copy(temp_file, local_file, true);
-            File.Delete(temp_file);
+            File.Delete(temp_file);// delete the now unneeded .temp file
 
             if (download_completed != null) download_completed(local_file);
             yield break;//exit routine
+        }
+        /// <summary>
+        /// Performs a coroutine Http GET request and returns a byte array with the result via both a callback and the current value of the IEnumerator object.
+        /// </summary>
+        public static IEnumerator Get(string url, Updater_File_Type_Confirm confirm = null, Updater_File_Download_Progress prog_callback = null, Updater_Get_Result callback = null)
+        {
+            byte[] tmp_buf = null;
+            if (remote_file_cache.TryGetValue(url, out tmp_buf))
+            {
+                yield return tmp_buf;
+                yield break;
+            }
+
+            WebResponse resp = null;
+            Stream stream = null;
+
+            HttpWebRequest webRequest = WebRequest.Create(url) as HttpWebRequest;
+            webRequest.UserAgent = USER_AGENT;
+
+            WebAsync webAsync = new WebAsync();
+            IEnumerator e = webAsync.GetResponse(webRequest);
+            while (e.MoveNext()) { yield return null; }// wait for response to arrive
+            while (!webAsync.isResponseCompleted) yield return null;// double check for clarity & safety
+
+            RequestState result = webAsync.requestState;
+            resp = result.webResponse;
+
+            if (confirm != null)
+            {
+                if (confirm(resp.ContentType) == false)
+                {
+                    yield break;//exit routine
+                }
+            }
+
+            stream = resp.GetResponseStream();
+            int total = (int)resp.ContentLength;
+            byte[] buf = new byte[total];
+            const int CHUNK_SIZE = 2048;
+
+            int read = 0;//how many bytes we have read so far (offset within the stream)
+            int remain = total;//how many bytes are left to read
+            int r = 0;
+
+            while (remain > 0)
+            {
+                r = stream.Read(buf, read, Math.Min(remain, CHUNK_SIZE));
+                read += r;
+                remain -= r;
+                if (prog_callback != null)
+                {
+                    try
+                    {
+                        prog_callback(read, total);
+                    }
+                    catch (Exception ex)
+                    {
+                        DebugHud.Log(ex);
+                    }
+                }
+                yield return null;// yield execution until next frame
+            }
+            remote_file_cache[url] = buf;
+            
+            if (callback!=null) callback(buf);
+            yield return buf;
         }
     }
 }

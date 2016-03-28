@@ -46,7 +46,7 @@ namespace SR_PluginLoader
             this.Add("author", auth);
 
             uiProgressBar prog = Create<uiProgressBar>();
-            Utility.Set_BG_Color(prog.local_style.normal, new Color(0.1f, 0.5f, 1.0f));
+            Utility.Set_BG_Color(prog.bar_style.normal, new Color(0.1f, 0.5f, 1.0f));
             prog.show_progress_text = false;
             this.Add("progress", prog);
             this.progress_bar = prog;

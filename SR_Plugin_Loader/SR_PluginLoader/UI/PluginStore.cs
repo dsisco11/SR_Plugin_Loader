@@ -20,7 +20,8 @@ namespace SR_PluginLoader
         private Dictionary<string, Plugin_Download_Data> plugins = new Dictionary<string, Plugin_Download_Data>();
         private uiListView list = null;
         private uiTextbox search = null;
-        private uiText lbl_search = null, pl_title=null, pl_auth=null;
+        private uiText lbl_search = null, pl_title = null, pl_auth = null;
+        private uiVarText lbl_pl_count = null;
         private uiTextArea pl_desc = null;
         private bool loaded = false, pending_rebuild = false;
         private Plugin_StoreItem selected_plugin = null;
@@ -33,6 +34,11 @@ namespace SR_PluginLoader
             this.title = "Install Plugins";
             this.Set_Size(800, 600);
             this.Center();
+
+            lbl_pl_count = Create<uiVarText>(this);
+            lbl_pl_count.label = "Total Plugins:";
+            lbl_pl_count.text = "0";
+            lbl_pl_count.label_style.fontStyle = FontStyle.Bold;
 
             list = uiControl.Create<uiListView>(this);
 
@@ -75,9 +81,13 @@ namespace SR_PluginLoader
 
         public override void doLayout()
         {
-            list.Set_Size(Plugin_StoreItem.DEFAULT_WIDTH, this.Get_Inner_Area().height);
-            float xPad = 5f;
+            lbl_pl_count.alignTop(5f);
+            lbl_pl_count.alignLeftSide(5f);
 
+            list.Set_Width(Plugin_StoreItem.DEFAULT_WIDTH);
+
+
+            float xPad = 5f;
             lbl_search.alignTop(10f);
             lbl_search.moveRightOf(list, xPad);
 
@@ -85,7 +95,9 @@ namespace SR_PluginLoader
             search.moveRightOf(lbl_search);
             search.floodX(12f);
             if (search.size.y != lbl_search.size.y) lbl_search.Set_Height(search.size.y);
-            
+
+            list.moveBelow(search, 10f);
+            list.floodY();
 
             info_panel.moveBelow(search, 10f);
             info_panel.moveRightOf(list, 2f);
@@ -171,17 +183,24 @@ namespace SR_PluginLoader
         
         private IEnumerator Client_Plugins_List_Update()
         {
+            var iter = Git_Updater.instance.Cache_And_Open_File(PLUGINS_LIST_URL);
+            while (iter.MoveNext()) yield return null;
+            
             try
             {
-                FileStream strm = Git_Updater.instance.Cache_And_Open_File(PLUGINS_LIST_URL);
+                FileStream strm = iter.Current as FileStream;
+
                 byte[] data = Utility.Read_Stream(strm);
                 var list = JSON.Parse(Encoding.ASCII.GetString(data))["plugins"];
                 this.plugins.Clear();
+                
                 foreach (JSONNode json in list.Childs)
                 {
                     var dat = new Plugin_Download_Data(json);
                     this.plugins[dat.Hash] = dat;
                 }
+
+                lbl_pl_count.text = this.plugins.Count.ToString();
                 pending_rebuild = true;
             }
             catch(Exception ex)
@@ -189,8 +208,7 @@ namespace SR_PluginLoader
                 DebugHud.Log("Error while updating plugins list.");
                 DebugHud.Log(ex);
             }
-
-            yield return null;
+            yield break;
         }
 
         private void Rebuild_Plugins_UI()

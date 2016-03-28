@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
+    <Compile Include="UI\uiVarText.cs" />
     <Compile Include="UI\Plugin_Update_Item.cs" />
     <Compile Include="UI\uiCheckbox.cs" />
     <Compile Include="UI\uiTextArea.cs" />
