@@ -1,0 +1,58 @@
+[97mINFO[39;49m: [37mInstalling: [92mSisco's Plugin Loader[39;49m[39;49m
+[97mINFO[39;49m: [37mDestination: c:\program files (x86)\steam\SteamApps\common\Slime Rancher\SlimeRancher_Data\Managed[39;49m
+[97mINFO[39;49m: [37mFILE_CHANGE: FALSE[39;49m
+[97mINFO[39;49m: [37mBACKUP_DIFF: TRUE[39;49m
+[97mINFO[39;49m: [37mRestoring: Assembly-CSharp.dll[39;49m
+[97mINFO[39;49m: [37m------------------------------------------[39;49m
+[97mINFO[39;49m: [37m         Base Code Alterations            [39;49m
+[97mINFO[39;49m: [37m[39;49m
+[97mINFO[39;49m: [37m[[92m8[39;49m] [97mCompleted[39;49m[39;49m
+[97mINFO[39;49m: [37m[[91m0[39;49m] [97mFailed[39;49m[39;49m
+[97mINFO[39;49m: [37m[39;49m
+[97mINFO[39;49m: [37m--------------------------------------------[39;49m
+[97mINFO[39;49m: [37m          Base Class Alterations            [39;49m
+[97mINFO[39;49m: [37m[39;49m
+[97mINFO[39;49m: [37m[[92m0[39;49m] [97mCompleted[39;49m[39;49m
+[97mINFO[39;49m: [37m[[91m0[39;49m] [97mFailed[39;49m[39;49m
+[97mINFO[39;49m: [37m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mVacPak_Consume[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mVacPak_Can_Capture[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mVacPak_Capture[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mVacPak_Think[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mGame_Saved[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Game_Loaded[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Game_Loaded[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mGet_Available_Saves[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mGet_Save_Directory[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Entity_Spawn[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mEntitySpawner_Init[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_CanGetUpgrade[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_ApplyUpgrade[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_Damaged[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_LoseEnergy[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_SetEnergy[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_MoneyChanged[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_AddRads[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPlayer_Death[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Player_Sleep[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Player_Sleep[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Region_Spawn_Cycle[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Region_Spawn_Cycle[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mSpawn_Player_Upgrades_UI[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Economy_Init[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Economy_Init[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Silo_Input[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Silo_Input[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Silo_Output[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Silo_Output[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mResourcePatch_Init[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Garden_Init[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Garden_Init[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mGarden_Got_Input[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPre_Garden_Set_Type[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92mOK[39;49m] [37mPost_Garden_Set_Type[39;49m[39;49m
+[97mINFO[39;49m: [37m[[92m36[39;49m] [97mInstalled[39;49m[39;49m
+[97mINFO[39;49m: [37m[[91m0[39;49m] [97mIgnored[39;49m[39;49m
+[97mINFO[39;49m: [37mDone![39;49m
+[97mINFO[39;49m: [37m[92mEnjoy a whole new world of plugin possibilities.[39;49m[39;49m
+[97mINFO[39;49m: [37mPress ANY key to exit.[39;49m
