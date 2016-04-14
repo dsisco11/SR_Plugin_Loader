@@ -65,6 +65,11 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_LoseEnergy, name = "PlayerState.SpendEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_SetEnergy, name = "PlayerState.SetEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_MoneyChanged, name = "PlayerState.AddCurrency" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_AddRads, name = "PlayerState.AddRads" },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_Death, name = "PlayerDeathHandler.OnDeath", pos=-1 },
+
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Player_Sleep, name = "LockOnDeath.LockUntil", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Player_Sleep, name = "LockOnDeath.Update", pos=1, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
@@ -74,11 +79,11 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Economy_Init, name = "EconomyDirector.InitForLevel", pos=0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Economy_Init, name = "EconomyDirector.InitForLevel", pos=-1 },
 
-            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Input, name = "SiloCatcher.OnTriggerEnter", pos=-1, method = debug_positioning.Cond_Branch_Start },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Input, name = "SiloCatcher.OnTriggerEnter", pos=-1, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Input, name = "SiloCatcher.OnTriggerEnter", pos=-2, method = debug_positioning.Cond_Branch_Start },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Input, name = "SiloCatcher.OnTriggerEnter", pos=-2, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },
 
-            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Output, name = "SiloCatcher.OnTriggerStay", pos=-1, method = debug_positioning.Cond_Branch_Start },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Output, name = "SiloCatcher.OnTriggerStay", pos=-1, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Output, name = "SiloCatcher.OnTriggerStay", pos=-2, method = debug_positioning.Cond_Branch_Start },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Output, name = "SiloCatcher.OnTriggerStay", pos=-2, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.ResourcePatch_Init, name = "SpawnResource.Start", pos=-1 },
 

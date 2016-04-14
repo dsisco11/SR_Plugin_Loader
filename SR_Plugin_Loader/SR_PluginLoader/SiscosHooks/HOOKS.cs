@@ -90,6 +90,11 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Player_LoseEnergy = new HOOK_ID();
         public static readonly HOOK_ID Player_SetEnergy = new HOOK_ID();
         public static readonly HOOK_ID Player_MoneyChanged = new HOOK_ID();
+        public static readonly HOOK_ID Player_AddRads = new HOOK_ID();
+        public static readonly HOOK_ID Player_Death = new HOOK_ID();
+
+        public static readonly HOOK_ID Pre_Player_Sleep = new HOOK_ID();
+        public static readonly HOOK_ID Post_Player_Sleep = new HOOK_ID();
 
         public static readonly HOOK_ID Pre_Region_Spawn_Cycle = new HOOK_ID();
         public static readonly HOOK_ID Post_Region_Spawn_Cycle = new HOOK_ID();

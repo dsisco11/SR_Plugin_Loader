@@ -56,9 +56,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ButtonStyler_Overrider.cs" />
+    <Compile Include="UI\ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
+    <Compile Include="Helpers\GameTime.cs" />
     <Compile Include="UI\uiVarText.cs" />
     <Compile Include="UI\Plugin_Update_Item.cs" />
     <Compile Include="UI\uiCheckbox.cs" />
@@ -72,7 +73,7 @@
     <Compile Include="UI\ProgressBar_Element.cs" />
     <Compile Include="UI\uiProgressBar.cs" />
     <Compile Include="UI\Drawing.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="Helpers\Player.cs" />
     <Compile Include="Plugin Classes\Plugin_Update_Method.cs" />
     <Compile Include="UI\uiTextbox.cs" />
     <Compile Include="UI\Plugin_StoreItem.cs" />
@@ -84,12 +85,12 @@
     <Compile Include="UI\uiText.cs" />
     <Compile Include="UI\uiWindow.cs" />
     <Compile Include="Updaters\Git_Updater.cs" />
-    <Compile Include="Singleton.cs" />
+    <Compile Include="Base\Singleton.cs" />
     <Compile Include="UI\Notice_Manager.cs" />
     <Compile Include="SiscosHooks\HOOKS.cs" />
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
-    <Compile Include="Loader.cs" />
-    <Compile Include="MainMenu.cs" />
+    <Compile Include="Base\Loader.cs" />
+    <Compile Include="Base\MainMenu.cs" />
     <Compile Include="Plugin Classes\Plugin.cs" />
     <Compile Include="Plugin Classes\Plugin_Dependency.cs" />
     <Compile Include="Plugin Classes\Plugin_Download_Data.cs" />
@@ -101,14 +102,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SimpleJSON.cs" />
+    <Compile Include="Helpers\SimpleJSON.cs" />
     <Compile Include="SiscosHooks\SiscosHooks.cs" />
     <Compile Include="SiscosHooks\Siscos_Return.cs" />
     <Compile Include="SiscosHooks\Sisco_Hook_Ref.cs" />
     <Compile Include="UI\ToggleSwitch.cs" />
     <Compile Include="UI\UI_Notification.cs" />
     <Compile Include="Updaters\Updater_Base.cs" />
-    <Compile Include="Utility.cs" />
+    <Compile Include="Helpers\Utility.cs" />
     <Compile Include="SiscosHooks\_hook_result.cs" />
     <Compile Include="Updaters\Web_Updater.cs" />
     <Compile Include="Updaters\WebAsync.cs" />

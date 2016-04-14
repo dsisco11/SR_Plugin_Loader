@@ -9,8 +9,8 @@ namespace SR_PluginLoader
 {
     public static class Player
     {
-        private static PlayerState player { get { return SRSingleton<GameContext>.Instance.PlayerState; } }
-        private static GameObject pObj { get { return SRSingleton<GameContext>.Instance.Player; } }
+        private static PlayerState player { get { return SRSingleton<SceneContext>.Instance.PlayerState; } }
+        private static GameObject pObj { get { return SRSingleton<SceneContext>.Instance.Player; } }
 
         public static GameObject gameObject { get { return pObj; } }
         public static PlayerState state { get { return player; } }
@@ -57,7 +57,11 @@ namespace SR_PluginLoader
 #endif
             return ret;
         }
-
+        /// <summary>
+        /// Returns the number of objects which are currently being sucked in by the players weapon.
+        /// </summary>
+        /// <param name="id">The type of object to count</param>
+        /// <returns></returns>
         public static int Get_Captive_Item_Count(Identifiable.Id id)
         {
             return Get_Captive_Items().Count(o => o.id == id);

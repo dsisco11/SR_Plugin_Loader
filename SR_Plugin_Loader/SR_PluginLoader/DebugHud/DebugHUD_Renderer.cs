@@ -173,9 +173,8 @@ namespace SR_PluginLoader
 
         private void onVisibility_Change(bool is_vis)
         {
-            var timeDir = SRSingleton<GameContext>.Instance.TimeDirector;
-            if (is_vis == true) timeDir.Pause();
-            else timeDir.Unpause();
+            if (is_vis == true) GameTime.Pause();
+            else GameTime.Unpause();
         }
         
         private void doLayout()

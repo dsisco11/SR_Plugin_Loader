@@ -70,7 +70,13 @@ namespace SR_PluginLoader
 
         private void Extend_MainMenu()
         {
-            if(MainMenu.mainmenu == null) MainMenu.mainmenu = UnityEngine.Object.FindObjectOfType<MainMenuUI>().gameObject;
+            if (MainMenu.mainmenu == null)
+            {
+                var menu = UnityEngine.Object.FindObjectOfType<MainMenuUI>();
+                if (menu == null) return;
+                MainMenu.mainmenu = menu.gameObject;
+                if (MainMenu.mainmenu == null) return;
+            }
             Add_Button("Plugins", "PluginsMenu", new UnityAction(this.Show_PluginManager));
             Add_Button("Plugin Store", "PluginStore", new UnityAction(this.Show_PluginStore), clr_gold_light, clr_gold, clr_brown);
         }
@@ -83,32 +89,26 @@ namespace SR_PluginLoader
                 Transform MenuUI = menu.transform.GetChild(0);
                 if (MenuUI.FindChild(name) == null)
                 {
-                    //push all the buttons (excluding the play button) down by their own height, to make room for OUR button
-                    for (int i = 1; i < MenuUI.childCount; i++)
-                    {
-                        var child = MenuUI.GetChild(i);
-
-                        var rTrans = child.GetComponent<RectTransform>();
-                        var height = rTrans.rect.height;
-
-                        Vector2 newPos = (rTrans.anchoredPosition + new Vector2(0f, height));
-                        child.GetComponent<RectTransform>().anchoredPosition.Set(newPos.x, newPos.y);
-                    }
-
-                    // Locate the play button
-                    Transform btnPos = MenuUI.FindChild("PlayButton");
+                    // Locate the last button in the menu
+                    Transform btnPos = MenuUI.transform.GetChild(MenuUI.childCount-1);
                     RectTransform btnSize = btnPos.GetComponent<RectTransform>();
 
-                    // Create a copy of the play button that we can alter to do our bidding. (We want to make a copy so we don't need to re-apply all the same styling and whatnot, thus ensuring it won't break in the future)
+                    // Create a copy of the button so we can alter it to do our bidding. (We want to make a copy so we don't need to re-apply all the same styling and whatnot, thus ensuring it won't break as easily in the future)
                     GameObject newButton = UnityEngine.Object.Instantiate<GameObject>(btnPos.gameObject);
                     newButton.transform.SetParent(MenuUI);
+
+                    
+                    // Move the menu panel down a little bit so it doesn't overlap the logo as we add more buttons.
+                    var menuTrans = MenuUI.GetComponent<RectTransform>();
+                    var btnHeight = btnSize.rect.height;
+                    Vector2 newPos = (menuTrans.anchoredPosition + new Vector2(0f, btnHeight));
+                    MenuUI.GetComponent<RectTransform>().anchoredPosition.Set(newPos.x, newPos.y);
+
                     // Add more height to the main menu UI panel so we can fit our fancy button in!
-                    RectTransform menuSize = MenuUI.GetComponent<RectTransform>();
-                    MenuUI.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
-                    MenuUI.GetComponent<RectTransform>().sizeDelta = new Vector2(Screen.width, Screen.height);
+                    MenuUI.GetComponent<RectTransform>().sizeDelta = new Vector2(menuTrans.sizeDelta.x, Screen.height - newPos.y);
+
 
                     newButton.transform.localPosition = new Vector2(btnPos.localPosition.x, (btnPos.localPosition.y + btnSize.rect.height));
-
                     // Set the plugins button text.
                     newButton.name = name;
                     newButton.GetComponentInChildren<Text>().text = text;
