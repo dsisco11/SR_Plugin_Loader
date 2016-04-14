@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace SR_PluginLoader
@@ -20,9 +21,11 @@ namespace SR_PluginLoader
         Method_Ref
     }
 
+    [DebuggerDisplay("{hook.name} @ {name}")]
     public class Hook_Dbg_Data
     {
         public HOOK_ID hook = HOOK_ID.NONE;
+        public HOOK_ID ext = HOOK_ID.NONE;
         public int id { get { return (int)hook; } set { this.hook = (HOOK_ID)value; } }
         public string name = null;
         public bool is_post = false;
@@ -50,16 +53,16 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, name = "Vacuumable.capture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, name = "WeaponVacuum.Update" },
             
-            new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Save", pos = -1 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Game_Loaded, name = "GameData.Load", pos = 0 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Game_Loaded, name = "GameData.Load", pos = -1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Save", pos = -1, ext = HOOK_ID.Ext_Game_Saved },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Game_Loaded, name = "GameData.Load", pos = 0, ext = HOOK_ID.Ext_Pre_Game_Loaded },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Game_Loaded, name = "GameData.Load", pos = -1, ext = HOOK_ID.Ext_Post_Game_Loaded },
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Available_Saves, name = "GameData.AvailableGames", pos = 0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Save_Directory, name = "GameData.ToPath", pos = 0 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Entity_Spawn, name = "DirectedActorSpawner.Spawn" },
             new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, name = "DirectedActorSpawner.Start" },
             
-            new Hook_Dbg_Data() { hook = HOOK_ID.Player_CanGetUpgrade, name = "PlayerState.CanGetUpgrade", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_CanBuyUpgrade, name = "PlayerState.CanGetUpgrade", pos=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_ApplyUpgrade, name="PlayerState.ApplyUpgrade", pos=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_Damaged, name = "PlayerState.Damage" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_LoseEnergy, name = "PlayerState.SpendEnergy" },

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace SR_PluginLoader
@@ -9,6 +10,7 @@ namespace SR_PluginLoader
     /// Naming scheme is as follows: (Pre_/Post_)ClassName_Event
     /// ClassName may be shortened when appropriate to keep hook names intuitive.
     /// </summary>
+    [DebuggerDisplay("Hook = {name}")]
     public class HOOK_ID
     {
 #region BLAH BLAH
@@ -24,6 +26,7 @@ namespace SR_PluginLoader
         private HOOK_ID(int i)
         {
             this.id = i;
+            if (i >= _idx) _idx = (i + 1);
         }
 
         public bool Equals(HOOK_ID obj)
@@ -71,7 +74,7 @@ namespace SR_PluginLoader
         }
 #endregion
 
-        public static readonly HOOK_ID NONE = new HOOK_ID();
+        public static readonly HOOK_ID NONE = new HOOK_ID(0);
                 
         public static readonly HOOK_ID VacPak_Think = new HOOK_ID();
         public static readonly HOOK_ID VacPak_Can_Capture = new HOOK_ID();
@@ -85,7 +88,7 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Post_Economy_Init = new HOOK_ID();
 
         public static readonly HOOK_ID Player_ApplyUpgrade = new HOOK_ID();
-        public static readonly HOOK_ID Player_CanGetUpgrade = new HOOK_ID();
+        public static readonly HOOK_ID Player_CanBuyUpgrade = new HOOK_ID();
         public static readonly HOOK_ID Player_Damaged = new HOOK_ID();
         public static readonly HOOK_ID Player_LoseEnergy = new HOOK_ID();
         public static readonly HOOK_ID Player_SetEnergy = new HOOK_ID();
@@ -102,10 +105,15 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Get_Available_Saves = new HOOK_ID();
         public static readonly HOOK_ID Get_Save_Directory = new HOOK_ID();
 
+        public static readonly HOOK_ID Ext_Game_Saved = new HOOK_ID();
         public static readonly HOOK_ID Game_Saved = new HOOK_ID();
 
         public static readonly HOOK_ID Pre_Game_Loaded = new HOOK_ID();
+        public static readonly HOOK_ID Ext_Pre_Game_Loaded = new HOOK_ID();
+
         public static readonly HOOK_ID Post_Game_Loaded = new HOOK_ID();
+        public static readonly HOOK_ID Ext_Post_Game_Loaded = new HOOK_ID();
+
 
         public static readonly HOOK_ID Spawn_Player_Upgrades_UI = new HOOK_ID();
 

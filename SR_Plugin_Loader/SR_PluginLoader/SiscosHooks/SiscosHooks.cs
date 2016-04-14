@@ -23,7 +23,7 @@ namespace SR_PluginLoader
     public static class SiscosHooks
     {
         /// <summary>
-        /// This is a table that tracks the number of hooks each event id has, this allows us the most efficient way to determine if an early abort on event firing is possible by limiting instructions at the had of the 'Call' function.
+        /// This is a table that tracks the number of hooks each event id has, this allows us the most efficient way to determine if an early abort on event firing is possible by limiting instructions at the head of the 'Call' function.
         /// </summary>
         private static int[] EventCounter = null;
         private static Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>> events = new Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>>();
@@ -42,8 +42,35 @@ namespace SR_PluginLoader
             {
                 EventCounter[i] = 0;
             }
+
+            // Setup any event extensions.
+            register(null, HOOK_ID.Ext_Game_Saved, Ext_Game_Saved);
+            register(null, HOOK_ID.Ext_Pre_Game_Loaded, Ext_Pre_Game_Loaded);
+            register(null, HOOK_ID.Ext_Post_Game_Loaded, Ext_Post_Game_Loaded);
         }
-        
+
+        #region Event Extensions
+
+        private static Sisco_Return Ext_Pre_Game_Loaded(ref object sender, ref object[] args, ref object return_value)
+        {
+            string saveFile = GameData.ToPath(args[0] as string);
+            return new Sisco_Return(call(HOOK_ID.Pre_Game_Loaded, sender, ref return_value, new object[] { saveFile }));
+        }
+
+        private static Sisco_Return Ext_Post_Game_Loaded(ref object sender, ref object[] args, ref object return_value)
+        {
+            string saveFile = GameData.ToPath(args[0] as string);
+            return new Sisco_Return(call(HOOK_ID.Post_Game_Loaded, sender, ref return_value, new object[] { saveFile }));
+        }
+
+        private static Sisco_Return Ext_Game_Saved(ref object sender, ref object[] args, ref object return_value)
+        {
+            string saveFile = GameData.ToPath((sender as GameData).gameName);
+            return new Sisco_Return(call(HOOK_ID.Game_Saved, sender, ref return_value, new object[] { saveFile }));
+        }
+
+        #endregion
+
         public static _hook_result call(HOOK_ID hook, object sender, ref object returnValue, object[] args)
         {
             try
@@ -62,7 +89,11 @@ namespace SR_PluginLoader
                         if (ret != null)
                         {
                             if (ret.early_return) result.abort = true;
-                            if (ret.handled == true) break;//cancel all other events
+                            if (ret.handled == true)
+                            {
+                                result.handled = true;
+                                break;//cancel all other events
+                            }
                         }
                     }
                     catch(Exception ex)
@@ -112,12 +143,6 @@ namespace SR_PluginLoader
         /// <returns>(BOOL) Whether the event was successfully hooked.</returns>
         public static bool register(object registrar, HOOK_ID hook, Sisco_Hook_Delegate cb)
         {
-            if (registrar == null)
-            {
-                Log("Registrar cannot be NULL!");
-                return false;
-            }
-
             if(hook == null)
             {
                 Log("Attempted to register for NULL event!");
@@ -130,14 +155,18 @@ namespace SR_PluginLoader
                 List<Sisco_Hook_Delegate> cb_list;
                 if (!SiscosHooks.events.TryGetValue(hook, out cb_list)) SiscosHooks.events[hook] = new List<Sisco_Hook_Delegate>();
                 EventCounter[(int)hook] = SiscosHooks.events[hook].Count;
-
-                // create this registrar's hooks list if it doesn't exist.
-                List<Sisco_Hook_Ref> hooks_list;
-                if (!SiscosHooks.tracker.TryGetValue(registrar, out hooks_list)) SiscosHooks.tracker[registrar] = new List<Sisco_Hook_Ref>();
-
-                //add this hook to their list.
-                SiscosHooks.tracker[registrar].Add(new Sisco_Hook_Ref(hook, cb));
                 SiscosHooks.events[hook].Add(cb);
+
+
+                if (registrar != null)
+                {
+                    // create this registrar's hooks list if it doesn't exist.
+                    List<Sisco_Hook_Ref> hooks_list;
+                    if (!SiscosHooks.tracker.TryGetValue(registrar, out hooks_list)) SiscosHooks.tracker[registrar] = new List<Sisco_Hook_Ref>();
+
+                    //add this hook to their list.
+                    SiscosHooks.tracker[registrar].Add(new Sisco_Hook_Ref(hook, cb));
+                }
                 return true;
             }
             catch (Exception ex)

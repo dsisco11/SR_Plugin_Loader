@@ -71,6 +71,7 @@ namespace SR_PluginLoader
                 Check_For_Updates();
 
                 Setup_Assembly_Resolver();
+                Upgrade_System.Setup();
                 Assemble_Plugin_List(); 
                 Load_Config();
                 IN_LOADING_PHASE = false;

@@ -56,6 +56,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Upgrades\IUpgrade.cs" />
     <Compile Include="UI\ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="SiscosHooks\_hook_result.cs" />
     <Compile Include="Updaters\Web_Updater.cs" />
     <Compile Include="Updaters\WebAsync.cs" />
+    <Compile Include="Upgrades\Upgrade_System.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

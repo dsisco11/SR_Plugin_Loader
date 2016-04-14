@@ -5,6 +5,7 @@
     /// </summary>
     public class _hook_result
     {
+        internal bool handled = false;
         public bool abort = false;
         //public bool has_custom_return;
         public object[] args = null;

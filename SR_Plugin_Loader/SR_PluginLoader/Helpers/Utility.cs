@@ -23,6 +23,24 @@ namespace SR_PluginLoader
 
     public static class Utility
     {
+        public static MessageBundle CreateMessageBundle(string bundleName, Dictionary<string, string> translations)
+        {
+            var rBundle = new ResourceBundle(translations);
+            var bundle = new MessageBundle();
+            bundle.Init(SRSingleton<GameContext>.Instance.MessageDirector, bundleName, rBundle, null);
+
+            return bundle;
+        }
+
+        /// <summary>
+        /// Used to create a translation key name that is unique to the assembly it is called from so as to avoid collisions
+        /// </summary>
+        /// <param name="keyName"></param>
+        public static string Format_Translation_Key(string keyName)
+        {
+            return String.Format("{0}.{1}", "", keyName);
+        }
+
         public static WebClient Get_Web_Client()
         {
             var webClient = new WebClient();
