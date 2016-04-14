@@ -17,9 +17,7 @@ If you need help with anything dont be afraid to create an <a href="https://gith
 ## For Developers  
 Example plugins are under the examples folder.  
 A project template for VisualStudio which allows you to instantly have a new plugin with all the needed classes and includes imported can be found [here](https://github.com/dsisco11/SR_Plugin_Loader/raw/master/SR_Plugin_Template.vsix)  
-To learn more about all of the features this project offers look at the <a href="https://github.com/dsisco11/SR_Plugin_Loader/wiki">WIKI</a>.  
-**ALSO**  
-If you are planning on creating a plugin you should absolutely check out the EventHook library I made for SlimeRancher <a href="https://github.com/dsisco11/SiscosHooks">Here is a link.</a>  
+To learn more about all of the features this project offers look at the <a href="https://github.com/dsisco11/SR_Plugin_Loader/wiki">WIKI</a>.
   
 ## License
 SR Plugin Loader is released under the <a href="https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)">Apache 2.0 license</a>
@@ -30,8 +28,7 @@ File an issue on this project github page and I'll see what I can do about it.
   
 ### "My anti-virus thinks the installer is a virus!"  
 Good, it's doing it's job, and while my installer isn't really a virus it does change the code in some game files and that might certainly look like a virus to some AV's.  
-This issue isn't unique to my mod installer either, it's an issue with a lot of code changing mods because they alter your game files.  
-The truth is that there is no magical program which can tell you without a doubt if something is a virus and always be 100% correct. Sometimes they get things wrong and at this point you have to make your own decisions on what you trust.  If you choose to trust my installer then I thank you, but if you don't then nothing anyone can say will convince you. Just always be safe guys!  
+This issue isn't unique to my mod installer either, it's an issue with a lot of code changing mods because they alter your game files. 
 
 ### "Why can't I see the code for your installer?"  
 Because it's my own proprietary creation and I have choosen to protect it.  
