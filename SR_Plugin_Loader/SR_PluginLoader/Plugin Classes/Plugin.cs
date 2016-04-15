@@ -320,9 +320,26 @@ namespace SR_PluginLoader
 
             try
             {
+                bool loaded = false;
+
                 if (this.load_funct != null)
                 {
-                    this.load_funct.Invoke(null, new object[] { gmObj });
+                    object[] args = new object[load_funct.GetParameters().Length];
+                    var paramz = load_funct.GetParameters();
+                    for(int i=0; i<paramz.Length; i++)
+                    {
+                        ParameterInfo param = paramz[i];
+                        if (typeof(GameObject) == param.ParameterType) args[i] = gmObj;
+                        else if (typeof(Plugin) == param.ParameterType) args[i] = this;
+
+                    }
+                    
+                    this.load_funct.Invoke(null, args);
+                    loaded = true;
+                }
+
+                if(loaded)
+                {
                     this.enabled = true;
                     this.root = gmObj;
                     Loader.Plugin_Status_Change(this, this.enabled);

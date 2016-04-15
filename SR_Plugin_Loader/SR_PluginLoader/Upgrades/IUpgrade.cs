@@ -73,8 +73,8 @@ namespace SR_PluginLoader
         /// <summary>
         /// A unique identifier string for the upgrade
         /// </summary>
-        public string ID { get { if (Parent==null) { return String.Concat("unknown.", idBase); } return String.Concat(Parent, ".", idBase); } }
-        private string idBase = "";
+        public string ID { get { return _id; } protected set { _id = value.ToLower(); } }
+        private string _id = null;
 
         public abstract bool Purchase(GameObject obj);
 
@@ -85,7 +85,9 @@ namespace SR_PluginLoader
         public UpgradeBase(Plugin parent, string id, int cost, string name, string desc, Action<GameObject> function, Texture2D icon)
         {
             Parent = parent;
-            idBase = id;
+            if (Parent == null) ID = String.Concat("unknown.", id).ToLower();
+            else ID = String.Concat(Parent.data.NAME, ".", Parent.data.AUTHOR, ".", id).ToLower();
+
             Cost = cost;
             Name = name;
             Description = desc;

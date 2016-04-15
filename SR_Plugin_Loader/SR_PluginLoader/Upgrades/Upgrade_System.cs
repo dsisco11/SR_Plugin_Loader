@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace SR_PluginLoader
 {
-    class Upgrade_System
+    public class Upgrade_System
     {
         private static bool setup = false;
         /// <summary>
@@ -23,7 +23,6 @@ namespace SR_PluginLoader
         /// A list of all the player upgrade id strings we werent able to load an upgrade instance for, we keep these so that if a plugin fails to load but a player had the upgrade for it, they will not lose the upgrade when they DO get the plugin to load again.
         /// </summary>
         public static List<string> Player_Upgrades_Missing { get; protected set; }
-
         private static MessageBundle plyUpgradesBundle = null;
 
 
@@ -46,11 +45,12 @@ namespace SR_PluginLoader
 
         public static void Register(IUpgrade upgrade)
         {
-            if (!Upgrades.ContainsKey(upgrade.Type)) Upgrades.Add(upgrade.Type, new List<IUpgrade>() { upgrade });
+            if (!Upgrades.ContainsKey(upgrade.Type)) Upgrades.Add(upgrade.Type, new List<IUpgrade>());
 
             var old = Upgrades[upgrade.Type].FirstOrDefault(o => String.Compare(o.ID, upgrade.ID) == 0);
             if (old != null) Upgrades[upgrade.Type].Remove(old);
 
+            //DebugHud.Log("[Upgrades] registered: {0}", upgrade.ID);
             Upgrades[upgrade.Type].Add(upgrade);
         }
 
@@ -108,8 +108,9 @@ namespace SR_PluginLoader
                 string[] list = str.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 if (list.Length <= 0) return null;
 
-                foreach (string id in list)
+                foreach (string ID in list)
                 {
+                    string id = ID.ToLower();
                     PlayerUpgrade upgrade = Get_Upgrade(Upgrade_Type.PLAYER_UPGRADE, id) as PlayerUpgrade;
                     if (upgrade == null)
                     {
@@ -134,7 +135,7 @@ namespace SR_PluginLoader
             List<string> upgrades_list = new List<string>(Player_Upgrades_Missing);
             upgrades_list.AddRange( PlayerUpgrades.Select(o => o.ID).ToArray() );
 
-            File.WriteAllText(tmpFile, String.Join("\n", upgrades_list.ToArray()));
+            File.WriteAllText(tmpFile, String.Join("\n", upgrades_list.Distinct(StringComparer.OrdinalIgnoreCase).ToArray()));
             File.Copy(tmpFile, fileName, true);
             File.Delete(tmpFile);
             return null;
