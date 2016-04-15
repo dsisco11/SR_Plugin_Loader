@@ -37,6 +37,7 @@ namespace SR_PluginLoader
         /// A unique identifier string for the upgrade
         /// </summary>
         string ID { get; }
+        bool IsBought { get; }
 
         bool Apply(GameObject obj);
         bool Purchase(GameObject obj);
@@ -46,6 +47,10 @@ namespace SR_PluginLoader
     public abstract class UpgradeBase : IUpgrade
     {
         private Plugin Parent;
+        /// <summary>
+        /// List of other upgrades that must be obtained before this one may.
+        /// </summary>
+        protected List<IUpgrade> prereqs = new List<IUpgrade>();
         public virtual Upgrade_Type Type { get { return Upgrade_Type.INVALID; } }
         /// <summary>
         /// How many credits this upgrade costs
@@ -77,9 +82,12 @@ namespace SR_PluginLoader
         private string _id = null;
 
         public abstract bool Purchase(GameObject obj);
-
         public Func<bool> can_buy_func = null;
-        public bool CanBuy() { if (Player.HasUpgrade(this)) { return false; } if (can_buy_func != null) { return can_buy_func(); } return true; }
+        public bool CanBuy() { if (!PrereqsMet()) { return false; } if (Player.HasUpgrade(this)) { return false; } if (can_buy_func != null) { return can_buy_func(); } return true; }
+        /// <summary>
+        /// Returns <c>true</c> is the player has this upgrade.
+        /// </summary>
+        public bool IsBought { get { return Player.HasUpgrade(this); } }
 
         
         public UpgradeBase(Plugin parent, string id, int cost, string name, string desc, Action<GameObject> function, Texture2D icon)
@@ -95,6 +103,8 @@ namespace SR_PluginLoader
             ApplyFunction = function;
 
             if (Icon == null && Parent != null) Icon = Parent.icon;
+            if (Icon == null) Icon = Loader.tex_unknown;
+            
         }
 
         public bool Apply(GameObject obj)
@@ -103,6 +113,26 @@ namespace SR_PluginLoader
 
             ApplyFunction(obj);
             return true;
+        }
+
+        private bool PrereqsMet()
+        {
+            foreach(IUpgrade up in prereqs)
+            {
+                if (!up.IsBought) return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Adds a another upgrade as a prerequisite for this one.
+        /// The player will have to obtain the other upgrade before this one is available.
+        /// </summary>
+        /// <param name="upgrade"></param>
+        public void Requires(IUpgrade upgrade)
+        {
+            prereqs.Add(upgrade);
         }
     }
 
@@ -113,6 +143,7 @@ namespace SR_PluginLoader
     {
         public override Upgrade_Type Type { get { return Upgrade_Type.PLAYER_UPGRADE; } }
         public override bool Purchase(GameObject sender) { return Upgrade_System.TryPurchase(sender.GetComponent<PersonalUpgradeUI>(), this); }
+        
 
         public PlayerUpgrade(Plugin parent, string id, int cost, string name, string desc, Action<GameObject> function, Texture2D icon=null) : base(parent, id, cost, name, desc, function, icon)
         {

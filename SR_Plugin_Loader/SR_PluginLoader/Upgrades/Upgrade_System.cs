@@ -43,7 +43,7 @@ namespace SR_PluginLoader
         }
 
 
-        public static void Register(IUpgrade upgrade)
+        internal static void Register(IUpgrade upgrade)
         {
             if (!Upgrades.ContainsKey(upgrade.Type)) Upgrades.Add(upgrade.Type, new List<IUpgrade>());
 
