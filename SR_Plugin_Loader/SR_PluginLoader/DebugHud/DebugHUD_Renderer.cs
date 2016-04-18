@@ -89,8 +89,8 @@ namespace SR_PluginLoader
         private void Init_Styles()
         {
             dirty_styles = false;
-            DebugHUD_Renderer.bg_fade = Utility.Get_Gradient_Texture(400, GRADIENT_DIR.LEFT_RIGHT, new Color(0f,0f,0f,1f), new Color(0f,0f,0f,0f), true, 1.5f);
-            Utility.Set_BG_Color(DebugHUD_Renderer.blackout.normal, 0.1f, 0.1f, 0.1f, 0.7f);
+            DebugHUD_Renderer.bg_fade = Util.Get_Gradient_Texture(400, GRADIENT_DIR.LEFT_RIGHT, new Color(0f,0f,0f,1f), new Color(0f,0f,0f,0f), true, 1.5f);
+            Util.Set_BG_Color(DebugHUD_Renderer.blackout.normal, 0.1f, 0.1f, 0.1f, 0.7f);
 
             DebugHUD_Renderer.text_style.normal.textColor = Color.white;
             DebugHUD_Renderer.text_style.active.textColor = Color.white;
@@ -108,11 +108,11 @@ namespace SR_PluginLoader
 
             skin.verticalScrollbar = new GUIStyle();
             skin.verticalScrollbar.fixedWidth = scrollbar_width;
-            Utility.Set_BG_Color(skin.verticalScrollbar.normal, new Color32(16, 16, 16, 200));
+            Util.Set_BG_Color(skin.verticalScrollbar.normal, new Color32(16, 16, 16, 200));
 
             skin.verticalScrollbarThumb = new GUIStyle();
             skin.verticalScrollbarThumb.fixedWidth = scrollbar_width;
-            Utility.Set_BG_Color(skin.verticalScrollbarThumb.normal, new Color32(80, 80, 80, 255));
+            Util.Set_BG_Color(skin.verticalScrollbarThumb.normal, new Color32(80, 80, 80, 255));
 
             skin.horizontalScrollbar = null;
             skin.horizontalScrollbarLeftButton = null;
@@ -148,7 +148,7 @@ namespace SR_PluginLoader
                 update_player_pos_display();
             }
 
-            if (Input.GetKeyUp(KeyCode.BackQuote) || Input.GetKeyUp(KeyCode.Tab) || (Input.GetKeyUp(KeyCode.Escape) && this.open))
+            if (Input.GetKeyUp(KeyCode.Tab) || (Input.GetKeyUp(KeyCode.Escape) && this.open))
             {
                 this.open = (!this.open);
                 if (this.open)
@@ -310,11 +310,6 @@ namespace SR_PluginLoader
             GUI.color = prevClr;
             //watermark_style.Draw(watermark_area, watermark_content, false, false, false, false);
             watermark_style.Draw(watermark_text_area, watermark_text_content, false, false, false, false);
-        }
-        
-        private void OnLevelLoaded(int lvl)
-        {
-            Loader.atMainMenu = Levels.isSpecial();
         }
     }
 }

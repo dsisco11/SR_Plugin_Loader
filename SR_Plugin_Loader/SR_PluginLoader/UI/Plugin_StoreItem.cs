@@ -22,8 +22,8 @@ namespace SR_PluginLoader
             margin = new RectOffset(2, 2, 2, 0);
             Set_Size(DEFAULT_WIDTH, DEFAULT_HEIGHT);
             
-            Utility.Set_BG_Color(local_style.normal, new Color32(32, 32, 32, 200));
-            Utility.Set_BG_Color(local_style.hover, new Color32(64, 64, 64, 255));
+            Util.Set_BG_Color(local_style.normal, new Color32(32, 32, 32, 200));
+            Util.Set_BG_Color(local_style.hover, new Color32(64, 64, 64, 255));
             //Utility.Set_BG_Color(local_style.hover, new Color32(32, 40, 60, 255));
 
 
@@ -46,7 +46,7 @@ namespace SR_PluginLoader
             this.Add("author", auth);
 
             uiProgressBar prog = Create<uiProgressBar>();
-            Utility.Set_BG_Color(prog.bar_style.normal, new Color(0.1f, 0.5f, 1.0f));
+            Util.Set_BG_Color(prog.bar_style.normal, new Color(0.1f, 0.5f, 1.0f));
             prog.show_progress_text = false;
             this.Add("progress", prog);
             this.progress_bar = prog;

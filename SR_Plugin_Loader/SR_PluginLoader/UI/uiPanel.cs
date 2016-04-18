@@ -14,6 +14,9 @@ namespace SR_PluginLoader
         public bool CanScroll = false;
         protected Vector2 scroll_pos = Vector2.zero;
         private Rect _content_area = new Rect();
+        /// <summary>
+        /// The area that the panels content currently takes up.
+        /// </summary>
         public virtual Rect content_area { get { return _content_area; } }
         protected override bool hasScrollbar { get { if (!this.CanScroll) { return false; } return (content_area.height > inner_area.height); } }
         public uiControl this[string key] { get { uiControl c; if (this.child_map.TryGetValue(key, out c)) { return c; } return null; } }
@@ -33,12 +36,13 @@ namespace SR_PluginLoader
         #endregion
 
         #region Generic child-control management
-        public virtual void Add(uiControl c)
+        public virtual uiControl Add(uiControl c)
         {
             this.Add_Control(c);
+            return c;
         }
         
-        public virtual void Add(string name, uiControl c)
+        public virtual uiControl Add(string name, uiControl c)
         {
             this.Add(c);
             uiControl tmp;
@@ -48,6 +52,7 @@ namespace SR_PluginLoader
             }
 
             child_map[name] = c;
+            return c;
         }
 
         public virtual void Remove(uiControl c)
@@ -118,6 +123,11 @@ namespace SR_PluginLoader
         }
         #endregion
 
+        /// <summary>
+        /// WAIT!
+        /// Be sure to use <see cref="final_area_from_inner()"/> when calculating the size.
+        /// </summary>
+        /// <returns></returns>
         protected override Vector2 Get_Autosize()
         {
             // OK so since autosizing panels are making themselves expand to a certain size based on their child controls bounds
@@ -197,7 +207,7 @@ namespace SR_PluginLoader
             if (this.CanScroll)
             {
                 GUI.EndScrollView(true);
-                if( !Utility.floatEq(scroll_pos.x, pre_scroll.x) || !Utility.floatEq(scroll_pos.y, pre_scroll.y) )
+                if( !Util.floatEq(scroll_pos.x, pre_scroll.x) || !Util.floatEq(scroll_pos.y, pre_scroll.y) )
                 {
                     foreach (var child in this.children)
                     {

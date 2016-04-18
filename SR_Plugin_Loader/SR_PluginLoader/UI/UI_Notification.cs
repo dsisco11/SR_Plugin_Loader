@@ -81,7 +81,7 @@ namespace SR_PluginLoader
             msg_style = new GUIStyle();
             title_style = new GUIStyle();
 
-            Utility.Set_BG_Color(style.normal, new Color(0.15f, 0.15f, 0.15f, 0.65f));
+            Util.Set_BG_Color(style.normal, new Color(0.15f, 0.15f, 0.15f, 0.65f));
 
             msg_style.wordWrap = true;
             msg_style.normal.textColor = new Color(0.8f, 0.8f, 0.8f);

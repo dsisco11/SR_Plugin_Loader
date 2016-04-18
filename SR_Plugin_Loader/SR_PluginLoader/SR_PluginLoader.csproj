@@ -56,6 +56,21 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\SafeEnum.cs" />
+    <Compile Include="Dev_Hud\DevHud.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\Game.cs" />
+    <Compile Include="Helpers\Directors.cs" />
+    <Compile Include="Helpers\Sound.cs" />
+    <Compile Include="Base\TimedObjectFlag.cs" />
+    <Compile Include="Helpers\ResourceExt.cs" />
+    <Compile Include="Helpers\Language.cs" />
+    <Compile Include="Experiments\Misc_Experiments.cs" />
+    <Compile Include="Helpers\Ident.cs" />
+    <Compile Include="SiscosHooks\Prefab_Spawn_Hook.cs" />
+    <Compile Include="UI\LayoutDirector.cs" />
+    <Compile Include="UI\uiListIcon.cs" />
+    <Compile Include="UI\uiListItem.cs" />
     <Compile Include="Upgrades\IUpgrade.cs" />
     <Compile Include="UI\ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
@@ -68,14 +83,14 @@
     <Compile Include="UI\Plugin_Update_Viewer.cs" />
     <Compile Include="UI\PluginManager.cs" />
     <Compile Include="UI\PluginSelector.cs" />
-    <Compile Include="UI\uiScrollView.cs" />
+    <Compile Include="UI\uiScrollPanel.cs" />
     <Compile Include="UI\uiToggle.cs" />
     <Compile Include="UI\uiIcon.cs" />
     <Compile Include="UI\ProgressBar_Element.cs" />
     <Compile Include="UI\uiProgressBar.cs" />
     <Compile Include="UI\Drawing.cs" />
     <Compile Include="Helpers\Player.cs" />
-    <Compile Include="Plugin Classes\Plugin_Update_Method.cs" />
+    <Compile Include="Plugins\Plugin_Update_Method.cs" />
     <Compile Include="UI\uiTextbox.cs" />
     <Compile Include="UI\Plugin_StoreItem.cs" />
     <Compile Include="UI\PluginStore.cs" />
@@ -86,31 +101,31 @@
     <Compile Include="UI\uiText.cs" />
     <Compile Include="UI\uiWindow.cs" />
     <Compile Include="Updaters\Git_Updater.cs" />
-    <Compile Include="Base\Singleton.cs" />
+    <Compile Include="Helpers\Singleton.cs" />
     <Compile Include="UI\Notice_Manager.cs" />
     <Compile Include="SiscosHooks\HOOKS.cs" />
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
     <Compile Include="Base\Loader.cs" />
-    <Compile Include="Base\MainMenu.cs" />
-    <Compile Include="Plugin Classes\Plugin.cs" />
-    <Compile Include="Plugin Classes\Plugin_Dependency.cs" />
-    <Compile Include="Plugin Classes\Plugin_Download_Data.cs" />
-    <Compile Include="Plugin Classes\Plugin_Data.cs" />
+    <Compile Include="UI\MainMenu.cs" />
+    <Compile Include="Plugins\Plugin.cs" />
+    <Compile Include="Plugins\Plugin_Dependency.cs" />
+    <Compile Include="Plugins\Plugin_Download_Data.cs" />
+    <Compile Include="Plugins\Plugin_Data.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Plugin Classes\Plugin_Version.cs" />
+    <Compile Include="Plugins\Plugin_Version.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\SimpleJSON.cs" />
+    <Compile Include="Base\SimpleJSON.cs" />
     <Compile Include="SiscosHooks\SiscosHooks.cs" />
     <Compile Include="SiscosHooks\Siscos_Return.cs" />
     <Compile Include="SiscosHooks\Sisco_Hook_Ref.cs" />
     <Compile Include="UI\ToggleSwitch.cs" />
     <Compile Include="UI\UI_Notification.cs" />
     <Compile Include="Updaters\Updater_Base.cs" />
-    <Compile Include="Helpers\Utility.cs" />
+    <Compile Include="Helpers\Util.cs" />
     <Compile Include="SiscosHooks\_hook_result.cs" />
     <Compile Include="Updaters\Web_Updater.cs" />
     <Compile Include="Updaters\WebAsync.cs" />
@@ -143,6 +158,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\checkmark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestBed\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -25,7 +25,7 @@ namespace SR_PluginLoader
             get
             {
                 if (!File.Exists(file)) return null;
-                if (_cached_data_hash == null) _cached_data_hash = Utility.Git_File_Sha1_Hash(file);
+                if (_cached_data_hash == null) _cached_data_hash = Util.Git_File_Sha1_Hash(file);
 
                 return _cached_data_hash;
             }
@@ -359,12 +359,22 @@ namespace SR_PluginLoader
 
         public void Disable()
         {
-            this.enabled = false;// Unloading doesn't follow the same rules as loading, the assume it's unloaded for the user's sake.
+            this.enabled = false;// Unloading doesn't follow the same rules as loading, we just assume it's unloaded for the user's sake.
             try
             {
                 if (this.unload_funct != null)
                 {
-                    this.unload_funct.Invoke(null, new object[] { this.root });
+                    object[] args = new object[unload_funct.GetParameters().Length];
+                    var paramz = unload_funct.GetParameters();
+                    for (int i = 0; i < paramz.Length; i++)
+                    {
+                        ParameterInfo param = paramz[i];
+                        if (typeof(GameObject) == param.ParameterType) args[i] = this.root;
+                        else if (typeof(Plugin) == param.ParameterType) args[i] = this;
+
+                    }
+
+                    this.unload_funct.Invoke(null, args);
                 }
             }
             catch (Exception ex)

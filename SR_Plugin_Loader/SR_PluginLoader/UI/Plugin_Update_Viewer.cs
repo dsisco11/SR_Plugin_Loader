@@ -10,7 +10,7 @@ namespace SR_PluginLoader
     class Plugin_Update_Viewer : uiWindow
     {
         private bool first_show = true;
-        private uiScrollView list = null;
+        private uiScrollPanel list = null;
         private uiCheckbox mark_all = null;
         private uiButton btn_update = null;
         private uiTextArea msg_instruct = null;
@@ -26,7 +26,7 @@ namespace SR_PluginLoader
             onShown += Plugin_Update_Viewer_onShown;
 
 
-            list = Create<uiScrollView>(this);
+            list = Create<uiScrollPanel>(this);
             list.margin = new RectOffset(5, 5, 0, 5);
             list.padding = new RectOffset(2, 2, 2, 2);
             list.onLayout += List_onLayout;

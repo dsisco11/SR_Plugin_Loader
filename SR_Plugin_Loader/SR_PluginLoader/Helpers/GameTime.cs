@@ -11,10 +11,11 @@ namespace SR_PluginLoader
     /// </summary>
     public static class GameTime
     {
-        public static TimeDirector Instance { get { return SRSingleton<SceneContext>.Instance.TimeDirector; } }
+        public static TimeDirector Instance { get { return SRSingleton<SceneContext>.Instance.TimeDirector; } }        
+        public static bool isPaused { get { return Instance.HasPauser(); } }
 
         /// <summary>
-        /// Pauses the game
+        /// Pauses the game.
         /// </summary>
         public static void Pause()
         {
@@ -22,11 +23,12 @@ namespace SR_PluginLoader
         }
 
         /// <summary>
-        /// Unpauses the game
+        /// Unpauses the game.s
         /// </summary>
         public static void Unpause()
         {
             Instance.Unpause();
         }
+        
     }
 }

@@ -175,7 +175,7 @@ namespace SR_PluginLoader
                     {
                         // Compare the SHA1 hash for the dll on GitHub to the hash for the one currently installed
                         string nSHA = file["sha"];
-                        string cSHA = Utility.Git_File_Sha1_Hash(local_file);
+                        string cSHA = Util.Git_File_Sha1_Hash(local_file);
                         //DebugHud.Log("nSHA({0})  cSHA({1})  local_file: {2}", nSHA, cSHA, local_file);
 
                         if (String.Compare(nSHA, cSHA) != 0)

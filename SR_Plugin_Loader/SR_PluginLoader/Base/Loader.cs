@@ -14,16 +14,17 @@ namespace SR_PluginLoader
 {
     public static class Loader
     {
-        public static bool atMainMenu = true;
+        /// <summary>
+        /// The version for the loader itself
+        /// </summary>
+        public static Plugin_Version VERSION = new Plugin_Version(0, 5);
+        
         public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", Loader.VERSION); } }
-        public static string DOWNLOADTITLE { get { return String.Format("Download Plugins"); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
-        public static Plugin_Version VERSION = new Plugin_Version(0, 4);// even though really this isnt a plugin, I guess if we ever do major changes a plugin could specify the loader as a requirement and set a specific version.
 
         private static GameObject root = null;
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
         private static string pluginDir = null;
-        public static int _plugin_id = 0;
         
         public static Texture2D tex_unknown = new Texture2D(1, 1);
         public static Texture2D tex_alert = new Texture2D(1, 1);
@@ -44,6 +45,7 @@ namespace SR_PluginLoader
         
         private static MainMenu menu = null;
         private static Plugin_Update_Viewer plugin_updater = null;
+        private static DevHud dev_tools = null;
 
 
         public static void init(string hash)
@@ -75,9 +77,16 @@ namespace SR_PluginLoader
                 Assemble_Plugin_List(); 
                 Load_Config();
                 IN_LOADING_PHASE = false;
+                ResourceExt.map_SR_Icons();
 
                 plugin_updater = uiControl.Create<Plugin_Update_Viewer>();// This control manages itself and is only able to become visible under certain conditions which it will control. Therefore it needs no var to track it.
                 plugin_updater.Show();
+
+                dev_tools = uiControl.Create<DevHud>();
+                //dev_tools.Show();
+                dev_tools.onShown += (uiWindow w) => { GameTime.Pause(); };
+                dev_tools.onHidden += (uiWindow w) => { GameTime.Unpause(); };
+                
             }
             catch(Exception ex)
             {
@@ -93,7 +102,7 @@ namespace SR_PluginLoader
         /// <returns></returns>
         private static bool Verify_PluginLoader_Hash(string hash)
         {
-            string dll_hash = Utility.Git_File_Sha1_Hash(Assembly.GetExecutingAssembly().Location);
+            string dll_hash = Util.Git_File_Sha1_Hash(Assembly.GetExecutingAssembly().Location);
             bool ok = (String.Compare(dll_hash, hash) == 0);
 
             if(!ok)
@@ -132,12 +141,12 @@ namespace SR_PluginLoader
             Loader.TryLoadAsset(ref Loader.tex_checkbox, "checkbox.png");
             Loader.TryLoadAsset(ref Loader.tex_checkmark, "checkmark.png");
 
-            Utility.Tint_Texture(Loader.tex_close_dark, new Color(1f, 1f, 1f, 0.5f));
+            Util.Tint_Texture(Loader.tex_close_dark, new Color(1f, 1f, 1f, 0.5f));
         }
 
         public static void TryLoadAsset(ref Texture2D tex, string asset)
         {
-            byte[] buf = Utility.Load_Resource(asset);
+            byte[] buf = Util.Load_Resource(asset);
             if (buf == null) return;
             tex.LoadImage(buf);
         }
@@ -536,7 +545,7 @@ namespace SR_PluginLoader
         {
             try
             {
-                byte[] buf = Utility.Load_Resource("Restart_Helper.exe");
+                byte[] buf = Util.Load_Resource("Restart_Helper.exe");
                 if (buf != null && buf.Length > 0)
                 {
                     File.WriteAllBytes(update_helper_file, buf);

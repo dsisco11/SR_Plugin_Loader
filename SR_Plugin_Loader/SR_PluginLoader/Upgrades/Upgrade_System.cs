@@ -40,8 +40,8 @@ namespace SR_PluginLoader
             SiscosHooks.register(null, HOOK_ID.Game_Saved, onGameSaved);
             SiscosHooks.register(null, HOOK_ID.Post_Game_Loaded, onGameLoaded);
             SiscosHooks.register(null, HOOK_ID.Spawn_Player_Upgrades_UI, onSpawn_PlayerUpgrades_Kiosk);
+            SiscosHooks.register(null, HOOK_ID.Spawn_Plot_Upgrades_UI, onSpawn_PlotUpgrades_Kiosk);
         }
-
 
         internal static void Register(IUpgrade upgrade)
         {
@@ -151,9 +151,28 @@ namespace SR_PluginLoader
             
             foreach (IUpgrade up in Upgrades[Upgrade_Type.PLAYER_UPGRADE])
             {
-                ui.AddButton(new PurchaseUI.Purchasable(up.Name, up.Sprite, up.Sprite, up.Description, up.Cost, PediaDirector.Id.BASICS, new UnityAction(() => { up.Purchase(kiosk.gameObject); }), Player.CanBuyUpgrade(up)));
+                ui.AddButton(new PurchaseUI.Purchasable(up.Name, up.Sprite, up.Sprite, up.Description, up.Cost, new PediaDirector.Id?(), new UnityAction(() => { up.Purchase(kiosk.gameObject); }), Player.CanBuyUpgrade(up)));
             }
 
+            return null;
+        }
+        
+        private static Sisco_Return onSpawn_PlotUpgrades_Kiosk(ref object sender, ref object[] args, ref object return_value)
+        {
+            LandPlot.Id kind = (LandPlot.Id)args[0];
+
+            var kiosk = sender as LandPlotUI;
+            GameObject panel = return_value as GameObject;
+            var ui = panel.GetComponent<PurchaseUI>();
+
+            foreach (PlotUpgrade up in Upgrades[Upgrade_Type.PLOT_UPGRADE])
+            {
+                if (up.Kind != kind) continue;
+
+                //TODO: we need to set can_buy to FALSE if this LandPlot already has the upgrade...
+                bool can_buy = up.CanBuy();
+                ui.AddButton(new PurchaseUI.Purchasable(up.Name, up.Sprite, up.Sprite, up.Description, up.Cost, new PediaDirector.Id?(), new UnityAction(() => { up.Purchase(kiosk.gameObject); }), can_buy));
+            }
             return null;
         }
         #endregion

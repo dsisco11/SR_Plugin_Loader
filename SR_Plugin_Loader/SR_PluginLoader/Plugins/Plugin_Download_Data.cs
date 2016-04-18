@@ -17,7 +17,7 @@ namespace SR_PluginLoader
         public string URL;
         public Texture2D Icon = Loader.tex_unknown;
         public Updater_Base Updater = null;
-        public string Hash { get { return Utility.SHA(String.Format("{0}.{1}", Author, Name)); } }
+        public string Hash { get { return Util.SHA(String.Format("{0}.{1}", Author, Name)); } }
         public string Title { get { return String.Format("{0}.{1}", Author, Name); } }
         public string Filename { get { string name = String.Format("{0}.{1}.dll", Author, Name); foreach (char c in System.IO.Path.GetInvalidFileNameChars()) { name = name.Replace(c.ToString(), String.Empty); } return name; } }
         public bool isInstalled { get { return Loader.Is_Plugin_Installed(Hash); } }

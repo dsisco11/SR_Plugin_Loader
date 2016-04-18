@@ -7,6 +7,9 @@ using UnityEngine;
 
 namespace SR_PluginLoader
 {
+    /// <summary>
+    /// Provides methods to alter player state and obtain player info.
+    /// </summary>
     public static class Player
     {
         private static PlayerState player { get { return SRSingleton<SceneContext>.Instance.PlayerState; } }
@@ -74,7 +77,7 @@ namespace SR_PluginLoader
         }
 #endregion
 
-    #region VacPak Helpers
+        #region VacPak Helpers
         /// <summary>
         /// Returns an array of GameObject which are currently being sucked in by the players weapon.
         /// </summary>
@@ -106,9 +109,39 @@ namespace SR_PluginLoader
         {
             return Get_Captive_Items().Count(o => o.id == id);
         }
-    #endregion
 
-    #region Upgrade Helpers
+        /// <summary>
+        /// Returns the <c>Vector3</c> position that the player is currently looking at.
+        /// </summary>
+        public static Vector3? RaycastPos()
+        {
+            Ray ray = new Ray(Weapon.vacOrigin.transform.position, Weapon.vacOrigin.transform.up);
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, float.MaxValue, -1610612997))
+            {
+                return raycastHit.point;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the players current view raycast.
+        /// </summary>
+        public static RaycastHit? Raycast()
+        {
+            Ray ray = new Ray(Weapon.vacOrigin.transform.position, Weapon.vacOrigin.transform.up);
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, float.MaxValue, -1610612997))
+            {
+                return raycastHit;
+            }
+
+            return null;
+        }
+        #endregion
+
+        #region Upgrade Helpers
 
         public static void GiveUpgrade(PlayerUpgrade upgrade)
         {
@@ -134,7 +167,7 @@ namespace SR_PluginLoader
         public static bool CanBuyUpgrade(PlayerState.Upgrade upgrade) { return player.CanGetUpgrade(upgrade); }
     #endregion
         
-    #region Misc
+        #region Misc
 
         public static void Damage(int dmg) { player.Damage(dmg); }
         public static void AddRads(float rads) { player.AddRads(rads); }

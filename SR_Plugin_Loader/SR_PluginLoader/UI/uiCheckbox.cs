@@ -45,7 +45,7 @@ namespace SR_PluginLoader
             //Utility.Set_BG_Color(checkbox_style.normal, new Color(0f, 0f, 0f, 0.5f));
             //Utility.Set_BG_Color(checkmark_style.normal, new Color(1f, 1f, 1f, 0.9f));
             checkbox_style.normal.background = Loader.tex_checkbox;
-            checkmark_style.normal.background = Utility.Tint_Texture( Loader.tex_checkmark, new Color(0.3f, 0.95f, 0.4f));
+            checkmark_style.normal.background = Util.Tint_Texture( Loader.tex_checkmark, new Color(0.3f, 0.95f, 0.4f));
 
             label = Create<uiText>(this);
         }

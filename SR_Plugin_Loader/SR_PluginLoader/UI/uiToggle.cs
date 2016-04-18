@@ -50,8 +50,8 @@ namespace SR_PluginLoader
             this.border.normal.color = new Color32(250, 160, 0, 180);// orange
 
             // background designs
-            this.local_style.normal.background = Utility.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, 0.3f, 0.15f);// black
-            this.local_style.active.background = Utility.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, 1.0f, 0.6f, new Color32(250, 160, 0, 255));// orange
+            this.local_style.normal.background = Util.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, 0.3f, 0.15f);// black
+            this.local_style.active.background = Util.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, 1.0f, 0.6f, new Color32(250, 160, 0, 255));// orange
         }
         
         private void UiToggle_onClicked(uiControl c)

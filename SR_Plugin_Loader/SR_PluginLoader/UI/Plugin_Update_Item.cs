@@ -27,11 +27,11 @@ namespace SR_PluginLoader
             this.border.active.color = skin.settings.selectionColor;
             this.border.normal.size = new RectOffset(0, 0, 0, 1);
 
-            Utility.Set_BG_Color(local_style.normal, new Color32(32, 32, 32, 200));
+            Util.Set_BG_Color(local_style.normal, new Color32(32, 32, 32, 200));
 
             progress_bar = Create<uiProgressBar>(this);
             progress_bar.show_progress_text = false;
-            Utility.Set_BG_Color(progress_bar.bar_style.normal, new Color(0.1f, 0.4f, 0.8f, 0.7f));
+            Util.Set_BG_Color(progress_bar.bar_style.normal, new Color(0.1f, 0.4f, 0.8f, 0.7f));
             progress_bar.onProgress += Progress_bar_onProgress;
 
             checkbox = Create<uiCheckbox>(this);

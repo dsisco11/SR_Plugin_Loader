@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 namespace SR_PluginLoader
 {
@@ -26,5 +26,6 @@ namespace SR_PluginLoader
             base.Display();
             if(this.image != null) GUI.DrawTexture(draw_area, this.image);
         }
+        
     }
 }

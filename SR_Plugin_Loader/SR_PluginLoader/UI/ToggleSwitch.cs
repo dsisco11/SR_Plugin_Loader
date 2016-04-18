@@ -61,7 +61,7 @@ namespace SR_PluginLoader
 
             float g1 = 0.30f;
             float g2 = 0.15f;
-            this.style.normal.background = Utility.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, g1, g2);
+            this.style.normal.background = Util.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, g1, g2);
             byte g = 180;
             this.style.normal.textColor = new Color32(g,g,g, 255);
 
@@ -71,7 +71,7 @@ namespace SR_PluginLoader
 
             g1 = 1.0f;
             g2 = 0.6f;
-            this.style.active.background = Utility.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, g1, g2, new Color32(250, 160, 0, 255));
+            this.style.active.background = Util.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, g1, g2, new Color32(250, 160, 0, 255));
 
             float blk = 0.1f;
             this.style.active.textColor = new Color(blk, blk, blk);
@@ -80,8 +80,8 @@ namespace SR_PluginLoader
 
 
             this.border_style = new GUIStyle();
-            Utility.Set_BG_Color(this.border_style.normal, new Color32(250, 160, 0, 180));
-            Utility.Set_BG_Color(this.border_style.active, new Color32(0,0,0, 255));
+            Util.Set_BG_Color(this.border_style.normal, new Color32(250, 160, 0, 180));
+            Util.Set_BG_Color(this.border_style.active, new Color32(0,0,0, 255));
         }
 
         private void OnGUI()

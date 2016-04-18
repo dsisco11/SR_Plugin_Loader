@@ -33,7 +33,7 @@ namespace SR_PluginLoader
         {
             text = Create<uiText>(this);
             text.local_style.alignment = TextAnchor.MiddleCenter;
-            Utility.Set_BG_Color(local_style.normal, new Color(0f, 0f, 0f, 0.5f));
+            Util.Set_BG_Color(local_style.normal, new Color(0f, 0f, 0f, 0.5f));
 
             bar = Create<ProgressBar_Element>(this);
 

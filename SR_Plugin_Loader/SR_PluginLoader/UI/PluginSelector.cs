@@ -32,11 +32,11 @@ namespace SR_PluginLoader
             //local_style.normal.background.SetPixel(0, 0, new Color(shade, shade, shade, 1f));
             //local_style.normal.background.Apply();
             
-            Utility.Set_BG_Color(this.local_style.normal, shade, shade, shade, 0.9f);
-            local_style.active.background = Utility.Get_Gradient_Texture(200, GRADIENT_DIR.TOP_BOTTOM, new Color(shade, shade, shade), new Color32(25, 99, 141, 255));
+            Util.Set_BG_Color(this.local_style.normal, shade, shade, shade, 0.9f);
+            local_style.active.background = Util.Get_Gradient_Texture(200, GRADIENT_DIR.TOP_BOTTOM, new Color(shade, shade, shade), new Color32(25, 99, 141, 255));
 
             shade += 0.3f;
-            Utility.Set_BG_Color(local_style.hover, shade, shade, shade, 0.5f);
+            Util.Set_BG_Color(local_style.hover, shade, shade, shade, 0.5f);
 
 
             pl_icon = Create<uiIcon>();
@@ -59,7 +59,7 @@ namespace SR_PluginLoader
             this.Add("version", pl_version);
 
             pl_status = Create<uiText>();
-            Utility.Set_BG_Color(pl_status.local_style.normal, 0f, 0f, 0f, 0.3f);
+            Util.Set_BG_Color(pl_status.local_style.normal, 0f, 0f, 0f, 0.3f);
             pl_status.selfPadding = new RectOffset(2, 2, 2, 2);
             pl_status.local_style.fontStyle = FontStyle.Bold;
             pl_status.local_style.fontSize = 12;

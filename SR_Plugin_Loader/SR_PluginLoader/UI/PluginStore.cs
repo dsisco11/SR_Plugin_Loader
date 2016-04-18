@@ -189,7 +189,7 @@ namespace SR_PluginLoader
             {
                 FileStream strm = iter.Current as FileStream;
 
-                byte[] data = Utility.Read_Stream(strm);
+                byte[] data = Util.Read_Stream(strm);
                 var list = JSON.Parse(Encoding.ASCII.GetString(data))["plugins"];
                 this.plugins.Clear();
                 

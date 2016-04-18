@@ -77,7 +77,15 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
 
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Player_Upgrades_UI, name = "PersonalUpgradeUI.CreatePurchaseUI", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "GardenUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "CorralUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "CoopUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "PondUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "SiloUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "IncineratorUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
+
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Economy_Init, name = "EconomyDirector.InitForLevel", pos=0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Economy_Init, name = "EconomyDirector.InitForLevel", pos=-1 },

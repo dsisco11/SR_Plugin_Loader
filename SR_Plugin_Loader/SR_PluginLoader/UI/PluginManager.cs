@@ -30,7 +30,7 @@ namespace SR_PluginLoader
             list = Create<uiListView>(this);
             list.Set_Width(200f);
 
-            info_panel = Create<uiScrollView>();
+            info_panel = Create<uiScrollPanel>();
             info_panel.margin = new RectOffset(2, 2, 2, 2);
             info_panel.padding = new RectOffset(5, 5, 5, 5);
             info_panel.onLayout += Info_panel_onLayout;
@@ -106,7 +106,7 @@ namespace SR_PluginLoader
                 return;
             }
 
-            string json_str = String.Format("\"{0}.{1}\": {{\n\t\t \"name\": \"{0}\",\n\t\t\t \"author\": \"{1}\",\n\t\t\t \"description\": \"{2}\",\n\t\t\t \"update_method\": \"{3}\",\n\t\t\t \"url\": \"{4}\"\n\t\t }}", pl.data.NAME, pl.data.AUTHOR, Utility.JSON_Escape_String(pl.data.DESCRIPTION), Enum.GetName(typeof(UPDATER_TYPE), pl.data.UPDATE_METHOD.METHOD), pl.data.UPDATE_METHOD.URL);
+            string json_str = String.Format("\"{0}.{1}\": {{\n\t\t \"name\": \"{0}\",\n\t\t\t \"author\": \"{1}\",\n\t\t\t \"description\": \"{2}\",\n\t\t\t \"update_method\": \"{3}\",\n\t\t\t \"url\": \"{4}\"\n\t\t }}", pl.data.NAME, pl.data.AUTHOR, Util.JSON_Escape_String(pl.data.DESCRIPTION), Enum.GetName(typeof(UPDATER_TYPE), pl.data.UPDATE_METHOD.METHOD), pl.data.UPDATE_METHOD.URL);
             GUIUtility.systemCopyBuffer = json_str;//copy this text to the clipboard
         }
         

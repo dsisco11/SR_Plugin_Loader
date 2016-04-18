@@ -75,18 +75,29 @@ namespace SR_PluginLoader
 #endregion
 
         public static readonly HOOK_ID NONE = new HOOK_ID(0);
-                
+
+        #region VacPak Events
         public static readonly HOOK_ID VacPak_Think = new HOOK_ID();
         public static readonly HOOK_ID VacPak_Can_Capture = new HOOK_ID();
         public static readonly HOOK_ID VacPak_Capture = new HOOK_ID();
         public static readonly HOOK_ID VacPak_Consume = new HOOK_ID();
+        #endregion
 
+        #region Entity Events
         public static readonly HOOK_ID Pre_Entity_Spawn = new HOOK_ID();
         public static readonly HOOK_ID EntitySpawner_Init = new HOOK_ID();
+
+        public static readonly HOOK_ID Entity_Spawned = new HOOK_ID();
+        public static readonly HOOK_ID Slime_Spawned = new HOOK_ID();
+        public static readonly HOOK_ID Animal_Spawned = new HOOK_ID();
+        public static readonly HOOK_ID Food_Spawned = new HOOK_ID();
+
+        #endregion
 
         public static readonly HOOK_ID Pre_Economy_Init = new HOOK_ID();
         public static readonly HOOK_ID Post_Economy_Init = new HOOK_ID();
 
+        #region Player Events
         public static readonly HOOK_ID Player_ApplyUpgrade = new HOOK_ID();
         public static readonly HOOK_ID Player_CanBuyUpgrade = new HOOK_ID();
         public static readonly HOOK_ID Player_Damaged = new HOOK_ID();
@@ -98,6 +109,7 @@ namespace SR_PluginLoader
 
         public static readonly HOOK_ID Pre_Player_Sleep = new HOOK_ID();
         public static readonly HOOK_ID Post_Player_Sleep = new HOOK_ID();
+        #endregion
 
         public static readonly HOOK_ID Pre_Region_Spawn_Cycle = new HOOK_ID();
         public static readonly HOOK_ID Post_Region_Spawn_Cycle = new HOOK_ID();
@@ -115,22 +127,29 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Ext_Post_Game_Loaded = new HOOK_ID();
 
 
+        public static readonly HOOK_ID Spawn_Plot_Upgrades_UI = new HOOK_ID();
+        public static readonly HOOK_ID Ext_Spawn_Plot_Upgrades_UI = new HOOK_ID();
+
         public static readonly HOOK_ID Spawn_Player_Upgrades_UI = new HOOK_ID();
 
+        #region Silo Events
         public static readonly HOOK_ID Pre_Silo_Input = new HOOK_ID();
         public static readonly HOOK_ID Post_Silo_Input = new HOOK_ID();
 
         public static readonly HOOK_ID Pre_Silo_Output = new HOOK_ID();
         public static readonly HOOK_ID Post_Silo_Output = new HOOK_ID();
-        
+        #endregion
+
         public static readonly HOOK_ID ResourcePatch_Init = new HOOK_ID();
 
+        #region Garden Events
         public static readonly HOOK_ID Pre_Garden_Init = new HOOK_ID();
         public static readonly HOOK_ID Post_Garden_Init = new HOOK_ID();
 
         public static readonly HOOK_ID Garden_Got_Input = new HOOK_ID();
         public static readonly HOOK_ID Pre_Garden_Set_Type = new HOOK_ID();
         public static readonly HOOK_ID Post_Garden_Set_Type = new HOOK_ID();
+        #endregion
 
     }
 

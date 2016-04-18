@@ -9,7 +9,7 @@ namespace SR_PluginLoader
     public class uiWindow : uiPanel
     {
         private Rect title_area = new Rect(), title_bar_abs_area = new Rect(), title_stipple_area = new Rect(), title_stipple_coords = new Rect(), titlebar_buttons_area = new Rect();
-        protected uiScrollView content_panel = null;
+        protected uiScrollPanel content_panel = null;
         private GUIStyle style_title = null, style_titlebar = null;
         private Texture2D title_bar_texture = null;
         private int title_bar_height { get { return 26; } }
@@ -52,7 +52,7 @@ namespace SR_PluginLoader
             closeBtn.onClicked += CloseBtn_onClicked;
             closeBtn.margin = new RectOffset(6, 6, 6, 6);
 
-            content_panel = Create<uiScrollView>();
+            content_panel = Create<uiScrollPanel>();
             content_panel.margin = new RectOffset(3,3,0,3);
             content_panel.autosize = false;
 
@@ -66,7 +66,7 @@ namespace SR_PluginLoader
         private void Awake()
         {
             style_titlebar = new GUIStyle();
-            Utility.Set_BG_Color(style_titlebar.normal, new Color(1f, 1f, 1f, 0.05f));
+            Util.Set_BG_Color(style_titlebar.normal, new Color(1f, 1f, 1f, 0.05f));
 
             this.style_title = new GUIStyle();
             style_title.normal.textColor = Color.white;
@@ -110,18 +110,33 @@ namespace SR_PluginLoader
             if(onClosed != null) this.onClosed(this);
         }
 
-        public void Show()
+        public void Show(bool pause=false)
         {
             if (this.visible) return;
             this.visible = true;
             if (onShown != null) this.onShown(this);
+            if (!Game.atMainMenu && pause) GameTime.Pause();
         }
 
-        public void Hide()
+        public void Hide(bool unpause=false)
         {
             if (!this.visible) return;
             this.visible = false;
             if (onHidden != null) this.onHidden(this);
+            if (!Game.atMainMenu && unpause) GameTime.Unpause();
+        }
+
+        public void ToggleShow()
+        {
+            switch(this.visible)
+            {
+                case false:
+                    this.Show();
+                    break;
+                default:
+                    this.Hide();
+                    break;
+            }
         }
 
         public void Center()
@@ -133,14 +148,16 @@ namespace SR_PluginLoader
         }
 
     #region Remap Add / Remove / Clear functions to our content_panel control
-        public override void Add(uiControl c)
+        public override uiControl Add(uiControl c)
         {
             content_panel.Add(c);
+            return c;
         }
 
-        public override void Add(string name, uiControl c)
+        public override uiControl Add(string name, uiControl c)
         {
             content_panel.Add(name, c);
+            return c;
         }
 
         public override void Remove(uiControl c)

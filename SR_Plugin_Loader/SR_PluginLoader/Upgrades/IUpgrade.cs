@@ -143,8 +143,18 @@ namespace SR_PluginLoader
     {
         public override Upgrade_Type Type { get { return Upgrade_Type.PLAYER_UPGRADE; } }
         public override bool Purchase(GameObject sender) { return Upgrade_System.TryPurchase(sender.GetComponent<PersonalUpgradeUI>(), this); }
-        
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parent">A reference to your plugin, also used to uniquely identify the upgrade in save files</param>
+        /// <param name="id">A string that will be used to uniquely identify this upgrade in save files</param>
+        /// <param name="cost">How many credits the upgrade costs</param>
+        /// <param name="name">The title text for the upgrade when shown in the upgrade kiosk</param>
+        /// <param name="desc">The description text for the upgrade when shown in the upgrade kiosk</param>
+        /// <param name="function">Function that applies the upgrade's effects.</param>
+        /// <param name="icon">An icon used to represent the plugin when shown in the upgrade kiosk</param>
         public PlayerUpgrade(Plugin parent, string id, int cost, string name, string desc, Action<GameObject> function, Texture2D icon=null) : base(parent, id, cost, name, desc, function, icon)
         {
             Upgrade_System.Register(this);
@@ -158,9 +168,22 @@ namespace SR_PluginLoader
     {
         public override Upgrade_Type Type { get { return Upgrade_Type.PLOT_UPGRADE; } }
         public override bool Purchase(GameObject sender) { return Upgrade_System.TryPurchase(sender, this); }
+        public LandPlot.Id Kind { get; protected set; }
 
-        public PlotUpgrade(Plugin parent, string id, int cost, string name, string desc, Action<GameObject> function, Texture2D icon = null) : base(parent, id, cost, name, desc, function, icon)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="parent">A reference to your plugin, also used to uniquely identify the upgrade in save files</param>
+        /// <param name="kind">What kind of plot item this upgrade is for; Coop, Silo, Corral, Pond, Garden, etc.</param>
+        /// <param name="id">A string that will be used to uniquely identify this upgrade in save files</param>
+        /// <param name="cost">How many credits the upgrade costs</param>
+        /// <param name="name">The title text for the upgrade when shown in the upgrade kiosk</param>
+        /// <param name="desc">The description text for the upgrade when shown in the upgrade kiosk</param>
+        /// <param name="function">Function that applies the upgrade's effects.</param>
+        /// <param name="icon">An icon used to represent the plugin when shown in the upgrade kiosk</param>
+        public PlotUpgrade(Plugin parent, LandPlot.Id kind, string id, int cost, string name, string desc, Action<GameObject> function, Texture2D icon = null) : base(parent, id, cost, name, desc, function, icon)
         {
+            Kind = kind;
             Upgrade_System.Register(this);
         }
     }

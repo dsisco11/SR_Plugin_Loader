@@ -19,7 +19,8 @@ namespace SR_PluginLoader
         Textfield,
         Checkbox,
         Progress,
-        Icon
+        Icon,
+        ListItem,
     }
 
     public delegate void onClickDelegate<T>(T c) where T : uiControl;
@@ -108,10 +109,10 @@ namespace SR_PluginLoader
         public override bool Equals(object obj)
         {
             uiBorderStyleState o = (uiBorderStyleState)obj;
-            bool sizeEq = (((o.size == null) == (this.size == null)) && Utility.floatEq(o.size.left, size.left) && Utility.floatEq(o.size.right, size.right) && Utility.floatEq(o.size.top, size.top) && Utility.floatEq(o.size.bottom, size.bottom));
+            bool sizeEq = (((o.size == null) == (this.size == null)) && Util.floatEq(o.size.left, size.left) && Util.floatEq(o.size.right, size.right) && Util.floatEq(o.size.top, size.top) && Util.floatEq(o.size.bottom, size.bottom));
             bool colorEq = (o.color.HasValue == this.color.HasValue);
             //if both colors have a value then we want to be more specific with our equality check.
-            if (colorEq && this.color.HasValue) colorEq = (Utility.floatEq(o.color.Value.r, this.color.Value.r) && Utility.floatEq(o.color.Value.b, this.color.Value.b) && Utility.floatEq(o.color.Value.g, this.color.Value.g) && Utility.floatEq(o.color.Value.a, this.color.Value.a));
+            if (colorEq && this.color.HasValue) colorEq = (Util.floatEq(o.color.Value.r, this.color.Value.r) && Util.floatEq(o.color.Value.b, this.color.Value.b) && Util.floatEq(o.color.Value.g, this.color.Value.g) && Util.floatEq(o.color.Value.a, this.color.Value.a));
 
             return (sizeEq && colorEq);
         }
@@ -206,7 +207,7 @@ namespace SR_PluginLoader
 
         public bool Equals(uiControl targ, float off, cPosDir d)
         {
-            return (this.target == targ && Utility.floatEq(this.offset, off) && this.dir == d);
+            return (this.target == targ && Util.floatEq(this.offset, off) && this.dir == d);
         }
 
         public override string ToString()
@@ -241,12 +242,14 @@ namespace SR_PluginLoader
         /// <summary>
         /// Is this control in an activated / selected state?
         /// </summary>
-        public bool active { get { return _active; } set { _active = value; update_area(); } }
+        public bool active { get { return _active; } set { bool was_active = _active; _active = value; update_area(); if (_active != was_active && _active) { onSelected?.Invoke(this); } } }
 
         /// <summary>
         /// Should this control be rendered?
         /// </summary>
-        public bool visible { get { return this.gameObject.activeSelf; } set { this.gameObject.SetActive(value); } }
+        public bool visible { get { return this._visible; } set { this._visible = value; } }
+        //public bool visible { get { return this.gameObject.activeSelf; } set { this.gameObject.SetActive(value); } }
+        private bool _visible = true;
 
         protected FocusType focus_type = FocusType.Passive;// Almost all controls will be using this FocusType, the only different ones will be ones that need keyboard input.
         protected static readonly GUISkin skin = null;
@@ -307,11 +310,12 @@ namespace SR_PluginLoader
         private bool set_explicit_H = false;// Tracks whether the control has had an explicit height set
         public bool autosize { get { return (_autosize || (should_autosize && !(set_explicit_W || set_explicit_H))); } set { _autosize = value; update_area(); } }// If this is true then the control will autosize itself, each control type can have custom autosizing logic, the user can use this field to force any control to attempt autosizing.
 
-        protected bool isClickable { get { return (type == uiControlType.Button || type == uiControlType.Checkbox || type == uiControlType.Textbox || type == uiControlType.Textfield || type == uiControlType.Panel || type == uiControlType.Window); } }
+        protected bool isClickable { get { return (type == uiControlType.Button || type == uiControlType.Checkbox || type == uiControlType.Textbox || type == uiControlType.Textfield || type == uiControlType.Panel || type == uiControlType.Window || this.onClicked!=null); } }
 
         protected bool can_have_positioners { get { return !(type == uiControlType.Window); } }
         #region EVENTS
         public event controlEventDelegate<uiControl> onClicked;
+        public event controlEventDelegate<uiControl> onSelected;
         public event controlEventDelegate<uiControl> onAreaUpdated;
         public event controlEventDelegate<uiControl> onParentAreaUpdated;
         #endregion
@@ -355,7 +359,10 @@ namespace SR_PluginLoader
         /// When drawing the control use "draw_area" as the intended area is altered by padding and margin values.
         /// </summary>
         public Rect area { get { if (cached_area.HasValue) { return cached_area.Value; } return _area; } set { _area = value; this.update_area(); } }
-
+        /// <summary>
+        /// Allows us to ignore area updates while true, so that child updates dont refire the whole process all over again!
+        /// </summary>
+        private bool area_update_lock = false;
         /// <summary>
         /// The absolute position where this control will render it's content, including child controls.
         /// </summary>
@@ -390,9 +397,9 @@ namespace SR_PluginLoader
         /// <summary>
         /// The final size of this control.
         /// </summary>
-        public virtual Vector2 size { get { if (autosize) { return auto_size; } if (cached_area.HasValue) { return cached_area.Value.size; } return this._area.size; } }
+        public virtual Vector2 size { get { if (autosize) { return size_auto; } if (cached_area.HasValue) { return cached_area.Value.size; } return this._area.size; } }
 
-        public Vector2 auto_size { get { var sz = this.Get_Autosize(); if (set_explicit_W) { sz.x = area.width; } if (set_explicit_H) { sz.y = area.height; } return sz; } }
+        public Vector2 size_auto { get { var sz = this.Get_Autosize(); if (set_explicit_W) { sz.x = area.width; } if (set_explicit_H) { sz.y = area.height; } return sz; } }
         /// <summary>
         /// The base size of this control without padding, border, or margins accounted for.
         /// </summary>
@@ -425,12 +432,12 @@ namespace SR_PluginLoader
         {
             skin = ScriptableObject.CreateInstance<GUISkin>();
 
-            Utility.Set_BG_Color(skin.box.normal, new Color(0f, 0f, 0f, 0.2f));
-            Utility.Set_BG_Color(skin.window.normal, new Color32(50, 50, 50, 255));
+            Util.Set_BG_Color(skin.box.normal, new Color(0f, 0f, 0f, 0.2f));
+            Util.Set_BG_Color(skin.window.normal, new Color32(50, 50, 50, 255));
 
             byte g = 20;
-            Utility.Set_BG_Color(skin.textArea.normal, new Color32(g, g, g, 255));
-            Utility.Set_BG_Color(skin.textField.normal, new Color32(g, g, g, 255));
+            Util.Set_BG_Color(skin.textArea.normal, new Color32(g, g, g, 255));
+            Util.Set_BG_Color(skin.textField.normal, new Color32(g, g, g, 255));
 
             //Utility.Set_BG_Color(skin.button.normal, new Color32(0, 0, 0, 0));// buttons have no background by default.
             //Utility.Set_BG_Color(skin.button.hover, new Color(1f, 1f, 1f, 0.06f));// slightly light up
@@ -438,7 +445,7 @@ namespace SR_PluginLoader
             // We want a sheen texture for buttons
             //skin.button.normal.background = Utility.Create_Sheen_Texture(100, Color.white);
             //Utility.Set_BG_Color(skin.button.normal, new Color32(32, 32, 32, 180));
-            Utility.Set_BG_Gradient(skin.button.normal, 100, GRADIENT_DIR.TOP_BOTTOM, new Color32(45, 45, 45, 180), new Color32(32, 32, 32, 180));
+            Util.Set_BG_Gradient(skin.button.normal, 100, GRADIENT_DIR.TOP_BOTTOM, new Color32(45, 45, 45, 180), new Color32(32, 32, 32, 180));
             //skin.button.hover.background = Utility.Create_Sheen_Texture(100, new Color(0.20f, 0.595f, 1.0f));
 
 
@@ -463,11 +470,11 @@ namespace SR_PluginLoader
 
             skin.verticalScrollbar = new GUIStyle();
             skin.verticalScrollbar.fixedWidth = scrollbar_width;
-            Utility.Set_BG_Color(skin.verticalScrollbar.normal, new Color32(16, 16, 16, 200));
+            Util.Set_BG_Color(skin.verticalScrollbar.normal, new Color32(16, 16, 16, 200));
 
             skin.verticalScrollbarThumb = new GUIStyle();
             skin.verticalScrollbarThumb.fixedWidth = scrollbar_width;
-            Utility.Set_BG_Color(skin.verticalScrollbarThumb.normal, new Color32(80, 80, 80, 255));
+            Util.Set_BG_Color(skin.verticalScrollbarThumb.normal, new Color32(80, 80, 80, 255));
 
         }
 
@@ -476,15 +483,21 @@ namespace SR_PluginLoader
             type = ty;
         }
 
-        public static T Create<T>(uiPanel parent = null) where T : uiControl
+        public static T Create<T>(uiPanel parent = null) where T : uiControl { return Create<T>(null, parent); }
+
+        public static T Create<T>(string name, uiPanel parent = null) where T : uiControl
         {
             GameObject obj = new GameObject();
             obj.SetActive(true);
             obj.layer = 5;//GUI layer
             UnityEngine.GameObject.DontDestroyOnLoad(obj);
-            
+
             T c = obj.AddComponent<T>();
-            if (parent != null) parent.Add(c);
+            if (parent != null)
+            {
+                if (name != null) parent.Add(name, c);
+                else parent.Add(c);
+            }
             return c;
         }
 
@@ -519,18 +532,31 @@ namespace SR_PluginLoader
             area = new Rect(pos, _area.size);
         }
 
+        public void Set_PosX(float x)
+        {
+            area = new Rect(new Vector2(x, this._area.y), _area.size);
+        }
+
+        public void Set_PosY(float y)
+        {
+            area = new Rect(new Vector2(this._area.x, y), _area.size);
+        }
+
+
         public void Set_Size(float w, float h)
         {
             set_explicit_W = true;
             set_explicit_H = true;
-            area = new Rect(_area.position, new Vector2(w, h));
+            maybeUpdate_Size(new Vector2(w, h));
+            //area = new Rect(_area.position, new Vector2(w, h));
         }
 
         public void Set_Size(Vector2 sz)
         {
             set_explicit_W = true;
             set_explicit_H = true;
-            area = new Rect(_area.position, sz);
+            maybeUpdate_Size(sz);
+            //area = new Rect(_area.position, sz);
         }
 
         public void Set_Width(float val)
@@ -556,10 +582,10 @@ namespace SR_PluginLoader
             if (this.content == null) return new Vector2(6f, 6f);// we can't do anything else.
             return (style.CalcSize(this.content) + new Vector2(_selfPadding.horizontal, _selfPadding.vertical));
         }
+
         /// <summary>
-        /// This is the method child controls should use to obtain the area they may occupy within their parent control.
+        /// This is the method child controls should use to obtain the area they MAY occupy within their parent control.
         /// </summary>
-        /// <returns></returns>
         public Rect Get_Inner_Area()
         {
             if (this.hasScrollbar)
@@ -570,12 +596,15 @@ namespace SR_PluginLoader
             return this.inner_area;
         }
         #endregion
+
         #region Property update handlers
         /// <summary>
         /// Call each time ANY factor that determines the controls size is changed.
         /// </summary>
         public virtual void update_area()
         {
+            if (area_update_lock) return;//we are in lock so just stahp
+
             try
             {
                 if (parent) parent.needs_layout = true;//cause the parent to update due to this control altering it's position
@@ -593,7 +622,7 @@ namespace SR_PluginLoader
                     if (!set_explicit_H) nsz.y = asz.y;
                     _area = new Rect(_area.position, nsz);
                     */
-                    _area = new Rect(_area.position, auto_size);
+                    _area = new Rect(_area.position, size_auto);
                 }
                 cached_area = new Rect(_area.position, constrain_size(size));
 
@@ -607,13 +636,15 @@ namespace SR_PluginLoader
                 */
                 border_area = _margin.Remove(cached_area.Value);
                 draw_area = borderStyle.size.Remove(border_area);
-                //_inner_area = _padding.Remove(draw_area);
                 _inner_area = final_area_to_inner(cached_area.Value);
+
+                area_update_lock = true;
+                Reposition();
+                if (onAreaUpdated != null) onAreaUpdated(this);
             }
             finally
             {
-                Reposition();
-                if (onAreaUpdated != null) onAreaUpdated(this);
+                area_update_lock = false;
             }
         }
 
@@ -687,7 +718,7 @@ namespace SR_PluginLoader
         #region Positioning Helpers
         private bool maybeUpdate_Pos(Vector2 new_pos)
         {
-            if (!Utility.floatEq(_area.position.x, new_pos.x) || !Utility.floatEq(_area.position.y, new_pos.y))
+            if (!Util.floatEq(_area.position.x, new_pos.x) || !Util.floatEq(_area.position.y, new_pos.y))
             {
                 this.area = new Rect(new_pos, this.size);
                 return true;
@@ -816,10 +847,11 @@ namespace SR_PluginLoader
             if (horizontal_positioner == null || !horizontal_positioner.Equals(null, 0f, cPosDir.CENTER_X)) horizontal_positioner = new ControlPositioner(null, 0f, cPosDir.CENTER_X);
         }
         #endregion
+        
         #region Sizing Helpers
         private bool maybeUpdate_Size(Vector2 sz)
         {
-            if (!Utility.floatEq(_area.width, sz.x) || !Utility.floatEq(_area.height, sz.y))
+            if (!Util.floatEq(_area.width, sz.x) || !Util.floatEq(_area.height, sz.y))
             {
                 this.area = new Rect(_area.position, sz);
                 return true;
@@ -1015,9 +1047,9 @@ namespace SR_PluginLoader
                 case EventType.MouseUp:
                     bool wasDown = this.isMouseDown;
                     this.isMouseDown = false;
-                    if (isMouseOver && isClickable && wasDown && onClicked != null)
+                    if (isMouseOver && isClickable && wasDown)
                     {
-                        this.onClicked(this);
+                        onClicked?.Invoke(this);
                     }
 
                     if (GUIUtility.hotControl == id)

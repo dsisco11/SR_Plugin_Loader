@@ -21,7 +21,7 @@ namespace SR_PluginLoader
     }
 
 
-    public static class Utility
+    public static class Util
     {
         public static MessageBundle CreateMessageBundle(string bundleName, Dictionary<string, string> translations)
         {
@@ -31,16 +31,7 @@ namespace SR_PluginLoader
 
             return bundle;
         }
-
-        /// <summary>
-        /// Used to create a translation key name that is unique to the assembly it is called from so as to avoid collisions
-        /// </summary>
-        /// <param name="keyName"></param>
-        public static string Format_Translation_Key(string keyName)
-        {
-            return String.Format("{0}.{1}", "", keyName);
-        }
-
+        
         public static WebClient Get_Web_Client()
         {
             var webClient = new WebClient();
@@ -292,9 +283,9 @@ namespace SR_PluginLoader
 
         public static Texture2D Create_Sheen_Texture(int size, Color tint)
         {
-            return Utility.Create_Texture(1, size, (int x, int y, int w, int h) => {
+            return Util.Create_Texture(1, size, (int x, int y, int w, int h) => {
                 float f = ((float)y / (float)h);
-                float g = Utility.Lerp(0.25f, 0.15f, f);
+                float g = Util.Lerp(0.25f, 0.15f, f);
                 if (y >= (h - 35)) g += 0.25f;
 
                 return new Color(tint.r*g, tint.g*g, tint.b*g, tint.a);
@@ -349,5 +340,58 @@ namespace SR_PluginLoader
         {
             return str.Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t");
         }
+
+        /// <summary>
+        /// Returns the radius of an objects collision bounds
+        /// </summary>
+        public static float Get_Object_Radius(GameObject obj)
+        {
+            return PhysicsUtil.RadiusOfObject(obj);
+        }
+
+        #region Item Spawning
+
+        public static GameObject TrySpawn(Identifiable.Id id, Vector3 pos, Quaternion? quat=null)
+        {
+            if (!quat.HasValue) quat = Quaternion.identity;
+            return (GameObject)GameObject.Instantiate(Directors.lookupDirector.GetPrefab(id), pos, quat.Value);
+        }
+
+        public static GameObject TrySpawn(Identifiable.Id id, RaycastHit ray)
+        {
+            var prefab = Directors.lookupDirector.GetPrefab(id);
+            float r = Get_Object_Radius(prefab);
+
+            Vector3 pos = (ray.point + (ray.normal * r * 2.0f));
+            return (GameObject)GameObject.Instantiate(prefab, pos, Quaternion.identity);
+        }
+
+        #endregion
+
+        public static HashSet<Identifiable.Id> Combine_Ident_Lists(IEnumerable<HashSet<Identifiable.Id>> lists)
+        {
+            HashSet<Identifiable.Id> final = new HashSet<Identifiable.Id>();
+            foreach (HashSet<Identifiable.Id> list in lists)
+            {
+                foreach (var o in list)
+                {
+                    final.Add(o);
+                }
+            }
+            return final;
+        }
+
+
+        public static void Inject_Into_Prefabs<Script>(HashSet<Identifiable.Id> ID_LIST) where Script : MonoBehaviour
+        {
+            // Attempt to inject our own MonoBehaviour class into some prefabs.
+            foreach (Identifiable.Id id in ID_LIST)
+            {
+                var pref = Directors.lookupDirector.GetPrefab(id);
+                if(pref != null) pref.AddComponent<Script>();
+            }
+        }
+
+
     }
 }

@@ -5,10 +5,6 @@ using System.Text;
 
 namespace SR_PluginLoader
 {
-    // DEVELOPERS NOTE:
-    // Be very weary of altering the structure of this class as *any* changes will break backwards compatability with all plugins
-    // until their creators get around to recompiling them
-    // *IF* changes must be made to the base plugin data class it might be more prudent to Create a new class which inherits from it.
     public class Plugin_Data
     {
         public string AUTHOR = null;
@@ -22,7 +18,7 @@ namespace SR_PluginLoader
         {
         }
 
-        public string Hash { get { return Utility.SHA(String.Format("{0}.{1}", this.AUTHOR, this.NAME)); } }
+        public string Hash { get { return Util.SHA(String.Format("{0}.{1}", this.AUTHOR, this.NAME)); } }
         public static Plugin_Data FromJSON(SimpleJSON.JSONNode data)
         {
             return new Plugin_Data()

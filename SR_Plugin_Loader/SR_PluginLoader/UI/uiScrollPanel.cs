@@ -11,9 +11,9 @@ namespace SR_PluginLoader
     /// This component just allows us to be more specific about the default behaviour of the control.
     /// even though any instance of a uiPanel may enable scrolling.
     /// </summary>
-    public class uiScrollView : uiPanel
+    public class uiScrollPanel : uiPanel
     {
-        public uiScrollView()
+        public uiScrollPanel()
         {
             this.CanScroll = true;
         }

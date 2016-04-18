@@ -26,6 +26,12 @@ namespace SR_PluginLoader
         /// This is a table that tracks the number of hooks each event id has, this allows us the most efficient way to determine if an early abort on event firing is possible by limiting instructions at the head of the 'Call' function.
         /// </summary>
         private static int[] EventCounter = null;
+
+        /// <summary>
+        /// (FOR DEBUG PURPOSES)
+        /// This is a list of hooks which when fired, we want to print a log messge for so we can verify they are working.
+        /// </summary>
+        public static HashSet<HOOK_ID> HOOKS_TO_ANNOUNCE = new HashSet<HOOK_ID>();
         private static Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>> events = new Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>>();
         private static Dictionary<object, List<Sisco_Hook_Ref>> tracker = new Dictionary<object, List<Sisco_Hook_Ref>>();
 
@@ -43,13 +49,46 @@ namespace SR_PluginLoader
                 EventCounter[i] = 0;
             }
 
-            // Setup any event extensions.
+            #region Setup Event Extensions
             register(null, HOOK_ID.Ext_Game_Saved, Ext_Game_Saved);
             register(null, HOOK_ID.Ext_Pre_Game_Loaded, Ext_Pre_Game_Loaded);
             register(null, HOOK_ID.Ext_Post_Game_Loaded, Ext_Post_Game_Loaded);
+            register(null, HOOK_ID.Ext_Spawn_Plot_Upgrades_UI, Ext_Spawn_Plot_Upgrades_UI);
+            #endregion
+
+            #region Hook Prefab Instantiation Events
+            Util.Inject_Into_Prefabs<Prefab_Spawn_Hook>(Ident.ALL_IDENTS);
+            #endregion
         }
 
         #region Event Extensions
+
+        private static Sisco_Return Ext_Spawn_Plot_Upgrades_UI(ref object sender, ref object[] args, ref object return_value)
+        {
+            LandPlot.Id kind = LandPlot.Id.NONE;
+            switch(sender.GetType().Name)
+            {
+                case nameof(GardenUI):
+                    kind = LandPlot.Id.GARDEN;
+                    break;
+                case nameof(CoopUI):
+                    kind = LandPlot.Id.COOP;
+                    break;
+                case nameof(CorralUI):
+                    kind = LandPlot.Id.CORRAL;
+                    break;
+                case nameof(PondUI):
+                    kind = LandPlot.Id.POND;
+                    break;
+                case nameof(SiloUI):
+                    kind = LandPlot.Id.SILO;
+                    break;
+                case nameof(IncineratorUI):
+                    kind = LandPlot.Id.INCINERATOR;
+                    break;
+            }
+            return new Sisco_Return(call(HOOK_ID.Spawn_Plot_Upgrades_UI, sender, ref return_value, new object[] { kind }));
+        }
 
         private static Sisco_Return Ext_Pre_Game_Loaded(ref object sender, ref object[] args, ref object return_value)
         {
@@ -75,6 +114,8 @@ namespace SR_PluginLoader
         {
             try
             {
+                if (HOOKS_TO_ANNOUNCE.Contains(hook)) DebugHud.Log("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
+
                 _hook_result result = new _hook_result(args);
                 List<Sisco_Hook_Delegate> cb_list;
                 bool r = SiscosHooks.events.TryGetValue((HOOK_ID)hook, out cb_list);
@@ -316,13 +357,15 @@ namespace SR_PluginLoader
         {
             if (args != null)
             {
-                string argStr = "";
+                List<string> arglist = new List<string>();
+                
                 foreach (object arg in args)
                 {
-                    if(arg == null) argStr = String.Format("{0}, null", argStr);
-                    else argStr = String.Format("{0}, {1}", argStr, arg.ToString());
+                    if(arg == null) arglist.Add( "null" );
+                    else arglist.Add( arg.ToString() );
                 }
-                return argStr.TrimEnd(new char[] { ',', ' ' });
+
+                return String.Join(", ", arglist.ToArray());
             }
 
             return "NULL";
