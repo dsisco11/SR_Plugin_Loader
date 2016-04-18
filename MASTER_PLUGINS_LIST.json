@@ -13,13 +13,20 @@
 			 "description": "- Holding the ALT key will make the VacPak's suction ignore slimes.",
 			 "update_method": "GIT",
 			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SlimeFilter.dll"
-		 }
+		 },
 		"SiloEnhancer.Sisco++": {
 			 "name": "SiloEnhancer",
 			 "author": "Sisco++",
 			 "description": "- Changes plort collectors so when using the vac-pak on them they will immediately suck out any loose plorts within their corral.\n- Alters silos so they dispense slightly faster.\n- Alters silos so they will not dispense more then the player can hold!\n- Garden timers can be refreshed by depositing another item of the same type into their canister.",
 			 "update_method": "GIT",
 			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SiloEnhancer.dll"
-	 	}
+	 	},
+	 	"Sunny Smiles.Sisco++": {
+		 	 "name": "Sunny Smiles",
+			 "author": "Sisco++",
+			 "description": "Modifies Rad slimes so their mouths glow again!",
+			 "update_method": "GIT",
+			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SunnySmiles.dll"
+		 },
 	]
 }
