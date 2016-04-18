@@ -1,8 +1,5 @@
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\SR_PluginLoader.dll
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\SR_PluginLoader.pdb
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\Assembly-CSharp.dll
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\UnityEngine.Analytics.dll
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\Release\Assembly-CSharp-firstpass.dll
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.csprojResolveAssemblyReference.cache
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.Properties.Resources.resources
 C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\Release\SR_PluginLoader.csproj.GenerateResource.Cache
