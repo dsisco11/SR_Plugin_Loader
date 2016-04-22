@@ -7,8 +7,14 @@ For a guide on HOW to install the plugin loader look <a href="https://github.com
 ## Donations  
 If you would like to help support me then you can <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DYGPA5XA4MWC2">Donate</a>!
 
+## SteamGroup  
+The official steam group for the plugin loader can be found here:
+<a href="http://steamcommunity.com/groups/SRMODS">http://steamcommunity.com/groups/SRMODS</a>  
+
 ### Installing plugins
-To install a plugin copy the plugin DLL to the _plugins_ folder within your SlimeRancher install directory.  
+Plugins can be installed in one of two ways.  
+1) From the main menu ingame click on the "Plugin Store" button.  
+2) Copy the plugin DLL to the _plugins_ folder within your SlimeRancher install directory.  
 On windows by default this should be `C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher\plugins`
 
 ## Help & Support  
