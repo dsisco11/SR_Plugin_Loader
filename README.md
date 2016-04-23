@@ -8,8 +8,14 @@ For a guide on HOW to install the plugin loader look <a href="https://github.com
 If you would like to help support me then you can <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DYGPA5XA4MWC2">Donate</a>!
 
 ## SteamGroup  
-The official steam group for the plugin loader can be found here:
-<a href="http://steamcommunity.com/groups/SRMODS">http://steamcommunity.com/groups/SRMODS</a>  
+The official steam group for the plugin loader can be found at 
+<a href="http://steamcommunity.com/groups/SRMODS">http://steamcommunity.com/groups/SRMODS</a>.  
+There you can:  
+- Stay up to date on the latest news for the loader.  
+- Get support for the plugin loader.  
+- Ask for help with plugins.  
+- Ask questions about creating plugins.  
+- Tell everyone about a plugin you have created!  
 
 ### Installing plugins
 Plugins can be installed in one of two ways.  
