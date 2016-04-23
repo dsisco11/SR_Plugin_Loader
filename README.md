@@ -19,7 +19,7 @@ There you can:
 
 ### Installing plugins
 Plugins can be installed in one of two ways.  
-1) From the main menu ingame click on the "Plugin Store"/"Install Plugins" button.  
+1) From the main menu ingame click on the "Plugin Store/Install Plugins" button.  
 2) Copy the plugin DLL to the _plugins_ folder within your SlimeRancher install directory.  
 On windows by default this should be `C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher\plugins`
 
