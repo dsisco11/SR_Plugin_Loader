@@ -44,8 +44,7 @@ This issue isn't unique to my mod installer either, it's an issue with a lot of 
 
 ### "I need an alternate download link, my Anti-Virus wont let me use yours!"  
 Here is an alternate form of the main download link: <a href="https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer.zip">Alt. Link</a>.  
-If that link will not work then you can try downloading the entire project source code and all, then opening the project folder and finding the folder named "Installer" and running the installer from there.
-The project source code link is <a href="https://github.com/dsisco11/SR_Plugin_Loader/archive/master.zip">Source</a>  
+If that link will not work then you can try downloading the entire project source code and all (from <a href="https://github.com/dsisco11/SR_Plugin_Loader/archive/master.zip">here</a>), then opening the project folder and finding the folder named "Installer" and running the installer from there.  
 If you cannot use either of those links then your anti-virus will probably block ANY link with a zip file containing an .exe or .dll file among others. There is nothing we can do from our end to fix that and youll need to fix it from your computer itself possibly by disabling your anti-virus while you download the file.
   
   
