@@ -24,7 +24,8 @@ Plugins can be installed in one of two ways.
 On windows by default this should be `C:\Program Files (x86)\Steam\steamapps\common\Slime Rancher\plugins`
 
 ## Help & Support  
-If you need help with anything dont be afraid to create an <a href="https://github.com/dsisco11/SR_Plugin_Loader/issues">issue report</a>!
+If you need help with anything dont be afraid to create an <a href="https://github.com/dsisco11/SR_Plugin_Loader/issues">issue report</a>!  
+Or pos it to our <a href="http://steamcommunity.com/groups/SRMODS">SteamGroup</a>.
 
 ## For Developers  
 Example plugins are under the examples folder.  
