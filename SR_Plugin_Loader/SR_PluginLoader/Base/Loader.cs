@@ -17,7 +17,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// The version for the loader itself
         /// </summary>
-        public static Plugin_Version VERSION = new Plugin_Version(0, 5);
+        public static Plugin_Version VERSION = new Plugin_Version(0, 6, 0);
         
         public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", Loader.VERSION); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
@@ -25,14 +25,6 @@ namespace SR_PluginLoader
         private static GameObject root = null;
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
         private static string pluginDir = null;
-        
-        public static Texture2D tex_unknown = new Texture2D(1, 1);
-        public static Texture2D tex_alert = new Texture2D(1, 1);
-        public static Texture2D tex_close = new Texture2D(1, 1);
-        public static Texture2D tex_close_dark = new Texture2D(1, 1);
-        public static Texture2D tex_logo = new Texture2D(1, 1);
-        public static Texture2D tex_checkbox = new Texture2D(1, 1);
-        public static Texture2D tex_checkmark = new Texture2D(1, 1);
 
         public static bool has_updates = false;
 
@@ -42,15 +34,18 @@ namespace SR_PluginLoader
         private static WebClient web = new WebClient();
         private static string update_helper_file = null;
         private static List<string> available_updates= new List<string>();// This isn't for plugin updates (yet)
+        public static SettingsFile Config = null;
         
-        private static MainMenu menu = null;
         private static Plugin_Update_Viewer plugin_updater = null;
-        private static DevHud dev_tools = null;
+        private static DevMenu dev_tools = null;
 
 
         public static void init(string hash)
         {
             if (Loader.config_stream != null) return;
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
             if (!Loader.Load_Config_Stream()) return;
 
             try
@@ -59,12 +54,13 @@ namespace SR_PluginLoader
                 UnityEngine.Object.DontDestroyOnLoad(Loader.root);
 
                 DebugHud.Init();
-                Loader.menu = Loader.root.AddComponent<MainMenu>();
+                TextureHelper.Load_Common();
+                SiscosHooks.Setup();
+                PluginLoader_Watermark.Setup();
+                MainMenu.Setup();
+                DebugUI.Setup();
 
-                SiscosHooks.init();
-                
                 Setup_Update_Helper();
-                Load_Assets();
                 bool ok = Verify_PluginLoader_Hash(hash);
                 if (!ok) return;
 
@@ -73,7 +69,7 @@ namespace SR_PluginLoader
                 Check_For_Updates();
 
                 Setup_Assembly_Resolver();
-                Upgrade_System.Setup();
+                Upgrades.Setup();
                 Assemble_Plugin_List(); 
                 Load_Config();
                 IN_LOADING_PHASE = false;
@@ -82,19 +78,25 @@ namespace SR_PluginLoader
                 plugin_updater = uiControl.Create<Plugin_Update_Viewer>();// This control manages itself and is only able to become visible under certain conditions which it will control. Therefore it needs no var to track it.
                 plugin_updater.Show();
 
-                dev_tools = uiControl.Create<DevHud>();
+                dev_tools = uiControl.Create<DevMenu>();
                 //dev_tools.Show();
-                dev_tools.onShown += (uiWindow w) => { GameTime.Pause(); };
-                dev_tools.onHidden += (uiWindow w) => { GameTime.Unpause(); };
-                
+                //dev_tools.onShown += (uiWindow w) => { GameTime.Pause(); };
+                //dev_tools.onHidden += (uiWindow w) => { GameTime.Unpause(); };
+
+                //Misc_Experiments.Find_Common_Classes_For_Idents(new HashSet<Identifiable.Id> { Identifiable.Id.PINK_RAD_LARGO });
             }
             catch(Exception ex)
             {
                 DebugHud.Log("Exception during PluginLoader initialization!");
                 DebugHud.Log(ex);
             }
+            finally
+            {
+                timer.Stop();
+                DebugHud.LogSilent("Plugin Loader initialized! Took: {0}ms", timer.ElapsedMilliseconds);
+            }
         }
-        
+
         /// <summary>
         /// Checks the given hash against the current dll files hash to make sure the proper version is installed
         /// </summary>
@@ -111,7 +113,7 @@ namespace SR_PluginLoader
                 {
                     msg = "The current loader's hash does not match the hash of the one that was installed, click here to install this version.",
                     title = "Version Mismatch",
-                    icon = Loader.tex_alert,
+                    icon = TextureHelper.icon_alert,
                     onClick = () =>
                     {
                         Restart_App();
@@ -130,28 +132,7 @@ namespace SR_PluginLoader
             //Let's keep the users folder as uncluttered as possible eh?
             if (File.Exists(update_helper_file)) File.Delete(update_helper_file);
         }
-
-        public static void Load_Assets()
-        {
-            Loader.TryLoadAsset(ref Loader.tex_unknown, "unknown.png");
-            Loader.TryLoadAsset(ref Loader.tex_alert, "alert.png");
-            Loader.TryLoadAsset(ref Loader.tex_close, "close.png");
-            Loader.TryLoadAsset(ref Loader.tex_close_dark, "close.png");
-            Loader.TryLoadAsset(ref Loader.tex_logo, "logo.png");
-            Loader.TryLoadAsset(ref Loader.tex_checkbox, "checkbox.png");
-            Loader.TryLoadAsset(ref Loader.tex_checkmark, "checkmark.png");
-
-            Util.Tint_Texture(Loader.tex_close_dark, new Color(1f, 1f, 1f, 0.5f));
-        }
-
-        public static void TryLoadAsset(ref Texture2D tex, string asset)
-        {
-            byte[] buf = Util.Load_Resource(asset);
-            if (buf == null) return;
-            tex.LoadImage(buf);
-        }
-
-
+        
         /// <summary>
         /// Reads the plugins directory and makes a record of all the plugins which exist.
         /// </summary>
@@ -212,11 +193,11 @@ namespace SR_PluginLoader
                 return false;
             }
 
-            if(Loader.menu != null)
+            if(MainMenu.isReady)
             {
-                if(MainMenu.plugin_manager != null)
+                if(PluginManager.Instance != null)
                 {
-                    MainMenu.plugin_manager.Update_Plugins_List();
+                    PluginManager.Instance.Update_Plugins_List();
                 }
             }
             return true;
@@ -264,6 +245,8 @@ namespace SR_PluginLoader
 
         public static void Load_Config()
         {
+            Config = new SettingsFile("plugin_loader.json");
+
             try
             {
                 byte[] buf = new byte[Loader.config_stream.Length];
@@ -402,6 +385,8 @@ namespace SR_PluginLoader
             return assembly;
         }
 
+        #region AUTO-UPDATER
+
         private static void Check_For_Updates()
         {
             has_updates = Do_Update_Check();
@@ -470,7 +455,30 @@ namespace SR_PluginLoader
 
             return false;
         }
-        
+
+        public static void Restart_App()
+        {
+            try
+            {
+                byte[] buf = Util.Load_Resource("Restart_Helper.exe");
+                if (buf != null && buf.Length > 0)
+                {
+                    File.WriteAllBytes(update_helper_file, buf);
+                    string args = String.Format("{0}", Process.GetCurrentProcess().Id);
+                    Process.Start(update_helper_file, args);
+                }
+                else
+                {
+                    DebugHud.Log("Failed to unpack the auto update helper!");
+                }
+            }
+            catch (Exception ex)
+            {
+                DebugHud.Log(ex);
+            }
+        }
+        #endregion
+
         public static bool Is_Plugin_Installed(Plugin_Data data)
         {
             return Is_Plugin_Installed(data.Hash);
@@ -480,7 +488,8 @@ namespace SR_PluginLoader
         {
             foreach (KeyValuePair<string, Plugin> kv in Loader.plugins)
             {
-                if (String.Compare(kv.Value.Hash, hash) == 0) return true;
+                if (kv.Value == null || kv.Value.data == null) { DebugHud.Log("[ERROR] @ Loader.Is_Plugin_Installed(): Value for KeyValuePair @ Key {0} is not a valid/loaded plugin!", kv.Key); }
+                else if (String.Compare(kv.Value.Hash, hash) == 0) return true;
             }
             return false;
         }
@@ -539,28 +548,6 @@ namespace SR_PluginLoader
             }
 
             return acceptCertificate;
-        }
-
-        public static void Restart_App()
-        {
-            try
-            {
-                byte[] buf = Util.Load_Resource("Restart_Helper.exe");
-                if (buf != null && buf.Length > 0)
-                {
-                    File.WriteAllBytes(update_helper_file, buf);
-                    string args = String.Format("{0}", Process.GetCurrentProcess().Id);
-                    Process.Start(update_helper_file, args);
-                }
-                else
-                {
-                    DebugHud.Log("Failed to unpack the auto update helper!");
-                }
-            }
-            catch(Exception ex)
-            {
-                DebugHud.Log(ex);
-            }
         }
     }
 }

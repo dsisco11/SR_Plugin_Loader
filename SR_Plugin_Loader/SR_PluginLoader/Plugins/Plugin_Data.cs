@@ -13,6 +13,14 @@ namespace SR_PluginLoader
         public Plugin_Version VERSION = null;
         public List<Plugin_Dependency> DEPENDENCIES = new List<Plugin_Dependency>();
         public Update_Method UPDATE_METHOD = null;
+        /// <summary>
+        /// Name of the embedded image resource to use as this plugins icon.
+        /// </summary>
+        public string ICON = null;
+        /// <summary>
+        /// Name of the embedded image resource to use as this plugins preview image.
+        /// </summary>
+        public string PREVIEW = null;
 
         public Plugin_Data()
         {

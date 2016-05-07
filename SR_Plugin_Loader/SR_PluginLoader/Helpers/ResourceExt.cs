@@ -21,6 +21,7 @@ namespace SR_PluginLoader
                 }
             }
         }
+
         /// <summary>
         /// Find texture by name, if the path is unknown. Warning: It is a slow process and uses a lot of memory.
         /// </summary>
@@ -48,6 +49,25 @@ namespace SR_PluginLoader
                 Debug.LogError("Could not find texture: " + name);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Outputs a list of all loaded Unity Shaders.
+        /// </summary>
+        public static void Print_All_Shaders()
+        {
+            var all = Resources.FindObjectsOfTypeAll<Shader>();
+            List<string> list = new List<string>();
+
+            DebugHud.Log("=== SHADERS ===");
+            foreach(Shader shader in all)
+            {
+                list.Add(shader.name);
+                DebugHud.Log("  - {0}", shader.name);
+            }
+            DebugHud.Log("===============");
+
+            System.IO.File.WriteAllLines("shader_list.txt", list.ToArray());
         }
     }
 }

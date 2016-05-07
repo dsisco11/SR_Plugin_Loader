@@ -15,7 +15,7 @@ namespace SR_PluginLoader
         public string Author;
         public string Description;
         public string URL;
-        public Texture2D Icon = Loader.tex_unknown;
+        public Texture2D Icon = TextureHelper.icon_unknown;
         public Updater_Base Updater = null;
         public string Hash { get { return Util.SHA(String.Format("{0}.{1}", Author, Name)); } }
         public string Title { get { return String.Format("{0}.{1}", Author, Name); } }

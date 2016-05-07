@@ -93,7 +93,7 @@ namespace SR_PluginLoader
             WebAsync webAsync = new WebAsync();
             IEnumerator e = webAsync.GetResponse(webRequest);
             while (e.MoveNext()) { yield return e.Current; }// wait for response to arrive
-            while (!webAsync.isResponseCompleted) yield return null;// double check for clarity & safety
+            while (!webAsync.isResponseCompleted) yield return 0;// double check for clarity & safety
 
             RequestState result = webAsync.requestState;
             resp = result.webResponse;
@@ -131,7 +131,7 @@ namespace SR_PluginLoader
                         DebugHud.Log(ex);
                     }
                 }
-                yield return null;// yield execution until next frame
+                yield return 0;// yield execution until next frame
             }
 
             // It's good practice when overwriting files to write the new version to a temporary location and then copy it overtop of the original.
@@ -140,7 +140,7 @@ namespace SR_PluginLoader
             File.Copy(temp_file, local_file, true);
             File.Delete(temp_file);// delete the now unneeded .temp file
 
-            if (download_completed != null) download_completed(local_file);
+            download_completed?.Invoke(local_file);
             yield break;//exit routine
         }
         /// <summary>
@@ -148,10 +148,9 @@ namespace SR_PluginLoader
         /// </summary>
         public static IEnumerator Get(string url, Updater_File_Type_Confirm confirm = null, Updater_File_Download_Progress prog_callback = null, Updater_Get_Result callback = null)
         {
-            byte[] tmp_buf = null;
-            if (remote_file_cache.TryGetValue(url, out tmp_buf))
+            if (remote_file_cache.ContainsKey(url))
             {
-                yield return tmp_buf;
+                yield return remote_file_cache[url];
                 yield break;
             }
 
@@ -160,14 +159,25 @@ namespace SR_PluginLoader
 
             HttpWebRequest webRequest = WebRequest.Create(url) as HttpWebRequest;
             webRequest.UserAgent = USER_AGENT;
-
+            
             WebAsync webAsync = new WebAsync();
             IEnumerator e = webAsync.GetResponse(webRequest);
+            if (e == null)
+            {
+                DebugHud.Log("Updater_Base.Get() Enumerator is NULL!");
+                yield return null;
+                yield break;
+            }
+            DebugHud.Log("Updater_Base.Get() Stage 1");
+
             while (e.MoveNext()) { yield return null; }// wait for response to arrive
+            DebugHud.Log("Updater_Base.Get() Stage 2");
             while (!webAsync.isResponseCompleted) yield return null;// double check for clarity & safety
 
+            DebugHud.Log("Updater_Base.Get() Stage 3");
             RequestState result = webAsync.requestState;
             resp = result.webResponse;
+            DebugHud.Log("Updater_Base.Get() Got Response!");
 
             if (confirm != null)
             {
@@ -204,9 +214,9 @@ namespace SR_PluginLoader
                 }
                 yield return null;// yield execution until next frame
             }
-            remote_file_cache[url] = buf;
+            remote_file_cache.Add(url, buf);
             
-            if (callback!=null) callback(buf);
+            callback?.Invoke(buf);
             yield return buf;
         }
     }

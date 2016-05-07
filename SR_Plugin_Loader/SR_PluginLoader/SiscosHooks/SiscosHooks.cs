@@ -34,87 +34,41 @@ namespace SR_PluginLoader
         public static HashSet<HOOK_ID> HOOKS_TO_ANNOUNCE = new HashSet<HOOK_ID>();
         private static Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>> events = new Dictionary<HOOK_ID, List<Sisco_Hook_Delegate>>();
         private static Dictionary<object, List<Sisco_Hook_Ref>> tracker = new Dictionary<object, List<Sisco_Hook_Ref>>();
+        private static Dictionary<string, object> assembly_registrars = new Dictionary<string, object>();
 
-        public static void init()
+        internal static void Setup()
         {
-            int max = 0;
-            foreach(var hook in HOOKS.HooksList)
-            {
-                max = Math.Max(max, hook.id);
-            }
-
-            EventCounter = new int[max+1];
+            int max = HOOK_ID.Count;
+            // foreach(var hook in HOOKS.HooksList) { max = Math.Max(max, hook.id); }
+            
+            EventCounter = new int[max];
             for(int i=0; i<EventCounter.Length; i++)
             {
                 EventCounter[i] = 0;
             }
 
-            #region Setup Event Extensions
-            register(null, HOOK_ID.Ext_Game_Saved, Ext_Game_Saved);
-            register(null, HOOK_ID.Ext_Pre_Game_Loaded, Ext_Pre_Game_Loaded);
-            register(null, HOOK_ID.Ext_Post_Game_Loaded, Ext_Post_Game_Loaded);
-            register(null, HOOK_ID.Ext_Spawn_Plot_Upgrades_UI, Ext_Spawn_Plot_Upgrades_UI);
+            #region Setup Event Extension Proxys
+            register(null, HOOK_ID.Ext_Game_Saved, HookProxys.Ext_Game_Saved);
+            register(null, HOOK_ID.Ext_Pre_Game_Loaded, HookProxys.Ext_Pre_Game_Loaded);
+            register(null, HOOK_ID.Ext_Post_Game_Loaded, HookProxys.Ext_Post_Game_Loaded);
+            register(null, HOOK_ID.Ext_Spawn_Plot_Upgrades_UI, HookProxys.Ext_Spawn_Plot_Upgrades_UI);
             #endregion
 
             #region Hook Prefab Instantiation Events
-            Util.Inject_Into_Prefabs<Prefab_Spawn_Hook>(Ident.ALL_IDENTS);
+            Util.Inject_Into_Prefabs<Entity_Pref_Spawn_Hook>(Ident.ALL_IDENTS);
+            Util.Inject_Into_Prefabs<Plot_Pref_Spawn_Hook>(Ident.ALL_PLOTS);
+            Util.Inject_Into_Prefabs<Resource_Pref_Spawn_Hook>(Ident.ALL_GARDEN_PATCHES);
             #endregion
+            
         }
-
-        #region Event Extensions
-
-        private static Sisco_Return Ext_Spawn_Plot_Upgrades_UI(ref object sender, ref object[] args, ref object return_value)
-        {
-            LandPlot.Id kind = LandPlot.Id.NONE;
-            switch(sender.GetType().Name)
-            {
-                case nameof(GardenUI):
-                    kind = LandPlot.Id.GARDEN;
-                    break;
-                case nameof(CoopUI):
-                    kind = LandPlot.Id.COOP;
-                    break;
-                case nameof(CorralUI):
-                    kind = LandPlot.Id.CORRAL;
-                    break;
-                case nameof(PondUI):
-                    kind = LandPlot.Id.POND;
-                    break;
-                case nameof(SiloUI):
-                    kind = LandPlot.Id.SILO;
-                    break;
-                case nameof(IncineratorUI):
-                    kind = LandPlot.Id.INCINERATOR;
-                    break;
-            }
-            return new Sisco_Return(call(HOOK_ID.Spawn_Plot_Upgrades_UI, sender, ref return_value, new object[] { kind }));
-        }
-
-        private static Sisco_Return Ext_Pre_Game_Loaded(ref object sender, ref object[] args, ref object return_value)
-        {
-            string saveFile = GameData.ToPath(args[0] as string);
-            return new Sisco_Return(call(HOOK_ID.Pre_Game_Loaded, sender, ref return_value, new object[] { saveFile }));
-        }
-
-        private static Sisco_Return Ext_Post_Game_Loaded(ref object sender, ref object[] args, ref object return_value)
-        {
-            string saveFile = GameData.ToPath(args[0] as string);
-            return new Sisco_Return(call(HOOK_ID.Post_Game_Loaded, sender, ref return_value, new object[] { saveFile }));
-        }
-
-        private static Sisco_Return Ext_Game_Saved(ref object sender, ref object[] args, ref object return_value)
-        {
-            string saveFile = GameData.ToPath((sender as GameData).gameName);
-            return new Sisco_Return(call(HOOK_ID.Game_Saved, sender, ref return_value, new object[] { saveFile }));
-        }
-
-        #endregion
 
         public static _hook_result call(HOOK_ID hook, object sender, ref object returnValue, object[] args)
         {
             try
             {
+#if DEBUG
                 if (HOOKS_TO_ANNOUNCE.Contains(hook)) DebugHud.Log("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
+#endif
 
                 _hook_result result = new _hook_result(args);
                 List<Sisco_Hook_Delegate> cb_list;
@@ -154,13 +108,6 @@ namespace SR_PluginLoader
                 {
                     Log(hook, "The size of Result.args does not match the number of arguments recieved from the function!");
                 }
-                /*
-                if (result.args != null)
-                {
-                    Log(hook, "Result.args.Length: {0}", result.args.Length);
-                    Log(hook, "Result.args: {0}", Get_Arg_String(args));
-                }
-                */
                 
                 return result;
             }
@@ -174,7 +121,26 @@ namespace SR_PluginLoader
             return new _hook_result();//no abort
         }
 
-        #region HOOK REGISTRATION LOGIC
+
+        #region Internal
+        internal static object Get_Assembly_Registrar(Assembly asy)
+        {
+            string key = asy.FullName;
+            object value;
+            if (!assembly_registrars.TryGetValue(key, out value))
+            {
+                value = new object();
+                assembly_registrars.Add(key, value);
+            }
+
+            if (!SiscosHooks.tracker.ContainsKey(value)) SiscosHooks.tracker.Add(value, new List<Sisco_Hook_Ref>());
+
+            return value;
+        }
+
+        #endregion
+
+        #region REGISTRATION LOGIC
         /// <summary>
         /// Register your own function to be called whenever a specified event triggers.
         /// </summary>
@@ -184,6 +150,7 @@ namespace SR_PluginLoader
         /// <returns>(BOOL) Whether the event was successfully hooked.</returns>
         public static bool register(object registrar, HOOK_ID hook, Sisco_Hook_Delegate cb)
         {
+            if (registrar == null) registrar = Get_Assembly_Registrar( Assembly.GetCallingAssembly() );
             if(hook == null)
             {
                 Log("Attempted to register for NULL event!");
@@ -193,18 +160,14 @@ namespace SR_PluginLoader
             try
             {
                 // create the callback list for this hook type if it doesn't exist.
-                List<Sisco_Hook_Delegate> cb_list;
-                if (!SiscosHooks.events.TryGetValue(hook, out cb_list)) SiscosHooks.events[hook] = new List<Sisco_Hook_Delegate>();
-                EventCounter[(int)hook] = SiscosHooks.events[hook].Count;
+                if (!SiscosHooks.events.ContainsKey(hook)) SiscosHooks.events[hook] = new List<Sisco_Hook_Delegate>();
                 SiscosHooks.events[hook].Add(cb);
-
+                EventCounter[(int)hook] = SiscosHooks.events[hook].Count;
 
                 if (registrar != null)
                 {
                     // create this registrar's hooks list if it doesn't exist.
-                    List<Sisco_Hook_Ref> hooks_list;
-                    if (!SiscosHooks.tracker.TryGetValue(registrar, out hooks_list)) SiscosHooks.tracker[registrar] = new List<Sisco_Hook_Ref>();
-
+                    if (!SiscosHooks.tracker.ContainsKey(registrar)) return false;
                     //add this hook to their list.
                     SiscosHooks.tracker[registrar].Add(new Sisco_Hook_Ref(hook, cb));
                 }
@@ -212,7 +175,7 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                Log(ex.Message);
+                Log(ex);
             }
 
             return false;
@@ -228,43 +191,38 @@ namespace SR_PluginLoader
         /// <returns>(BOOL) Whether the event was successfully unhooked.</returns>
         public static bool unregister(object registrar, HOOK_ID hook, Sisco_Hook_Delegate cb)
         {
-            if (registrar == null)
-            {
-                Log("Registrar cannot be NULL!");
-                return false;
-            }
+            if (registrar == null) registrar = Get_Assembly_Registrar(Assembly.GetCallingAssembly());
 
             try
             {
-                // create the callback list for this hook type if it doesn't exist.
-                List<Sisco_Hook_Delegate> cb_list;
-                if (!SiscosHooks.events.TryGetValue(hook, out cb_list)) SiscosHooks.events[hook] = new List<Sisco_Hook_Delegate>();
-
-                // create this registrar's hooks list if it doesn't exist.
-                List<Sisco_Hook_Ref> hooks_list;
-                if (!SiscosHooks.tracker.TryGetValue(registrar, out hooks_list)) SiscosHooks.tracker[registrar] = new List<Sisco_Hook_Ref>();
-
-                //add this hook to their list.
-                bool tr_success = SiscosHooks.tracker[registrar].Remove(new Sisco_Hook_Ref(hook, cb));
-                if (!tr_success)
+                bool hk_success = false;
+                if (SiscosHooks.events.ContainsKey(hook))
                 {
-                    Log("Failed to remove hook from tracker. Sender({0})", registrar);
-                    return false;
+                    hk_success = SiscosHooks.events[hook].Remove(cb);
+                    if (!hk_success)
+                    {
+                        Log("Failed to remove hook from hooks list. Sender({0})", registrar);
+                        return false;
+                    }
+                    else EventCounter[(int)hook] = SiscosHooks.events[hook].Count;
                 }
 
-                bool hk_success = SiscosHooks.events[hook].Remove(cb);
-                EventCounter[(int)hook] = SiscosHooks.events[hook].Count;
-                if (!hk_success)
+                bool tr_success = false;
+                if (SiscosHooks.tracker.ContainsKey(registrar))
                 {
-                    Log("Failed to remove hook from hooks list. Sender({0})", registrar);
-                    return false;
+                    //add this hook to their list.
+                    tr_success = SiscosHooks.tracker[registrar].Remove(new Sisco_Hook_Ref(hook, cb));
+                    if (!tr_success)
+                    {
+                        Log("Failed to remove hook from tracker. Sender({0})", registrar);
+                    }
                 }
 
                 return (tr_success && hk_success);
             }
             catch (Exception ex)
             {
-                Log(ex.Message);
+                Log(ex);
             }
 
             return false;
@@ -279,19 +237,17 @@ namespace SR_PluginLoader
         /// <returns>(BOOL) Whether the events was successfully unhooked.</returns>
         public static bool unregister_all(object registrar)
         {
-            if (registrar == null)
-            {
-                Log("Registrar cannot be NULL!");
-                return false;
-            }
+            if (registrar == null) registrar = Get_Assembly_Registrar(Assembly.GetCallingAssembly());
 
             try
             {
                 // create this registrar's hooks list if it doesn't exist.
                 List<Sisco_Hook_Ref> hooks_list;
-                if (!SiscosHooks.tracker.TryGetValue(registrar, out hooks_list)) SiscosHooks.tracker[registrar] = new List<Sisco_Hook_Ref>();
-                
-                foreach(var o in hooks_list)
+                if (!SiscosHooks.tracker.ContainsKey(registrar)) return false;
+                SiscosHooks.tracker.TryGetValue(registrar, out hooks_list);
+
+                List<Sisco_Hook_Ref> trash = new List<Sisco_Hook_Ref>(hooks_list);
+                foreach (var o in trash)
                 {
                     bool b = unregister(registrar, o.evt, o.callback);
                     if(!b)
@@ -302,7 +258,7 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                Log(ex.Message);
+                Log(ex);
             }
 
             return false;
@@ -317,23 +273,20 @@ namespace SR_PluginLoader
         /// <returns>(BOOL) Whether the events was successfully unhooked.</returns>
         public static bool unregister_all(object registrar, HOOK_ID hook)
         {
-            if (registrar == null)
-            {
-                Log("Registrar cannot be NULL!");
-                return false;
-            }
+            if (registrar == null) registrar = Get_Assembly_Registrar(Assembly.GetCallingAssembly());
 
             try
             {
                 // create the callback list for this hook type if it doesn't exist.
-                List<Sisco_Hook_Delegate> cb_list;
-                if (!SiscosHooks.events.TryGetValue(hook, out cb_list)) SiscosHooks.events[hook] = new List<Sisco_Hook_Delegate>();
+                if (!SiscosHooks.events.ContainsKey(hook)) SiscosHooks.events[hook] = new List<Sisco_Hook_Delegate>();
 
                 // create this registrar's hooks list if it doesn't exist.
                 List<Sisco_Hook_Ref> hooks_list;
-                if (!SiscosHooks.tracker.TryGetValue(registrar, out hooks_list)) SiscosHooks.tracker[registrar] = new List<Sisco_Hook_Ref>();
+                if (!SiscosHooks.tracker.ContainsKey(registrar)) return false;
+                SiscosHooks.tracker.TryGetValue(registrar, out hooks_list);
 
-                foreach (var o in hooks_list)
+                List<Sisco_Hook_Ref> trash = new List<Sisco_Hook_Ref>(hooks_list);
+                foreach (var o in trash)
                 {
                     if (hook != HOOK_ID.NONE && o.evt != hook) continue;
                     bool b = unregister(registrar, o.evt, o.callback);
@@ -353,6 +306,7 @@ namespace SR_PluginLoader
 
         #endregion
 
+        #region HELPERS
         public static string Get_Arg_String(object[] args)
         {
             if (args != null)
@@ -382,8 +336,11 @@ namespace SR_PluginLoader
                 return textWriter.ToString();
             }
         }
+        #endregion
 
         #region LOGGING
+        //These are just a bunch of functions to wrap around the logging system calls so the Event Hooks system can print customized log messages
+
         private const string LOG_TAG = "<b>SiscosHooks</b>  ";
         private static void Log(HOOK_ID hook, string format, params object[] args)
         {
@@ -397,25 +354,68 @@ namespace SR_PluginLoader
 
         private static void Log(Exception ex)
         {
-            string str = DebugHud.Format_Log(ex, 1);
-            DebugHud.Log("{0} {1}", LOG_TAG, str);
+            string str = DebugHud.Format_Exception_Log(ex, 1);
+            DebugHud.Log("{0}(Exception) {1}", LOG_TAG, str);
         }
 
-        #endregion
+#endregion
 
-        public static void Example(GameObject gameObj, ref int slimesInVac, ref List<LiquidSource> currLiquids)
+    }
+
+    /// <summary>
+    /// Here is where we keep any event hook extension proxys (Too keep things tidy!)
+    /// An event hook extension proxy is a proxy function that extends or builds upon the information provided by a default hook coming from the generic hook system.
+    /// This allows us to provide more intelligent and useful hooks to plugin makers!
+    /// How does it work? Well to be honest I don't know, but I suspect magic...
+    /// </summary>
+    internal static class HookProxys
+    {
+
+        internal static Sisco_Return Ext_Spawn_Plot_Upgrades_UI(ref object sender, ref object[] args, ref object return_value)
         {
-            object num = 0;
-            _hook_result hook_result = SiscosHooks.call(HOOK_ID.VacPak_Consume, null, ref num, new object[]
+            LandPlot.Id kind = LandPlot.Id.NONE;
+            switch (sender.GetType().Name)
             {
-                (object) gameObj,
-		        (object) slimesInVac,
-                (object) currLiquids
-            });
-
-            gameObj = (GameObject)hook_result.args[0];
-            slimesInVac = (int)hook_result.args[1];
-            currLiquids = (List<LiquidSource>)hook_result.args[2];
+                case nameof(GardenUI):
+                    kind = LandPlot.Id.GARDEN;
+                    break;
+                case nameof(CoopUI):
+                    kind = LandPlot.Id.COOP;
+                    break;
+                case nameof(CorralUI):
+                    kind = LandPlot.Id.CORRAL;
+                    break;
+                case nameof(PondUI):
+                    kind = LandPlot.Id.POND;
+                    break;
+                case nameof(SiloUI):
+                    kind = LandPlot.Id.SILO;
+                    break;
+                case nameof(IncineratorUI):
+                    kind = LandPlot.Id.INCINERATOR;
+                    break;
+            }
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Spawn_Plot_Upgrades_UI, sender, ref return_value, new object[] { kind }));
         }
+
+        internal static Sisco_Return Ext_Pre_Game_Loaded(ref object sender, ref object[] args, ref object return_value)
+        {
+            string saveFile = GameData.ToPath(args[0] as string);
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Pre_Game_Loaded, sender, ref return_value, new object[] { saveFile }));
+        }
+
+        internal static Sisco_Return Ext_Post_Game_Loaded(ref object sender, ref object[] args, ref object return_value)
+        {
+            string saveFile = GameData.ToPath(args[0] as string);
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Post_Game_Loaded, sender, ref return_value, new object[] { saveFile }));
+        }
+
+        internal static Sisco_Return Ext_Game_Saved(ref object sender, ref object[] args, ref object return_value)
+        {
+            string saveFile = GameData.ToPath((sender as GameData).gameName);
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Game_Saved, sender, ref return_value, new object[] { saveFile }));
+        }
+
+        
     }
 }

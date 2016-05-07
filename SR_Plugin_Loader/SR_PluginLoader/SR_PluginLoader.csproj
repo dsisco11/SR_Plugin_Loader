@@ -57,57 +57,132 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\MonoBehaviour Scripts\ActionDelayer.cs" />
     <Compile Include="Base\SafeEnum.cs" />
-    <Compile Include="Dev_Hud\DevHud.cs" />
-    <Compile Include="Helpers\Extensions.cs" />
-    <Compile Include="Helpers\Game.cs" />
-    <Compile Include="Helpers\Directors.cs" />
-    <Compile Include="Helpers\Sound.cs" />
-    <Compile Include="Base\TimedObjectFlag.cs" />
+    <Compile Include="Base\DDS_HEADER.cs" />
+    <Compile Include="Base\SettingsFile.cs" />
+    <Compile Include="Helpers\ColorUtil.cs" />
+    <Compile Include="UI\Misc\SkinPresets.cs" />
+    <Compile Include="UI\Base\uiIconButton.cs" />
+    <Compile Include="UI\Enums\AutosizeMethod.cs" />
+    <Compile Include="UI\Enums\ControlType.cs" />
+    <Compile Include="UI\Base\uiCollapser.cs" />
+    <Compile Include="UI\Base\uiWrapperPanel.cs" />
+    <Compile Include="UI\Misc\ControlSizer.cs" />
+    <Compile Include="DebugHud\DebugUI.cs" />
+    <Compile Include="UI\Base\uiControl_Debug.cs" />
+    <Compile Include="UI\Base\uiTabbedPanel.cs" />
+    <Compile Include="UI\Base\uiBorderStyleState.cs" />
+    <Compile Include="UI\Base\uiBorderStyle.cs" />
+    <Compile Include="UI\Misc\ControlPositioner.cs" />
+    <Compile Include="Helpers\MonoBehaviour Scripts\BoxCollider_Draw.cs" />
+    <Compile Include="Dev_Menu\DevMenu.cs" />
+    <Compile Include="Helpers\MonoBehaviour Scripts\FollowPlayerSight.cs" />
+    <Compile Include="Base\Extensions.cs" />
+    <Compile Include="Helpers\Game Interaction\Game.cs" />
+    <Compile Include="Helpers\Game Interaction\Directors.cs" />
+    <Compile Include="Helpers\Game Interaction\Sound.cs" />
+    <Compile Include="Helpers\MonoBehaviour Scripts\ObjectFlags.cs" />
     <Compile Include="Helpers\ResourceExt.cs" />
-    <Compile Include="Helpers\Language.cs" />
+    <Compile Include="Helpers\Game Interaction\Language.cs" />
     <Compile Include="Experiments\Misc_Experiments.cs" />
-    <Compile Include="Helpers\Ident.cs" />
+    <Compile Include="Helpers\Game Interaction\Ident.cs" />
+    <Compile Include="Helpers\ModelHelper.cs" />
+    <Compile Include="Helpers\Game Interaction\HUD.cs" />
+    <Compile Include="Helpers\MonoBehaviour Scripts\ModelData.cs" />
+    <Compile Include="ObjLoader\Common\StringExtensions.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\DataStore.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\IDataStore.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\IElementGroup.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\IFaceGroup.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\IGroupDataStore.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\IMaterialLibrary.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\ISubMeshGroup.cs" />
+    <Compile Include="ObjLoader\Data\Elements\SubMesh.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\INormalDataStore.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\IObjectDataStore.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\ITextureDataStore.cs" />
+    <Compile Include="ObjLoader\Data\DataStore\IVertexDataStore.cs" />
+    <Compile Include="ObjLoader\Data\Elements\Face.cs" />
+    <Compile Include="ObjLoader\Data\Elements\Group.cs" />
+    <Compile Include="ObjLoader\Data\Material.cs" />
+    <Compile Include="ObjLoader\Data\Vec3.cs" />
+    <Compile Include="ObjLoader\Data\VertexData\Normal.cs" />
+    <Compile Include="ObjLoader\Data\VertexData\Texture.cs" />
+    <Compile Include="ObjLoader\Data\VertexData\Vertex.cs" />
+    <Compile Include="ObjLoader\Loaders\IMaterialLibraryLoader.cs" />
+    <Compile Include="ObjLoader\Loaders\IMaterialLibraryLoaderFacade.cs" />
+    <Compile Include="ObjLoader\Loaders\IObjLoader.cs" />
+    <Compile Include="ObjLoader\Loaders\IObjLoaderFactory.cs" />
+    <Compile Include="ObjLoader\Loaders\LoaderBase.cs" />
+    <Compile Include="ObjLoader\Loaders\LoadResult.cs" />
+    <Compile Include="ObjLoader\Loaders\MaterialLibraryLoader.cs" />
+    <Compile Include="ObjLoader\Loaders\MaterialLibraryLoaderFacade.cs" />
+    <Compile Include="ObjLoader\Loaders\MaterialStreamProvider.cs" />
+    <Compile Include="ObjLoader\Loaders\ObjLoader.cs" />
+    <Compile Include="ObjLoader\Loaders\ObjLoaderFactory.cs" />
+    <Compile Include="ObjLoader\TypeParsers\FaceParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\GroupParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\IFaceParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\IGroupParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\IMaterialLibraryParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\INormalParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\IObjectParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\ITextureParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\ITypeParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\IUseMaterialParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\Interfaces\IVertexParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\MaterialLibraryParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\NormalParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\ObjectParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\TextureParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\TypeParserBase.cs" />
+    <Compile Include="ObjLoader\TypeParsers\UseMaterialParser.cs" />
+    <Compile Include="ObjLoader\TypeParsers\VertexParser.cs" />
+    <Compile Include="Helpers\Game Interaction\TextureHelper.cs" />
+    <Compile Include="Helpers\Upgrades\PlotUpgradeTracker.cs" />
     <Compile Include="SiscosHooks\Prefab_Spawn_Hook.cs" />
-    <Compile Include="UI\LayoutDirector.cs" />
-    <Compile Include="UI\uiListIcon.cs" />
-    <Compile Include="UI\uiListItem.cs" />
-    <Compile Include="Upgrades\IUpgrade.cs" />
-    <Compile Include="UI\ButtonStyler_Overrider.cs" />
+    <Compile Include="UI\Base\uiLayoutDirector.cs" />
+    <Compile Include="UI\Base\uiList_Icon.cs" />
+    <Compile Include="UI\Base\uiList_Item.cs" />
+    <Compile Include="Helpers\Upgrades\IUpgrade.cs" />
+    <Compile Include="UI\Interfaces\IScrollableUI.cs" />
+    <Compile Include="UI\Utility\ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
-    <Compile Include="Helpers\GameTime.cs" />
-    <Compile Include="UI\uiVarText.cs" />
-    <Compile Include="UI\Plugin_Update_Item.cs" />
-    <Compile Include="UI\uiCheckbox.cs" />
-    <Compile Include="UI\uiTextArea.cs" />
-    <Compile Include="UI\Plugin_Update_Viewer.cs" />
-    <Compile Include="UI\PluginManager.cs" />
-    <Compile Include="UI\PluginSelector.cs" />
-    <Compile Include="UI\uiScrollPanel.cs" />
-    <Compile Include="UI\uiToggle.cs" />
-    <Compile Include="UI\uiIcon.cs" />
-    <Compile Include="UI\ProgressBar_Element.cs" />
-    <Compile Include="UI\uiProgressBar.cs" />
-    <Compile Include="UI\Drawing.cs" />
-    <Compile Include="Helpers\Player.cs" />
+    <Compile Include="Helpers\Game Interaction\GameTime.cs" />
+    <Compile Include="UI\Base\uiVarText.cs" />
+    <Compile Include="UI\Classes\Plugin_Update_Item.cs" />
+    <Compile Include="UI\Base\uiCheckbox.cs" />
+    <Compile Include="UI\Base\uiTextArea.cs" />
+    <Compile Include="UI\Classes\Plugin_Update_Viewer.cs" />
+    <Compile Include="UI\Classes\PluginManager.cs" />
+    <Compile Include="UI\Classes\Plugin_Manager_List_Item.cs" />
+    <Compile Include="UI\Base\uiScrollPanel.cs" />
+    <Compile Include="UI\Base\uiToggle.cs" />
+    <Compile Include="UI\Base\uiIcon.cs" />
+    <Compile Include="UI\Classes\ProgressBar_Element.cs" />
+    <Compile Include="UI\Base\uiProgressBar.cs" />
+    <Compile Include="UI\Utility\Drawing.cs" />
+    <Compile Include="Helpers\Game Interaction\Player.cs" />
     <Compile Include="Plugins\Plugin_Update_Method.cs" />
-    <Compile Include="UI\uiTextbox.cs" />
-    <Compile Include="UI\Plugin_StoreItem.cs" />
-    <Compile Include="UI\PluginStore.cs" />
-    <Compile Include="UI\uiButton.cs" />
-    <Compile Include="UI\uiListView.cs" />
-    <Compile Include="UI\uiControl.cs" />
-    <Compile Include="UI\uiPanel.cs" />
-    <Compile Include="UI\uiText.cs" />
-    <Compile Include="UI\uiWindow.cs" />
+    <Compile Include="UI\Base\uiTextbox.cs" />
+    <Compile Include="UI\Classes\Plugin_StoreItem.cs" />
+    <Compile Include="UI\Classes\PluginStore.cs" />
+    <Compile Include="UI\Base\uiButton.cs" />
+    <Compile Include="UI\Base\uiList_View.cs" />
+    <Compile Include="UI\Base\uiControl.cs" />
+    <Compile Include="UI\Base\uiPanel.cs" />
+    <Compile Include="UI\Base\uiText.cs" />
+    <Compile Include="UI\Base\uiWindow.cs" />
+    <Compile Include="UI\Enums\uiSkinPreset.cs" />
     <Compile Include="Updaters\Git_Updater.cs" />
-    <Compile Include="Helpers\Singleton.cs" />
-    <Compile Include="UI\Notice_Manager.cs" />
+    <Compile Include="Helpers\MonoBehaviour Scripts\Singleton.cs" />
+    <Compile Include="UI\Legacy\Notice_Manager.cs" />
     <Compile Include="SiscosHooks\HOOKS.cs" />
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
     <Compile Include="Base\Loader.cs" />
-    <Compile Include="UI\MainMenu.cs" />
+    <Compile Include="Helpers\Game Interaction\MainMenu.cs" />
     <Compile Include="Plugins\Plugin.cs" />
     <Compile Include="Plugins\Plugin_Dependency.cs" />
     <Compile Include="Plugins\Plugin_Download_Data.cs" />
@@ -123,14 +198,17 @@
     <Compile Include="SiscosHooks\SiscosHooks.cs" />
     <Compile Include="SiscosHooks\Siscos_Return.cs" />
     <Compile Include="SiscosHooks\Sisco_Hook_Ref.cs" />
-    <Compile Include="UI\ToggleSwitch.cs" />
-    <Compile Include="UI\UI_Notification.cs" />
+    <Compile Include="UI\Classes\ToggleSwitch.cs" />
+    <Compile Include="UI\Legacy\UI_Notification.cs" />
     <Compile Include="Updaters\Updater_Base.cs" />
     <Compile Include="Helpers\Util.cs" />
     <Compile Include="SiscosHooks\_hook_result.cs" />
     <Compile Include="Updaters\Web_Updater.cs" />
     <Compile Include="Updaters\WebAsync.cs" />
-    <Compile Include="Upgrades\Upgrade_System.cs" />
+    <Compile Include="Helpers\Upgrades\Upgrades.cs" />
+    <Compile Include="Helpers\Game Interaction\ViewModel.cs" />
+    <Compile Include="Base\Watermark_UI.cs" />
+    <Compile Include="Base\Active_State_Tracker.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -140,28 +218,27 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\unknown.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\alert.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <EmbeddedResource Include="Resources\checkbox.png" />
+    <EmbeddedResource Include="Resources\checkmark.png" />
+    <EmbeddedResource Include="Resources\close.png" />
+    <EmbeddedResource Include="Resources\logo.png" />
     <EmbeddedResource Include="Resources\Restart_Helper.exe" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\checkbox.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\close.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\checkmark.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="TestBed\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\mystery.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\arrow_left.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\arrow_right.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

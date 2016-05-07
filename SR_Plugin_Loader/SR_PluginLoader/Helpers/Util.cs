@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -23,6 +24,8 @@ namespace SR_PluginLoader
 
     public static class Util
     {
+        public static int UnixTimestamp() { return (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds; }
+
         public static MessageBundle CreateMessageBundle(string bundleName, Dictionary<string, string> translations)
         {
             var rBundle = new ResourceBundle(translations);
@@ -42,6 +45,65 @@ namespace SR_PluginLoader
 
             return webClient;
         }
+
+        /// <summary>
+        /// Gets a string listing information for all Components attached to all GameObjects attached to a specified GameObject.
+        /// </summary>
+        public static string Get_Unity_GameObject_Hierarchy_String(GameObject targ, int nest_level=0)
+        {
+            StringBuilder sb = new StringBuilder();
+            // Format our pre-spacing string
+            string space = "";
+            for (int i = 0; i < nest_level; i++) space += "  ";
+            // Create a map of all sub-components this object has
+            Dictionary<string, List<Component>> map = new Dictionary<string, List<Component>>();
+            List<Component> ccomps = targ.GetComponentsInChildren<Component>().ToList();
+            foreach(Component c in ccomps)
+            {
+                if (!map.ContainsKey(c.name)) map.Add(c.name, new List<Component>());
+                map[c.name].Add(c);
+            }
+
+            // First let's print this objects name 
+            sb.AppendFormat("{0}GameObject(\"{1}\")  Layer<{2}>  Children<{3}>", space, targ.name, targ.layer, targ.transform.childCount);
+            sb.Append("  Components: {");
+            // Now let's list all of the script components attached to it
+            List<Component> comps = targ.GetComponents<Component>().ToList();
+            sb.Append(String.Join(", ", comps.Select(c => c.GetType().Name).ToArray()));
+            // End the components list
+            sb.AppendLine("}");
+
+            const string spacing = "   ";
+            foreach(KeyValuePair<string, List<Component>> kvp in map)
+            {
+                sb.AppendLine(String.Format("{0}\"{1}\" {{{2}}}", spacing, kvp.Key, String.Join(", ", kvp.Value.Select(c => c.GetType().FullName).ToArray())));
+            }
+            /*
+            // Start the process of listing all attached GameObjects
+            for (int idx = 1; idx < targ.transform.childCount; idx++)// start at offset 1 to avoid printing ourself again!
+            {
+                GameObject obj = targ.transform.GetChild(idx).gameObject;
+                sb.AppendLine(Get_Unity_GameObject_Hierarchy_String(targ, nest_level+1));
+            }
+            */
+
+            return sb.ToString();
+        }
+        
+        /// <summary>
+        /// Translates a Unity GUI object's transforms into a screenspace Rect area.
+        /// </summary>
+        public static Rect Get_Unity_UI_Object_Area(GameObject obj)
+        {
+            RectTransform rt = obj.GetComponent<RectTransform>();
+            if (rt == null) return new Rect(obj.transform.localPosition, new Vector2(5,5));
+
+            Vector2 hSZ = (rt.sizeDelta * 0.5f);
+            return new Rect(new Vector2(rt.position.x - hSZ.x, Screen.height - (rt.position.y + hSZ.y)), rt.sizeDelta);
+            //return new Rect(rt.anchoredPosition + new Vector2(rt.position.x, rt.position.y), rt.sizeDelta);
+        }
+
+        #region Hashing
 
         public static string SHA(string data)
         {
@@ -110,10 +172,11 @@ namespace SR_PluginLoader
 
             return sb.ToString();
         }
+        #endregion
 
         public static void Log_Resource_Names()
         {
-            var thisExe = System.Reflection.Assembly.GetExecutingAssembly();
+            var thisExe = System.Reflection.Assembly.GetCallingAssembly();
             string[] resources = thisExe.GetManifestResourceNames();
 
             foreach(var res in resources)
@@ -122,12 +185,17 @@ namespace SR_PluginLoader
             }
         }
 
-        public static byte[] Load_Resource(string name)
+        public static Stream Get_Resource_Stream(string name, string namespace_str)
+        {
+            string asset_name = String.Format("{0}.Resources.{1}", namespace_str, name);
+            return Assembly.GetCallingAssembly().GetManifestResourceStream(asset_name);
+        }
+
+        public static byte[] Load_Resource(string name, string namespace_str = "SR_PluginLoader")
         {
             try
             {
-                string asset_name = String.Format("SR_PluginLoader.Resources.{0}", name);
-                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(asset_name))
+                using (Stream stream = Get_Resource_Stream(name, namespace_str))
                 {
                     if (stream == null) return null;
 
@@ -175,7 +243,40 @@ namespace SR_PluginLoader
 
             return buf;
         }
-        
+
+        #region TEXTURES
+        [Obsolete("Use TextureHelper.Load_From_Resource instead!", true)]
+        public static Texture2D Load_Texture_Resource(string name, string namespace_str)
+        {
+            return (Texture2D)TextureHelper.Load_From_Resource(name, namespace_str);
+        }
+
+        [Obsolete("Use TextureHelper.Load_From_Data instead!", true)]
+        public static Texture2D Load_Texture_From_Data(byte[] data)
+        {
+            return (Texture2D)TextureHelper.Load(data);
+        }
+        /// <summary>
+        /// Helper function to load an array of bytes as a struct instance. God I wish I had done this whole loader in C++
+        /// </summary>
+        public static T BytesToStructure<T>(byte[] bytes)
+        {
+            int size = Marshal.SizeOf(typeof(T));
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            try
+            {
+                Marshal.Copy(bytes, 0, ptr, size);
+                return (T)Marshal.PtrToStructure(ptr, typeof(T));
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(ptr);
+            }
+        }
+        #endregion
+
+        #region UI Helpers
+
         public static void Set_BG_Color(GUIStyleState style, float R, float G, float B, float A = 1.0f)
         {
             Set_BG_Color(style, new Color(R, G, B, A));
@@ -291,11 +392,34 @@ namespace SR_PluginLoader
                 return new Color(tint.r*g, tint.g*g, tint.b*g, tint.a);
             });
         }
-        
+
         public static void Set_BG_Gradient(GUIStyleState style, int pixels, GRADIENT_DIR dir, Color clr1, Color clr2, bool exponential = false, float exponent = 1f)
         {
             if (style == null) return;
             var tex = Get_Gradient_Texture(pixels, dir, clr1, clr2, exponential, exponent);
+            style.background = tex;
+        }
+
+        public static void Set_BG_Gradient(GUIStyleState style, int pixels, GRADIENT_DIR dir, Color clr1, Color clr2, float? exp)
+        {
+            if (style == null) return;
+            var tex = Get_Gradient_Texture(pixels, dir, clr1, clr2, exp.HasValue, exp.HasValue ? exp.Value : 1f);
+            style.background = tex;
+        }
+
+        public static void Set_BG_Gradient(GUIStyleState style, int pixels, GRADIENT_DIR dir, Color clr, float darken)
+        {
+            if (style == null) return;
+
+            var tex = Get_Gradient_Texture(pixels, dir, clr, clr * darken);
+            style.background = tex;
+        }
+
+        public static void Set_BG_Gradient(GUIStyleState style, int pixels, GRADIENT_DIR dir, Color clr, float darken, float exp)
+        {
+            if (style == null) return;
+
+            var tex = Get_Gradient_Texture(pixels, dir, clr, clr * darken, false, exp);
             style.background = tex;
         }
 
@@ -314,6 +438,8 @@ namespace SR_PluginLoader
             tex.Apply();
             return tex;
         }
+
+        #endregion
 
         public static bool floatEq(float a, float b, float epsilon = 0.001f)
         {
@@ -335,7 +461,18 @@ namespace SR_PluginLoader
                 return diff / (absA + absB) < epsilon;
             }
         }
-        
+
+        public static string FormatByteArray(byte[] bytes)
+        {
+            var sb = new StringBuilder("new byte[] { ");
+            foreach (var b in bytes)
+            {
+                sb.Append(b + ", ");
+            }
+            sb.Append("}");
+            return sb.ToString();
+        }
+
         public static string JSON_Escape_String(string str)
         {
             return str.Replace("\n", "\\n").Replace("\r", "\\r").Replace("\t", "\\t");
@@ -354,15 +491,15 @@ namespace SR_PluginLoader
         public static GameObject TrySpawn(Identifiable.Id id, Vector3 pos, Quaternion? quat=null)
         {
             if (!quat.HasValue) quat = Quaternion.identity;
-            return (GameObject)GameObject.Instantiate(Directors.lookupDirector.GetPrefab(id), pos, quat.Value);
+            return (GameObject)GameObject.Instantiate(Ident.GetPrefab(id), pos, quat.Value);
         }
 
         public static GameObject TrySpawn(Identifiable.Id id, RaycastHit ray)
         {
-            var prefab = Directors.lookupDirector.GetPrefab(id);
+            var prefab = Ident.GetPrefab(id);
             float r = Get_Object_Radius(prefab);
 
-            Vector3 pos = (ray.point + (ray.normal * r * 2.0f));
+            Vector3 pos = (ray.point + (ray.normal * r * 3f));
             return (GameObject)GameObject.Instantiate(prefab, pos, Quaternion.identity);
         }
 
@@ -381,17 +518,66 @@ namespace SR_PluginLoader
             return final;
         }
 
-
+        #region Prefab Injection
         public static void Inject_Into_Prefabs<Script>(HashSet<Identifiable.Id> ID_LIST) where Script : MonoBehaviour
         {
             // Attempt to inject our own MonoBehaviour class into some prefabs.
             foreach (Identifiable.Id id in ID_LIST)
             {
-                var pref = Directors.lookupDirector.GetPrefab(id);
-                if(pref != null) pref.AddComponent<Script>();
+                var pref = Ident.GetPrefab(id);
+                if (pref != null) pref.AddComponent<Script>();
             }
         }
 
+        public static void Inject_Into_Prefabs<Script>(HashSet<LandPlot.Id> ID_LIST) where Script : MonoBehaviour
+        {
+            // Attempt to inject our own MonoBehaviour class into some prefabs.
+            foreach (LandPlot.Id id in ID_LIST)
+            {
+                var pref = Directors.lookupDirector.GetPlotPrefab(id);
+                if (pref != null) pref.AddComponent<Script>();
+            }
+        }
+
+        public static void Inject_Into_Prefabs<Script>(HashSet<SpawnResource.Id> ID_LIST) where Script : MonoBehaviour
+        {
+            // Attempt to inject our own MonoBehaviour class into some prefabs.
+            foreach (SpawnResource.Id id in ID_LIST)
+            {
+                var pref = Directors.lookupDirector.GetResourcePrefab(id);
+                if (pref != null) pref.AddComponent<Script>();
+            }
+        }
+        #endregion
+
+        #region Mesh
+
+        public static Mesh Get_Mesh_From_Identifiable(Identifiable.Id id)
+        {
+            var pref = Ident.GetPrefab(id);
+            if (pref == null) return null;
+
+            var inst = (GameObject)GameObject.Instantiate(pref, Vector3.zero, Quaternion.identity);
+
+            MeshFilter mf = inst.GetComponentInChildren<MeshFilter>();
+            GameObject.Destroy(inst);
+            if (mf == null) return null;
+
+            if (mf.mesh != null) return mf.mesh;
+            return mf.sharedMesh;
+        }
+
+        public static MeshRenderer Get_MeshRenderer_From_Identifiable(Identifiable.Id id)
+        {
+            var pref = Ident.GetPrefab(id);
+            if (pref == null) return null;
+            
+            var inst = (GameObject)GameObject.Instantiate(pref, Vector3.zero, Quaternion.identity);
+            var rend = pref.GetComponent<MeshRenderer>();
+            GameObject.Destroy(inst);
+            return rend;
+        }
+        #endregion
 
     }
 }

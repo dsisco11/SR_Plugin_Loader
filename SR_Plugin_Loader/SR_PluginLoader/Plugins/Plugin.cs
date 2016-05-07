@@ -13,8 +13,8 @@ namespace SR_PluginLoader
     public class Plugin 
     {
         public Plugin_Data data = null;
-        public string Hash { get { return this.data.Hash; } }
-        protected Updater_Base Updater { get { return Updater_Base.Get_Instance(this.data.UPDATE_METHOD.METHOD); } }
+        public string Hash { get { if (data==null) { throw new ArgumentNullException("Plugin DATA is NULL!"); } return data.Hash; } }
+        protected Updater_Base Updater { get { return Updater_Base.Get_Instance(data.UPDATE_METHOD.METHOD); } }
         public override string ToString() { return String.Format("Plugin[{0}.{1}]", data.NAME, data.AUTHOR); }
 
         /// <summary>
@@ -79,15 +79,15 @@ namespace SR_PluginLoader
         public void load()
         {
             this.Load_DLL();
-            this.Load_Assets();
             this.Load_Plugin_Info();
+            this.Load_Assets();
         }
         
         private void Load_Assets()
         {
             if (this.dll == null) return;
-            string icon_file = "icon.png";
-            string thumb_file = "thumb.png";
+            string icon_file = this.data.ICON;
+            string thumb_file = this.data.PREVIEW;
 
             
             if (icon_file != null)
@@ -95,10 +95,7 @@ namespace SR_PluginLoader
                 byte[] buf = this.Load_Resource(icon_file);
                 if (buf != null)
                 {
-                    this.icon = new Texture2D(0, 0, TextureFormat.RGBA32, true);
-                    this.icon.filterMode = FilterMode.Trilinear;
-                    this.icon.LoadImage(buf);
-                    this.icon.Apply(true);
+                    this.icon = (Texture2D)TextureHelper.Load(buf, icon_file);
                 }
                 else
                 {
@@ -111,10 +108,7 @@ namespace SR_PluginLoader
                 byte[] buf = this.Load_Resource(thumb_file);
                 if (buf != null)
                 {
-                    this.thumbnail = new Texture2D(0, 0, TextureFormat.RGBA32, true);
-                    this.thumbnail.filterMode = FilterMode.Trilinear;
-                    this.thumbnail.LoadImage(buf);
-                    this.thumbnail.Apply(true);
+                    this.thumbnail = (Texture2D)TextureHelper.Load(buf, thumb_file);
                 }
                 else
                 {
@@ -342,7 +336,7 @@ namespace SR_PluginLoader
                 {
                     this.enabled = true;
                     this.root = gmObj;
-                    Loader.Plugin_Status_Change(this, this.enabled);
+                    Loader.Plugin_Status_Change(this, enabled);
                 }
             }
             catch(Exception ex)
@@ -369,7 +363,7 @@ namespace SR_PluginLoader
                     for (int i = 0; i < paramz.Length; i++)
                     {
                         ParameterInfo param = paramz[i];
-                        if (typeof(GameObject) == param.ParameterType) args[i] = this.root;
+                        if (typeof(GameObject) == param.ParameterType) args[i] = root;
                         else if (typeof(Plugin) == param.ParameterType) args[i] = this;
 
                     }
@@ -385,6 +379,7 @@ namespace SR_PluginLoader
             {
                 if (this.root != null) UnityEngine.GameObject.Destroy(this.root);
                 this.root = null;
+                Loader.Plugin_Status_Change(this, enabled);
             }
         }
 

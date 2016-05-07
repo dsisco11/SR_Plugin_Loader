@@ -60,7 +60,7 @@ namespace SR_PluginLoader
 
         public static void Log(Exception ex)
         {
-            string str = DebugHud.Format_Log(ex, 1);
+            string str = DebugHud.Format_Exception_Log(ex, 1);
             DebugHud.Add_Line(str, true);
         }
 
@@ -84,7 +84,7 @@ namespace SR_PluginLoader
 
         public static void LogSilent(Exception ex)
         {
-            string str = DebugHud.Format_Log(ex, 0);
+            string str = DebugHud.Format_Exception_Log(ex, 0);
             DebugHud.write_log(str, true);
         }
 
@@ -126,23 +126,23 @@ namespace SR_PluginLoader
             write_log(str);
         }
 
-        public static string Format_Log(Exception ex, int stack_offset = 0)
+        public static string Format_Exception_Log(Exception ex, int stack_offset = 0)
         {
             string str = null;
             try
             {
-                var trace = new StackTrace(ex, stack_offset, true);
+                var trace = new StackTrace(ex, 1 + stack_offset, true);
                 str = String.Format("{0}\n{1}", ex.Message, trace.ToString());
             }
             catch(Exception e)
             {
-                write_log("{0}\n{1}", e.Message, e.StackTrace);
+                write_log("DebugHUD.Format_Exception_Log() THREW AN INTERNAL EXCEPTION!\n{0}\n{1}", e.Message, e.StackTrace);
                 str = String.Format("{0}\n{1}", ex.Message, StackTraceUtility.ExtractStackTrace());
             }
 
             if (ex.InnerException != null) str = String.Format("{0}\n{1}", str, ex.InnerException.Message);
 
-            return DebugHud.Format_Log(str, 2);//reformat our exception string with an additional stack offset of 1 to make it skip past the function that called THIS format function.
+            return DebugHud.Format_Log(str, 2+stack_offset);//reformat our exception string with an additional stack offset of 1 to make it skip past the function that called THIS format function.
             //return DebugHud.Tag_String(str, stack_offset);
         }
 

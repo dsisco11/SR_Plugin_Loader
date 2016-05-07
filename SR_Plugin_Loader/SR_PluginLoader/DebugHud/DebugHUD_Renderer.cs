@@ -138,7 +138,7 @@ namespace SR_PluginLoader
             watermark_style.normal.background = null;
 
             watermark_text_content.text = Loader.TITLE;
-            watermark_content = new GUIContent(Loader.tex_logo);
+            watermark_content = new GUIContent(TextureHelper.icon_logo);
         }
         
         private void Update()
@@ -258,7 +258,7 @@ namespace SR_PluginLoader
                 return;
             }
 
-            this.Render_Loader_Watermark();
+            //this.Render_Loader_Watermark();
             if (!this.open)
             {
                 if (this.new_count > 0)
@@ -272,7 +272,7 @@ namespace SR_PluginLoader
                     var prevClr = GUI.color;
                     GUI.color = clr;
 
-                    GUI.DrawTexture(alertPos, Loader.tex_alert, ScaleMode.ScaleToFit);
+                    GUI.DrawTexture(alertPos, TextureHelper.icon_alert, ScaleMode.ScaleToFit);
                     GUI.color = prevClr;
                 }
             }
@@ -306,10 +306,11 @@ namespace SR_PluginLoader
         {
             var prevClr = GUI.color;
             GUI.color = watermark_style.normal.textColor;
-            GUI.DrawTexture(watermark_area, Loader.tex_logo, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(watermark_area, TextureHelper.icon_logo, ScaleMode.ScaleToFit);
             GUI.color = prevClr;
             //watermark_style.Draw(watermark_area, watermark_content, false, false, false, false);
             watermark_style.Draw(watermark_text_area, watermark_text_content, false, false, false, false);
         }
+
     }
 }

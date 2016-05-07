@@ -9,16 +9,25 @@ namespace SR_PluginLoader
     {
         public int major;
         public int minor;
+        public int patch;
 
-        public Plugin_Version(int maj, int min=0)
+        public Plugin_Version(int _major, int _minor = 0)
         {
-            this.major = maj;
-            this.minor = min;
+            this.major = _major;
+            this.minor = _minor;
+            this.patch = 0;
+        }
+
+        public Plugin_Version(int _major, int _minor, int _patch)
+        {
+            this.major = _major;
+            this.minor = _minor;
+            this.patch = _patch;
         }
 
         public override string ToString()
         {
-            return String.Format("v{0}.{1}", this.major, this.minor);
+            return String.Format("v{0}.{1}.{2}", this.major, this.minor, this.patch);
         }
 
         public static bool operator ==(Plugin_Version v1, Plugin_Version v2)
@@ -53,12 +62,23 @@ namespace SR_PluginLoader
 
         protected long toInt()
         {
-            return ((this.major << 8) + this.minor);
+            return ((this.major << 32) + (this.minor << 16) + this.patch);
         }
 
         public int Compare(Plugin_Version other)
         {
             return (int)Math.Max(-1, Math.Min(1, this.toInt() - other.toInt()));
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)toInt();
+        }
+
+        public override bool Equals(object obj)
+        {
+            Plugin_Version vers = obj as Plugin_Version;
+            return Compare(vers)==0;
         }
     }
 }

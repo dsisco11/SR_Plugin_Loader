@@ -53,7 +53,7 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, name = "Vacuumable.capture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, name = "WeaponVacuum.Update" },
             
-            new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Save", pos = -1, ext = HOOK_ID.Ext_Game_Saved },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Save", pos = 0, ext = HOOK_ID.Ext_Game_Saved },
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Game_Loaded, name = "GameData.Load", pos = 0, ext = HOOK_ID.Ext_Pre_Game_Loaded },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Game_Loaded, name = "GameData.Load", pos = -1, ext = HOOK_ID.Ext_Post_Game_Loaded },
             new Hook_Dbg_Data() { hook = HOOK_ID.Get_Available_Saves, name = "GameData.AvailableGames", pos = 0 },
@@ -77,8 +77,11 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
 
+            
+            new Hook_Dbg_Data() { hook = HOOK_ID.Plot_Load_Upgrades, name = "LandPlot.SetUpgrades", pos=-1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Player_Upgrades_UI, name = "PersonalUpgradeUI.CreatePurchaseUI", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "EmptyPlotUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "GardenUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "CorralUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "CoopUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
