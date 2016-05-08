@@ -1028,15 +1028,7 @@ namespace SR_PluginLoader
             if (x < 0) x = 0f;
             if (y < 0) y = 0f;
         }
-
-        [Obsolete("Use clamp_pos(ref float, ref float) instead!")]
-        protected Vector2 clamp_pos(Vector2 v)
-        {
-            if (v.x < 0) v.x = 0f;
-            if (v.y < 0) v.y = 0f;
-            return v;
-        }
-
+        
         public void Apply_Positioners()
         {
             if (isDraggable)// Draggable components shouldnt have their positions affected by auto-positioners
@@ -1078,7 +1070,10 @@ namespace SR_PluginLoader
             maybeUpdate_Pos(set_area.x, y);
             //area = new Rect(new Vector2(this._area.x, y), _area.size);
         }
-        
+
+        /// <summary>
+        /// Positions the control so it's top edge is yOff away below another given control.
+        /// </summary>
         public void moveBelow(uiControl targ, float yOff = 0f)
         {
             if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
@@ -1098,6 +1093,9 @@ namespace SR_PluginLoader
             maybeUpdate_Pos(Area.position.x, targ.Area.yMin - size.y - yOff);
         }
 
+        /// <summary>
+        /// Positions the control so it's right edge is xOff away from the right edge of another given control.
+        /// </summary>
         public void moveRightOf(uiControl targ, float xOff = 0f)
         {
             if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
@@ -1144,8 +1142,7 @@ namespace SR_PluginLoader
             horizontal_positioner = null;
             //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.BELOW)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_BELOW);
         }
-
-
+        
         /// <summary>
         /// Adjusts X & Y position of the control so it sites directly to the right of another given control.
         /// </summary>
@@ -1194,10 +1191,12 @@ namespace SR_PluginLoader
             float val = Screen.height;
             if (isChild) val = parent.Get_Content_Area().height;// parent.inner_area.height;
 
-            Vector2 offset = clamp_pos(new Vector2(Area.x, val - size.y - yOff));// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
-            if (CONFIRM_POSITIONER) DebugHud.Log("{0}  Confirm Positioner  |  align bottom  |  offset: {1}  |  val: {2}  |  area: {3}  |  size: {4}", this, offset, val, Area, size);
+            float x = Area.x;
+            float y = (val - size.y - yOff);
+            clamp_pos(ref x, ref y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            if (CONFIRM_POSITIONER) DebugHud.Log("{0}  Confirm Positioner  |  align bottom  |  offset: {1}  |  val: {2}  |  area: {3}  |  size: {4}", this, new Vector2(x,y), val, Area, size);
 
-            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            maybeUpdate_Pos(x, y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (vertical_positioner == null || !vertical_positioner.Equals(null, yOff, cPosDir.BOTTOM_OF)) vertical_positioner = new ControlPositioner(null, yOff, cPosDir.BOTTOM_OF);
@@ -1209,8 +1208,10 @@ namespace SR_PluginLoader
         /// <param name="xOff">Offset from the edge where we will be positioned</param>
         public void alignLeftSide(float xOff = 0f)
         {
-            Vector2 offset = clamp_pos(new Vector2(xOff, Area.position.y));
-            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            float x = xOff;
+            float y = Area.position.y;
+            clamp_pos(ref x, ref y);
+            maybeUpdate_Pos(x, y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (horizontal_positioner == null || !horizontal_positioner.Equals(null, xOff, cPosDir.LEFT_SIDE_OF)) horizontal_positioner = new ControlPositioner(null, xOff, cPosDir.LEFT_SIDE_OF);
         }
@@ -1224,8 +1225,10 @@ namespace SR_PluginLoader
             float val = Screen.width;
             if(isChild) val = parent.Get_Content_Area().width;
 
-            Vector2 offset = clamp_pos(new Vector2(val - size.x - xOff, Area.position.y));
-            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            float x = (val - size.x - xOff);
+            float y = Area.position.y;
+            clamp_pos(ref x, ref y);
+            maybeUpdate_Pos(x, y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (horizontal_positioner == null || !horizontal_positioner.Equals(null, xOff, cPosDir.RIGHT_SIDE_OF)) horizontal_positioner = new ControlPositioner(null, xOff, cPosDir.RIGHT_SIDE_OF);
@@ -1240,8 +1243,10 @@ namespace SR_PluginLoader
             float val = Screen.height;
             if (isChild) val = parent.Get_Content_Area().height;
 
-            Vector2 offset = clamp_pos(new Vector2(Area.position.x, (val / 2) - (size.y / 2) - yOff));
-            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            float x = Area.position.x;
+            float y = ((val / 2) - (size.y / 2) - yOff);
+            clamp_pos(ref x, ref y);
+            maybeUpdate_Pos(x, y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (vertical_positioner == null || !vertical_positioner.Equals(null, 0f, cPosDir.CENTER_Y)) vertical_positioner = new ControlPositioner(null, 0f, cPosDir.CENTER_Y);
@@ -1256,8 +1261,10 @@ namespace SR_PluginLoader
             float val = Screen.width;
             if (isChild) val = parent.Get_Content_Area().width;
 
-            Vector2 offset = clamp_pos(new Vector2((val / 2) - (size.x / 2) - xOff, Area.position.y));
-            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            float x = ((val / 2) - (size.x / 2) - xOff);
+            float y = Area.position.y;
+            clamp_pos(ref x, ref y);
+            maybeUpdate_Pos(x, y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (horizontal_positioner == null || !horizontal_positioner.Equals(null, 0f, cPosDir.CENTER_X)) horizontal_positioner = new ControlPositioner(null, 0f, cPosDir.CENTER_X);

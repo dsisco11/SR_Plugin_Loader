@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 using System.Net;
@@ -17,7 +18,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// The version for the loader itself
         /// </summary>
-        public static Plugin_Version VERSION = new Plugin_Version(0, 6, 1);
+        public static Plugin_Version VERSION = new Plugin_Version(0, 6, 2);
         
         public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", Loader.VERSION); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
@@ -42,7 +43,7 @@ namespace SR_PluginLoader
 
         public static void init(string hash)
         {
-            if (Loader.config_stream != null) return;
+            if (Loader.Config != null) return;
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
@@ -245,46 +246,65 @@ namespace SR_PluginLoader
 
         public static void Load_Config()
         {
-            Config = new SettingsFile("plugin_loader.json");
+            Config = new SettingsFile("plugins.json");
+            if (Config == null) throw new Exception("CONFIG is not ready!");
 
             try
             {
-                byte[] buf = new byte[Loader.config_stream.Length];
-                int read = Loader.config_stream.Read(buf, 0, (int)Loader.config_stream.Length);
-                if (read < (int)Loader.config_stream.Length)
+                if (Config["ENABLED_PLUGINS"] != null)
                 {
-                    int remain = ((int)Loader.config_stream.Length - read);
-                    int r = 0;
-                    while (r < remain && remain > 0)
+                    List<string> list = Config.Get_Array<string>("ENABLED_PLUGINS");
+                    Load_Enabled_Plugins(list.ToArray());
+                }
+                else// Load from the old save format!
+                {
+                    string[] list = new string[] { };
+
+                    if (Loader.config_stream != null)
                     {
-                        r = Loader.config_stream.Read(buf, read, remain);
-                        read += r;
-                        remain -= r;
+                        byte[] buf = new byte[Loader.config_stream.Length];
+                        int read = Loader.config_stream.Read(buf, 0, (int)Loader.config_stream.Length);
+                        if (read < (int)Loader.config_stream.Length)
+                        {
+                            int remain = ((int)Loader.config_stream.Length - read);
+                            int r = 0;
+                            while (r < remain && remain > 0)
+                            {
+                                r = Loader.config_stream.Read(buf, read, remain);
+                                read += r;
+                                remain -= r;
+                            }
+                        }
+
+                        string str = Encoding.ASCII.GetString(buf);
+                        list = str.Split('\n');
+                        Load_Enabled_Plugins(list);
+
                     }
+
+                    Config.Set_Array<string>("ENABLED_PLUGINS", list);
+                    Config.Save();
                 }
 
-                string str = Encoding.ASCII.GetString(buf);
-                string[] en = str.Split('\n');
-                
-                Load_Enabled_Plugins(en);
+                if (Loader.config_stream != null)
+                {
+                    Loader.config_stream.Close();
+                    File.Delete(Get_CFG_File());
+                }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 DebugHud.Log(ex);
             }
         }
-
-        /// <summary>
-        /// This function serves two purposes.
-        /// 1) It loads our config data, which plugins th euser has enabled and whatnot.
-        /// 2) It aquires a file lock on the config file, so that even though the loaders entry site seems to be run simultaneously on multiple threads on start. Only one instance can end up getting the lock and all others will exit!
-        /// </summary>
+        
+        [Obsolete("Remove around v0.6.5")]
         public static bool Load_Config_Stream()
         {
             try
             {
-                FileStream stream = new FileStream(Get_CFG_File(), FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                if (stream == null) return false;
+                FileStream stream = new FileStream(Get_CFG_File(), FileMode.Open, FileAccess.ReadWrite);
+                //if (stream == null) return false;
 
                 Loader.config_stream = stream;
                 return true;
@@ -302,41 +322,17 @@ namespace SR_PluginLoader
 
             try
             {
-                if (config_stream == null)
-                {
-                    DebugHud.Log("CRITICAL ERROR: Config stream not loaded, loading now!");
-                    Load_Config_Stream();
-                }
                 if(plugins == null)
                 {
                     DebugHud.Log("CRITICAL ERROR: Active plugins list is null!");
                     return;
                 }
-
-                List<string> arr = new List<string>();
-                foreach (KeyValuePair<string, Plugin> kv in Loader.plugins)
-                {
-                    if (kv.Key == null) continue;
-                    if(kv.Value == null)
-                    {
-                        DebugHud.Log("NULL PLUGIN: {0}", kv.Key);
-                        continue;
-                    }
-
-                    if (kv.Value.enabled == true)
-                    {
-                        DebugHud.Log("Enabled plugin: {0}", kv.Key);
-                        arr.Add(kv.Key);
-                    }
-                }
-
-                byte[] buf = Encoding.ASCII.GetBytes(String.Join("\n", arr.ToArray()));
-
-                Loader.config_stream.SetLength(0);// erase all config file's contents
-                Loader.config_stream.Seek(0, SeekOrigin.Begin);// go back to the config file's beginning
-                Loader.config_stream.Write(buf, 0, (int)buf.Length);
-                Loader.config_stream.Flush();
                 
+                // Select the keynames of all non-null, enabled plugins from our dictionary.
+                List<string> list = Loader.plugins.Where(kv => (kv.Value != null && kv.Value.enabled)).Select(kv => kv.Key).ToList();
+
+                Config.Set_Array<string>("ENABLED_PLUGINS", list);
+                Config.Save();
             }
             catch (Exception ex)
             {

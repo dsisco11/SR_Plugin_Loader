@@ -230,9 +230,11 @@ namespace SR_PluginLoader
                 DebugHud.Log("Unable to find plugin via hash: {0}", this.selected);
                 return;
             }
-
+            /*
             string json_str = String.Format("\"{0}.{1}\": {{\n\t\t \"name\": \"{0}\",\n\t\t\t \"author\": \"{1}\",\n\t\t\t \"description\": \"{2}\",\n\t\t\t \"update_method\": \"{3}\",\n\t\t\t \"url\": \"{4}\"\n\t\t }}", pl.data.NAME, pl.data.AUTHOR, Util.JSON_Escape_String(pl.data.DESCRIPTION), Enum.GetName(typeof(UPDATER_TYPE), pl.data.UPDATE_METHOD.METHOD), pl.data.UPDATE_METHOD.URL);
             GUIUtility.systemCopyBuffer = json_str;//copy this text to the clipboard
+            */
+            GUIUtility.systemCopyBuffer = pl.data.ToJSON();
         }
         
         private void PluginManager_onShown(uiControl c)

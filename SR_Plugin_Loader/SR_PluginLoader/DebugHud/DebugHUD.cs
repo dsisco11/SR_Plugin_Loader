@@ -131,8 +131,9 @@ namespace SR_PluginLoader
             string str = null;
             try
             {
-                var trace = new StackTrace(ex, 1 + stack_offset, true);
-                str = String.Format("{0}\n{1}", ex.Message, trace.ToString());
+                //string trace = new StackTrace(ex, 1 + stack_offset, true).ToString();
+                string trace = StackTraceUtility.ExtractStringFromException(ex);
+                str = String.Format("{0}\n{1}", ex.Message, trace);
             }
             catch(Exception e)
             {

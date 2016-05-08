@@ -35,5 +35,17 @@ namespace SR_PluginLoader
                 AUTHOR = data["author"]
             };
         }
+
+        public string ToJSON()
+        {
+            SimpleJSON.JSONClass js = new SimpleJSON.JSONClass();
+            js["name"] = NAME;
+            js["author"] = AUTHOR;
+            js["description"] = DESCRIPTION;
+            js["update_method"] = Enum.GetName(typeof(UPDATER_TYPE), UPDATE_METHOD.METHOD);
+            js["url"] = UPDATE_METHOD.URL;
+            
+            return String.Concat("\"", NAME, ".", AUTHOR, "\"", ": ", js.ToString(), ",\n");
+        }
     }
 }

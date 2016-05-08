@@ -715,6 +715,10 @@ namespace SimpleJSON
             get { return m_Dict.Count; }
         }
  
+        public bool ContainsKey(string key)
+        {
+            return m_Dict.ContainsKey(key);
+        }
  
         public override void Add(string aKey, JSONNode aItem)
         {
