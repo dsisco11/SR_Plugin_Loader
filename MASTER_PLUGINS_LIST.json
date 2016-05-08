@@ -28,5 +28,7 @@
 			 "update_method": "GIT",
 			 "url": "https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SunnySmiles.dll"
 		 },
+		 "GardenMastery.Sisco++": {"name":"GardenMastery", "author":"Sisco++", "description":"Adds a new upgrade for garden plots that, when purchased, will place a seed bag next to the garden input terminal.\r\nFiring a plantable food item into the bag will cause it to be automatically planted in the garden when the current crop is finished!", "update_method":"GIT", "url":"https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/GardenMastery.dll"},
+
 	]
 }
