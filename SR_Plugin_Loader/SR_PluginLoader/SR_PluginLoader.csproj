@@ -63,6 +63,7 @@
     <Compile Include="Base\SettingsFile.cs" />
     <Compile Include="Helpers\Extensions\ColorExt.cs" />
     <Compile Include="Helpers\Extensions\TypeExt.cs" />
+    <Compile Include="Plugin_Static.cs" />
     <Compile Include="UI\Misc\SkinPresets.cs" />
     <Compile Include="UI\Base\uiIconButton.cs" />
     <Compile Include="UI\Enums\AutosizeMethod.cs" />

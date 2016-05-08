@@ -492,7 +492,7 @@ namespace SR_PluginLoader
                bool success = Loader.Add_Plugin_To_List(filename);
                if (success)
                {
-                   Plugin pl = Loader.Get_Plugin(plData.Hash);
+                   Plugin pl = Plugin.Get_Plugin(plData.Hash);
                    if (pl != null) pl.Enable();//enable the plugin by default, since they JUST installed it and all.
                    else throw new Exception("Cannot find and enable plugin: "+ plData.Name);
 

@@ -224,7 +224,7 @@ namespace SR_PluginLoader
 
         private void Btn_copy_json_onClicked(uiControl c)
         {
-            Plugin pl = Loader.Get_Plugin(this.selected);
+            Plugin pl = Plugin.Get_Plugin(this.selected);
             if (pl == null)
             {
                 DebugHud.Log("Unable to find plugin via hash: {0}", this.selected);
@@ -346,7 +346,7 @@ namespace SR_PluginLoader
 
         private Plugin GetPlugin()
         {
-            return Loader.Get_Plugin(this.selected);
+            return Plugin.Get_Plugin(this.selected);
         }
 
     }

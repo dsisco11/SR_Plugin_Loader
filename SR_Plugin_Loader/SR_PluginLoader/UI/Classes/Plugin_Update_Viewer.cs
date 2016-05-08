@@ -72,7 +72,7 @@ namespace SR_PluginLoader
                 Plugin_Update_Item itm = child as Plugin_Update_Item;
                 if(itm.isChecked)
                 {
-                    Plugin plugin = Loader.Get_Plugin(itm.plugin_hash);
+                    Plugin plugin = Plugin.Get_Plugin(itm.plugin_hash);
                     download_queue.Add(plugin);
                 }
             }

@@ -303,8 +303,10 @@ namespace SR_PluginLoader
         {
             try
             {
+                if (!File.Exists(Get_CFG_File())) return true;
+
                 FileStream stream = new FileStream(Get_CFG_File(), FileMode.Open, FileAccess.ReadWrite);
-                //if (stream == null) return false;
+                if (stream == null) return true;
 
                 Loader.config_stream = stream;
                 return true;
@@ -474,32 +476,7 @@ namespace SR_PluginLoader
             }
         }
         #endregion
-
-        public static bool Is_Plugin_Installed(Plugin_Data data)
-        {
-            return Is_Plugin_Installed(data.Hash);
-        }
-
-        public static bool Is_Plugin_Installed(string hash)
-        {
-            foreach (KeyValuePair<string, Plugin> kv in Loader.plugins)
-            {
-                if (kv.Value == null || kv.Value.data == null) { DebugHud.Log("[ERROR] @ Loader.Is_Plugin_Installed(): Value for KeyValuePair @ Key {0} is not a valid/loaded plugin!", kv.Key); }
-                else if (String.Compare(kv.Value.Hash, hash) == 0) return true;
-            }
-            return false;
-        }
-
-        public static Plugin Get_Plugin(string name_hash)
-        {
-            foreach (KeyValuePair<string, Plugin> kv in Loader.plugins)
-            {
-                if (String.Compare(kv.Value.Hash, name_hash) == 0) return kv.Value;
-            }
-
-            return null;
-        }
-        
+                
         private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
             //Return true if the server certificate is ok

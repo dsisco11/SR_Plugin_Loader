@@ -7,9 +7,7 @@ using UnityEngine;
 
 namespace SR_PluginLoader
 {
-    // TODO: plugin_selector status color doesn't update when the text does.
     // TODO: uiTextArea doesn't seems to ignore it's padding when rendering it's text.
-    // TODO: rewrite all methods using clamp_pos(Vector2) to use clamp_pos(ref float, ref float) instead for speed.
 
     public delegate void controlEvent<T>(T c) where T : uiControl;
     public delegate void parentEvent(uiPanel c);

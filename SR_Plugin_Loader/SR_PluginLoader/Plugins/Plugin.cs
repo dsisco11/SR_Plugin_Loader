@@ -10,7 +10,7 @@ using System.Collections;
 
 namespace SR_PluginLoader
 {
-    public class Plugin 
+    public partial class Plugin 
     {
         public Plugin_Data data = null;
         public string Hash { get { if (data==null) { throw new ArgumentNullException("Plugin DATA is NULL!"); } return data.Hash; } }
