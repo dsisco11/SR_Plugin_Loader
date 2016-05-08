@@ -411,7 +411,8 @@ namespace SR_PluginLoader
         {
             if (style == null) return;
 
-            var tex = Get_Gradient_Texture(pixels, dir, clr, clr * darken);
+            float a = clr.a;
+            var tex = Get_Gradient_Texture(pixels, dir, clr, (clr*darken).SetAlpha(a));
             style.background = tex;
         }
 
@@ -419,7 +420,8 @@ namespace SR_PluginLoader
         {
             if (style == null) return;
 
-            var tex = Get_Gradient_Texture(pixels, dir, clr, clr * darken, false, exp);
+            float a = clr.a;
+            var tex = Get_Gradient_Texture(pixels, dir, clr, (clr*darken).SetAlpha(a), false, exp);
             style.background = tex;
         }
 

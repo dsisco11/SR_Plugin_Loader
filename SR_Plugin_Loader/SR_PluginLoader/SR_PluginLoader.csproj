@@ -61,7 +61,7 @@
     <Compile Include="Base\SafeEnum.cs" />
     <Compile Include="Base\DDS_HEADER.cs" />
     <Compile Include="Base\SettingsFile.cs" />
-    <Compile Include="Helpers\ColorUtil.cs" />
+    <Compile Include="Helpers\Extensions\ColorExt.cs" />
     <Compile Include="UI\Misc\SkinPresets.cs" />
     <Compile Include="UI\Base\uiIconButton.cs" />
     <Compile Include="UI\Enums\AutosizeMethod.cs" />
@@ -83,7 +83,7 @@
     <Compile Include="Helpers\Game Interaction\Directors.cs" />
     <Compile Include="Helpers\Game Interaction\Sound.cs" />
     <Compile Include="Helpers\MonoBehaviour Scripts\ObjectFlags.cs" />
-    <Compile Include="Helpers\ResourceExt.cs" />
+    <Compile Include="Helpers\Extensions\ResourceExt.cs" />
     <Compile Include="Helpers\Game Interaction\Language.cs" />
     <Compile Include="Experiments\Misc_Experiments.cs" />
     <Compile Include="Helpers\Game Interaction\Ident.cs" />
@@ -209,6 +209,7 @@
     <Compile Include="Helpers\Game Interaction\ViewModel.cs" />
     <Compile Include="Base\Watermark_UI.cs" />
     <Compile Include="Base\Active_State_Tracker.cs" />
+    <Compile Include="Helpers\Extensions\VectorExt.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

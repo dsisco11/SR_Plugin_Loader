@@ -17,13 +17,13 @@ namespace SR_PluginLoader
         /// </summary>
         protected override Vector2 Get_Autosize(Vector2? starting_size = null)
         {
-            if (content == null || content.text == null || content.text.Length <= 0) return base.Get_Autosize(content_size_to_inner(new Vector2(0f, Style.lineHeight)));
+            if (content == null || content.text == null) return base.Get_Autosize(Vector2.zero);// if our Text is NULL then we "collapse" into a zero size.
+            if (string.IsNullOrEmpty(content.text)) return base.Get_Autosize(content_size_to_inner(new Vector2(0f, Style.lineHeight)));// if our Text is just empty then we only assume a 0 width.
             
             Vector2 csz = styleText.CalcSize(content);
-            Vector2 acsz = Padding.Add(new Rect(Vector2.zero, csz)).size;
-            return base.Get_Autosize(acsz);
-            
-            //return base.Get_Autosize(starting_size);
+            csz.y += Padding.vertical;
+            csz.x += Padding.horizontal;
+            return base.Get_Autosize(csz);
         }
 
         protected override void Display()

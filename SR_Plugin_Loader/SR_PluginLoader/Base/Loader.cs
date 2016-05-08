@@ -17,7 +17,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// The version for the loader itself
         /// </summary>
-        public static Plugin_Version VERSION = new Plugin_Version(0, 6, 0);
+        public static Plugin_Version VERSION = new Plugin_Version(0, 6, 1);
         
         public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", Loader.VERSION); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }

@@ -8,6 +8,15 @@ namespace SR_PluginLoader
     public static class ColorExt
     {
         /// <summary>
+        /// Sets the Alpha component for a color instance and returns the instance.
+        /// </summary>
+        public static Color SetAlpha(this Color c, float a)
+        {
+            c.a = a;
+            return c;
+        }
+
+        /// <summary>
         /// Adds an ammount to the RGB components of a <see cref="UnityEngine.Color"/> object
         /// </summary>
         public static Color Add(this Color clr, float v)

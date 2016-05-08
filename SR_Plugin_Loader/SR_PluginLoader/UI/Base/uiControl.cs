@@ -9,6 +9,7 @@ namespace SR_PluginLoader
 {
     // TODO: plugin_selector status color doesn't update when the text does.
     // TODO: uiTextArea doesn't seems to ignore it's padding when rendering it's text.
+    // TODO: rewrite all methods using clamp_pos(Vector2) to use clamp_pos(ref float, ref float) instead for speed.
 
     public delegate void controlEvent<T>(T c) where T : uiControl;
     public delegate void parentEvent(uiPanel c);
@@ -97,7 +98,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Only controls where isClickable returns true will perform handling for mouse events
         /// </summary>
-        protected bool isClickable { get { return ((type == uiControlType.Button || type == uiControlType.Checkbox || type == uiControlType.Textbox || type == uiControlType.TextArea || type == uiControlType.Panel || type == uiControlType.Panel_Dark || type == uiControlType.Window) && onClicked != null); } }
+        protected bool isClickable { get { return ((type == uiControlType.Button || type == uiControlType.Checkbox || type == uiControlType.Textbox || type == uiControlType.TextArea || type == uiControlType.Panel || type == uiControlType.Panel_Dark || type == uiControlType.Window) || onClicked != null); } }
         /// <summary>
         /// Can the user click and drag this control?
         /// </summary>
@@ -138,15 +139,39 @@ namespace SR_PluginLoader
         /// </summary>
         public bool Active { get { return _active; } set { bool was_active = _active; _active = value; update_area(); if (_active != was_active && _active) { onSelected?.Invoke(this); } } }
 
+        // This whole "Selectable" business is normally for things that go into ListView type controls where the user makes selections from the list
+        public bool Selected { get { return Active; } set { Active = value; } }
+        public bool Selectable { get { return _selectable; } set { _selectable = value; if (!value) { Selected = false; } } }
+        protected bool _selectable = false;
+
         /// <summary>
-        /// Should this control be rendered?
+        /// Should this control take up space and be visible? This property ties itself to the <see cref="isVisible"/> property and will "bump" it's value to cause it to reevaluate itself whenever this property changes.
+        /// </summary>
+        public virtual bool isDisplayed {
+            get
+            {
+                /* if (isChild) {
+                    if (!_parent_displayed.HasValue) _parent_displayed = parent.isDisplayed;
+                    return (_parent_displayed.Value && _displayed);
+                } */
+                return _displayed;
+            }
+            set {
+                _displayed = value;
+                //isVisible = _visible;// We don;t need this, the isVisible function already checks US instead.(each frame)
+            }
+        }
+        private bool _displayed = true;
+        private bool? _parent_displayed = null;
+
+        /// <summary>
+        /// Should this control be rendered? (Note: the control will still take up space even if this is false, to cause a control to no longer occupy an area set <see cref="isDisplayed"/> to FALSE)
         /// </summary>
         public virtual bool isVisible {
             get {
+                if (!isDisplayed) return false;// if we are not currently displayed, we are not visible either.
                 if (isChild) {
-                    if (!_parent_visible.HasValue) {
-                        _parent_visible = parent.isVisible;
-                    }
+                    if (!_parent_visible.HasValue) _parent_visible = parent.isVisible;
                     return (_parent_visible.Value && _visible);
                 }
                 return _visible;
@@ -312,7 +337,8 @@ namespace SR_PluginLoader
         public bool Autosize { get { return (_autosize && _autosizing_supported); } set { _autosize = value; update_area(); } }
         private bool _autosize = true;//this is the value which is explicitly set by the user, if the control should defy it's default nature and always stick to autosizing then the user indirectly set's this to TRUE.
         /// <summary>
-        /// This is set by a control internally to determine if it CAN support autosizing.
+        /// This is set by a control internally to determine if it SHOULD support autosizing.
+        /// EG: Used by collapsable controls to ensure they maintain a zero size when collapsed.
         /// </summary>
         protected bool _autosizing_supported = true;
         /// <summary>
@@ -322,8 +348,9 @@ namespace SR_PluginLoader
         /// <summary>
         /// Returns the controls size with autosizing calculated for width or height or both depending on which of them should affect the controls size.
         /// </summary>
-        protected Vector2 size_auto { get { if (has_explicit_W && has_explicit_H) { return area.size; }  var sz = Get_Autosize(); if (has_explicit_W) { sz.x = area.width; } if (has_explicit_H) { sz.y = area.height; } return sz; } }
-        
+        protected Vector2 size_auto { get { if (has_explicit_W && has_explicit_H) { return Area.size; } var sz = Get_Autosize(); if (has_explicit_W) { sz.x = Area.width; } if (has_explicit_H) { sz.y = Area.height; } return sz; } }
+        //protected Vector2 size_auto { get { if (has_explicit_W && has_explicit_H) { return set_area.size; } var sz = Get_Autosize(); if (has_explicit_W) { sz.x = set_area.width; } if (has_explicit_H) { sz.y = set_area.height; } return sz; } }
+
         private bool has_explicit_W = false;// Tracks whether the control has had an explicit width set
         private bool has_explicit_H = false;// Tracks whether the control has had an explicit height set
 
@@ -355,7 +382,7 @@ namespace SR_PluginLoader
         /// </summary>
         protected virtual Rect inner_area { get { return _inner_area; } }
         protected Rect _inner_area = new Rect();
-
+        
         /// <summary>
         /// The area this control will draw its background within
         /// </summary>
@@ -367,22 +394,22 @@ namespace SR_PluginLoader
         protected Rect border_area = new Rect();
 
         /// <summary>
-        /// This control's position within whatever other control may contain it.
-        /// This is the area a control is intended to occupy.
-        /// When drawing the control use "draw_area" as the intended area is altered by padding and margin values.
+        /// The control's visible area
+        /// (Note: when drawing the control use "draw_area" as the intended area is altered by padding and margin values)
         /// </summary>
-        public Rect area { get { if (cached_area.HasValue) { return cached_area.Value; } return _area; } set { cached_area = null; if (_area == null) { _area = value; } else { _area.Set(value.x, value.y, value.width, value.height); } update_area(); } }
-        private Rect? cached_area = null;
+        public Rect Area { get { if (area.HasValue) { return area.Value; } return set_area; } set { area = null; set_area = value; update_area(); } }
+
+
+        private Rect? area = null;// This is the "Area" propertys proxy value.
         /// <summary>
         /// This is the field that stores the position this control was SET to occupy and the size that was SET explicitly for it
-        /// If no size was explicitly set then it's size values will always be -1
         /// </summary>
-        protected Rect _area = new Rect(0, 0, -1, -1);
+        private Rect set_area = new Rect(0, 0, 0, 0);
 
         /// <summary>
         /// The absolute area this control occupies on screen.
         /// </summary>
-        public Rect absArea { get { if (!_absArea.HasValue) { _absArea = new Rect(area.position + parentPosInner - parentScroll, area.size); } return _absArea.Value; } set { _absArea = null; } }
+        public Rect absArea { get { if (!_absArea.HasValue) { _absArea = new Rect(Area.position + parentPosInner - parentScroll, Area.size); } return _absArea.Value; } set { _absArea = null; } }
         private Rect? _absArea = null;
 
         /// <summary>
@@ -404,14 +431,14 @@ namespace SR_PluginLoader
         public Vector2 absPos { get { return absArea.position; } }
 
         /// <summary>
-        /// The (relative) position of this control.
+        /// The (relative) visible position of this control. Shortcut for <see cref="Area.position"/>
         /// </summary>
-        public virtual Vector2 pos { get { return this.area.position; } }
+        public Vector2 Pos { get { return Area.position; } }
 
         /// <summary>
         /// The position of this control as set by the user, or the auto positioning system.
         /// </summary>
-        public virtual Vector2 _pos { get { return this._area.position; } }
+        public virtual Vector2 _pos { get { return set_area.position; } }
 
         private ControlPositioner vertical_positioner = null;
         private ControlPositioner horizontal_positioner = null;
@@ -420,20 +447,35 @@ namespace SR_PluginLoader
         #region Size
 
         /// <summary>
-        /// The final size of this control.
+        /// The unconstrained size which this control should currently be BEFORE adding margin, padding, or border offsets.
+        /// When the controls Area is updated it's size will be set to this value and constrained to be within the controls set min/max size values.
         /// </summary>
-        public virtual Vector2 size { get { if (Autosize) { return size_auto; } if (cached_area.HasValue) { return cached_area.Value.size; } return this._area.size; } }
+        protected virtual Vector2 size { get { if (!isDisplayed) { return Vector2.zero; } if (Autosize) { return size_auto; } return set_area.size; } }
+        //protected virtual Vector2 size { get { if (!isDisplayed) { return Vector2.zero; } if (Autosize) { return size_auto; } if (area.HasValue) { return area.Value.size; } return set_area.size; } }
 
         /// <summary>
         /// The base size of this control without padding, border, or margins accounted for.
         /// </summary>
-        public Vector2 _size { get { return this._area.size; } set { _area.size = value; update_area(); } }
+        public Vector2 _size { get { return set_area.size; } set { set_area.size = value; update_area(); } }
 
-        public float? Min_Width;
-        public float? Min_Height;
+        /// <summary>
+        /// Minimum Width this control can be.
+        /// </summary>
+        public float? Min_Width = null;
+        /// <summary>
+        /// Minimum Height this control can be.
+        /// </summary>
+        public float? Min_Height = null;
 
-        public float? Max_Width;
-        public float? Max_Height;
+
+        /// <summary>
+        /// Maximum Width this control can be.
+        /// </summary>
+        public float? Max_Width = null;
+        /// <summary>
+        /// Maximum Height this control can be.
+        /// </summary>
+        public float? Max_Height = null;
 
         /// <summary>
         /// Handles adjustments to the controls width if it's size was assigned a dynamic value, <see cref="FloodX(float)"/>
@@ -637,7 +679,7 @@ namespace SR_PluginLoader
 
                 if (lock_area_update)
                 {
-                    if (cached_area != null && !_area.Compare(_last_area_value.Value))
+                    if (area.HasValue && !set_area.Compare(_last_area_value.Value))
                     {
                         dirty_area = true;// fire the update_area() function again next frame.
                     }
@@ -661,33 +703,32 @@ namespace SR_PluginLoader
                 _potential_area_max_cached = null;// Yeah regen this one too.
                 _last_cached_area = null;
 
-                if (cached_area.HasValue) _last_cached_area = cached_area.Value;
-                cached_area = null;// we *WANT* to set the cached value to null here so when we call this.size we don't get the previously cached value stored there, otherwise the size would never change after we explicitly set it.
+                if (area.HasValue) _last_cached_area = area.Value;// Track what the area WAS so we can tell when it updates and only trigger extra logic when it's needed.
                 
+                Vector2 nowpos = set_area.position;
+                Vector2 nowsize = constrain_size(size);
 
-                // If we are autosizing then go ahead and set the current autosize value.
-                if (Autosize) _area = new Rect(_area.position, size_auto);
-                cached_area = new Rect(_area.position, constrain_size(size));
+                area = null;// For SOME REASON Rect.Set(x,y, w,h) doesn't seem to actually change it's values. so we have to trash memory a bit and create a new Rect anytime we wanna get something done.
+                area = new Rect(nowpos, nowsize);
+                // update our visible area
+                /*
+                if (!area.HasValue) area = new Rect(nowpos, nowsize);
+                else area.Value.Set(nowpos.x, nowpos.y, nowsize.x, nowsize.y);
+                */
 
                 bool area_updated = false;
                 if (force) area_updated = true;
 
-                if (!_last_cached_area.HasValue || !cached_area.Value.Compare(_last_cached_area.Value))
+                if (!_last_cached_area.HasValue || !area.Value.Compare(_last_cached_area.Value))
                 {
                     area_updated = true;
                     Vector2 old_size = Vector2.zero;
                     if (_last_cached_area.HasValue) old_size = _last_cached_area.Value.size;
-                    if (CONFIRM_SIZE && _last_cached_area.HasValue && cached_area.Value.size != old_size) DebugHud.Log("{0}  Confirm Size  |  Size Changed  |  new size: {1} | old size: {2}", this, cached_area.Value.size, old_size);
+                    if (CONFIRM_SIZE && _last_cached_area.HasValue && area.Value.size != old_size) DebugHud.Log("{0}  Confirm Size  |  Size Changed  |  new size: {1} | old size: {2}", this, area.Value.size, old_size);
                 }
-                _last_area_value = _area;
-
-                /*
-                border_area = _margin.Remove(cached_area.Value);
-                draw_area = borderStyle.size.Remove(border_area);
-                _inner_area = outter_area_to_inner(cached_area.Value);
-                */
-                
-                border_area = _margin.Remove(cached_area.Value);// The area where our BORDERS will be drawn, it is the position and size we were given - our MARGINS.
+                _last_area_value = set_area;
+                                
+                border_area = _margin.Remove(area.Value);// The area where our BORDERS will be drawn, it is the position and size we were given - our MARGINS.
                 draw_area = borderStyle.size.Remove(border_area);// The area where our BACKGROUND will be drawn, it is the position and size we were given - our MARGINS - BORDER size.
                 _inner_area = _padding.Remove(draw_area);// The area where our CONTENT will be drawn, it is the position and size we were given - our MARGINS - BORDER size - PADDING.
 
@@ -700,13 +741,13 @@ namespace SR_PluginLoader
                 }
                 _last_inner_area = _inner_area;
 
-                if (CONFIRM_MARGIN) DebugHud.Log("{0}  Confirm Margins  |  Area without margins {1}  | Area with margins {2}", this, cached_area.Value, border_area);
+                if (CONFIRM_MARGIN) DebugHud.Log("{0}  Confirm Margins  |  Area without margins {1}  | Area with margins {2}", this, area.Value, border_area);
                 if (CONFIRM_BORDER) DebugHud.Log("{0}  Confirm Borders  |  Area without borders {1}  | Area with borders {2}", this, border_area, draw_area);
                 if (CONFIRM_PADDING) DebugHud.Log("{0}  Confirm Padding  |  Area without padding {1}  | Area with padding {2}", this, draw_area, _inner_area);
 
                 if (CONFIRM_AREA)
                 {
-                    DebugHud.Log("{0}  Confirm Area Update  | _Area {1} | inner_area: {2} | border: {3} | draw: {4}", this, _area, inner_area, border_area, draw_area);
+                    DebugHud.Log("{0}  Confirm Area Update  | _Area {1} | inner_area: {2} | border: {3} | draw: {4}", this, set_area, inner_area, border_area, draw_area);
                     //DebugHud.Log("TRACE: {0}", new StackFrame(1).ToString());
                     //DebugHud.Log("{0}", new StackTrace().ToString());
                 }
@@ -748,6 +789,19 @@ namespace SR_PluginLoader
         {
             _absArea = null;// Cause our absolute area to be recalculated.
             _absInnerArea = null;// Cause our absolute inner area to be recalculated.
+        }
+
+        /// <summary>
+        /// This should *ONLY* be used internally by <see cref="uiControl"/>.
+        /// This function will alter the set_area value (without wasting memory or creating a new <see cref="Rect"/> instance)
+        /// To alter the Size or Position of a <see cref="uiControl"/> from outside the class itself use the provided sizing and positioning functions below
+        /// </summary>
+        private void _alter_area(float nx, float ny, Vector2 newsize)
+        {
+            area = null;// I forget why, but if we don't set this to null here we get an infinite loop that stack overflows immediately on program start.
+            set_area.Set(nx, ny, newsize.x, newsize.y);// Set the new area values
+            //set_area = new Rect(nx, ny, newsize.x, newsize.y);
+            update_area();// Finalize our changes
         }
         #endregion
 
@@ -792,7 +846,7 @@ namespace SR_PluginLoader
         /// <returns></returns>
         protected Vector2 internalToAbsolutePos(Vector2 p)
         {
-            return (p + absArea.position - area.position);
+            return (p + absArea.position - Area.position);
         }
 
         /// <summary>
@@ -830,8 +884,8 @@ namespace SR_PluginLoader
         /// </summary>
         protected Vector2 content_size_to_inner(Vector2 content_size)
         {
-            return content_size;
-            //return _padding.Add(new Rect(Vector2.zero, content_size)).size;
+            //return content_size;
+            return _padding.Add(new Rect(Vector2.zero, content_size)).size;
         }
 
         /// <summary>
@@ -937,27 +991,29 @@ namespace SR_PluginLoader
             }
         }
 
-        public void parent_visibility_updated() { _parent_visible = null; isVisible = _visible;/*Refresh the value*/ }
+        public void parent_visibility_updated() { _parent_visible = null; isDisplayed = _displayed;/*Refresh the value*/ }
 
         public void parent_enable_updated() { _parent_disabled = null; isDisabled = _disabled;/*Refresh the value*/ }
 
         #endregion
 
         #region Position
-
+        
         /// <summary>
         /// Updates the controls position to match a given position if it's not equal to the current position.
         /// All coordinates are restricted such that they are above 0.
         /// </summary>
-        protected bool maybeUpdate_Pos(Vector2 new_pos)
+        protected bool maybeUpdate_Pos(float x, float y)
         {
-            if (new_pos.x < 0f) new_pos.x = 0;
-            if (new_pos.y < 0f) new_pos.y = 0;
+            if (x < 0f) x = 0;
+            if (y < 0f) y = 0;
 
-            if (!Util.floatEq(_area.position.x, new_pos.x) || !Util.floatEq(_area.position.y, new_pos.y))
+            if (!Util.floatEq(set_area.position.x, x) || !Util.floatEq(set_area.position.y, y))
             {
-                if (CONFIRM_POS) DebugHud.Log("{0}  Pos Changed | pos {1} | new_pos {2}", this, area.position, new_pos);
-                area = new Rect(new_pos, size);
+                if (CONFIRM_POS) DebugHud.Log("{0}  Pos Changed | pos {1} | new_pos ({2}, {3})", this, set_area.position, x, y);
+                _alter_area(x, y, size);
+                //_alter_area(newpos, set_area.size);
+                //Area = new Rect(newpos, size);
                 return true;
             }
 
@@ -967,10 +1023,17 @@ namespace SR_PluginLoader
         /// <summary>
         /// Clamps a vector's coordinates so they are never below zero.
         /// </summary>
+        protected void clamp_pos(ref float x, ref float y)
+        {
+            if (x < 0) x = 0f;
+            if (y < 0) y = 0f;
+        }
+
+        [Obsolete("Use clamp_pos(ref float, ref float) instead!")]
         protected Vector2 clamp_pos(Vector2 v)
         {
-            if (v.x < 0) v.x = 0;
-            if (v.y < 0) v.y = 0;
+            if (v.x < 0) v.x = 0f;
+            if (v.y < 0) v.y = 0f;
             return v;
         }
 
@@ -994,35 +1057,34 @@ namespace SR_PluginLoader
         
         public void Set_Pos(float x, float y)
         {
-            maybeUpdate_Pos(new Vector2(x, y));
+            maybeUpdate_Pos(x, y);
             //area = new Rect(new Vector2(x, y), _area.size);
         }
 
         public void Set_Pos(Vector2 pos)
         {
-            maybeUpdate_Pos(pos);
+            maybeUpdate_Pos(pos.x, pos.y);
             //area = new Rect(pos, _area.size);
         }
 
         public void Set_PosX(float x)
         {
-            maybeUpdate_Pos(new Vector2(x, this._area.y));
+            maybeUpdate_Pos(x, set_area.y);
             //area = new Rect(new Vector2(x, this._area.y), _area.size);
         }
 
         public void Set_PosY(float y)
         {
-            maybeUpdate_Pos(new Vector2(this._area.x, y));
+            maybeUpdate_Pos(set_area.x, y);
             //area = new Rect(new Vector2(this._area.x, y), _area.size);
         }
         
         public void moveBelow(uiControl targ, float yOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
-
-            maybeUpdate_Pos(new Vector2(area.x, targ.area.yMax + yOff));
-            //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.BELOW)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.BELOW);
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
+            
+            maybeUpdate_Pos(Area.x, targ.Area.yMax + yOff);
         }
 
         /// <summary>
@@ -1030,19 +1092,18 @@ namespace SR_PluginLoader
         /// </summary>
         public void moveAbove(uiControl targ, float yOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
 
-            maybeUpdate_Pos(new Vector2(area.position.x, targ.area.yMin - size.y - yOff));
-            //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.ABOVE)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.ABOVE);
+            maybeUpdate_Pos(Area.position.x, targ.Area.yMin - size.y - yOff);
         }
 
         public void moveRightOf(uiControl targ, float xOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
 
-            maybeUpdate_Pos(new Vector2(targ.area.xMax + xOff, area.position.y));
+            maybeUpdate_Pos(targ.Area.xMax + xOff, Area.position.y);
             //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.RIGHT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.RIGHT);
         }
 
@@ -1051,10 +1112,10 @@ namespace SR_PluginLoader
         /// </summary>
         public void moveLeftOf(uiControl targ, float xOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
 
-            maybeUpdate_Pos(new Vector2(targ.area.xMin - size.x - xOff, area.y));
+            maybeUpdate_Pos(targ.Area.xMin - size.x - xOff, Area.y);
             //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.LEFT);
         }
         
@@ -1063,10 +1124,10 @@ namespace SR_PluginLoader
         /// </summary>
         public void sitAbove(uiControl targ, float yOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
 
-            maybeUpdate_Pos(new Vector2(targ.area.xMin, targ.area.yMin - area.height - yOff));
+            maybeUpdate_Pos(targ.Area.xMin, targ.Area.yMin - Area.height - yOff);
             horizontal_positioner = null;
             //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.ABOVE)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_ABOVE);
         }
@@ -1076,10 +1137,10 @@ namespace SR_PluginLoader
         /// </summary>
         public void sitBelow(uiControl targ, float yOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
 
-            maybeUpdate_Pos(new Vector2(targ.area.xMin, targ.area.yMax + yOff));
+            maybeUpdate_Pos(targ.Area.xMin, targ.Area.yMax + yOff);
             horizontal_positioner = null;
             //if (vertical_positioner == null || !vertical_positioner.Equals(targ, yOff, cPosDir.BELOW)) vertical_positioner = new ControlPositioner(targ, yOff, cPosDir.SIT_BELOW);
         }
@@ -1090,10 +1151,10 @@ namespace SR_PluginLoader
         /// </summary>
         public void sitRightOf(uiControl targ, float xOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
 
-            maybeUpdate_Pos(new Vector2(targ.area.xMax + xOff, targ.area.yMin));
+            maybeUpdate_Pos(targ.Area.xMax + xOff, targ.Area.yMin);
             vertical_positioner = null;
             //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.RIGHT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_RIGHT_OF);
         }
@@ -1103,50 +1164,68 @@ namespace SR_PluginLoader
         /// </summary>
         public void sitLeftOf(uiControl targ, float xOff = 0f)
         {
-            if (targ == null) throw new ArgumentNullException(this.Name + " target cannot be NULL!");
-            if (targ.parent != parent) throw new ArgumentException(this.Name + " target control must be parented to the same control!");
+            if (targ == null) throw new ArgumentNullException(Name + " target cannot be NULL!");
+            if (targ.parent != parent) throw new ArgumentException(Name + " target control must be parented to the same control!");
 
-            maybeUpdate_Pos(new Vector2(targ.area.xMin - area.width - xOff, targ.area.position.y));
+            maybeUpdate_Pos(targ.Area.xMin - Area.width - xOff, targ.Area.position.y);
             vertical_positioner = null;
             //if (horizontal_positioner == null || !horizontal_positioner.Equals(targ, xOff, cPosDir.LEFT)) horizontal_positioner = new ControlPositioner(targ, xOff, cPosDir.SIT_LEFT_OF);
         }
-        
+
+        /// <summary>
+        /// Repositions the control so it's top edge sits on it's parent's top edge.
+        /// </summary>
+        /// <param name="yOff">Offset from the edge where we will be positioned</param>
         public void alignTop(float yOff = 0f)
         {
-            Vector2 offset = clamp_pos(new Vector2(area.position.x, yOff));
-            maybeUpdate_Pos(offset);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            float x = Area.position.x;
+            float y = yOff;
+            clamp_pos(ref x, ref y);
+            maybeUpdate_Pos(x, y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
             if (vertical_positioner == null || !vertical_positioner.Equals(null, yOff, cPosDir.TOP_OF)) vertical_positioner = new ControlPositioner(null, yOff, cPosDir.TOP_OF);
         }
 
+        /// <summary>
+        /// Repositions the control so it's bottom edge sits on it's parent's bottom edge.
+        /// </summary>
+        /// <param name="yOff">Offset from the edge where we will be positioned</param>
         public void alignBottom(float yOff = 0f)
         {
             float val = Screen.height;
             if (isChild) val = parent.Get_Content_Area().height;// parent.inner_area.height;
 
-            Vector2 offset = clamp_pos(new Vector2(area.x, val - size.y - yOff));// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
-            if (CONFIRM_POSITIONER) DebugHud.Log("{0}  Confirm Positioner  |  align bottom  |  offset: {1}  |  val: {2}  |  area: {3}  |  size: {4}", this, offset, val, area, size);
+            Vector2 offset = clamp_pos(new Vector2(Area.x, val - size.y - yOff));// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            if (CONFIRM_POSITIONER) DebugHud.Log("{0}  Confirm Positioner  |  align bottom  |  offset: {1}  |  val: {2}  |  area: {3}  |  size: {4}", this, offset, val, Area, size);
 
-            maybeUpdate_Pos(offset);
+            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (vertical_positioner == null || !vertical_positioner.Equals(null, yOff, cPosDir.BOTTOM_OF)) vertical_positioner = new ControlPositioner(null, yOff, cPosDir.BOTTOM_OF);
         }
 
+        /// <summary>
+        /// Repositions the control so it's left edge sits on it's parent's left edge.
+        /// </summary>
+        /// <param name="xOff">Offset from the edge where we will be positioned</param>
         public void alignLeftSide(float xOff = 0f)
         {
-            Vector2 offset = clamp_pos(new Vector2(xOff, area.position.y));
-            maybeUpdate_Pos(offset);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            Vector2 offset = clamp_pos(new Vector2(xOff, Area.position.y));
+            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (horizontal_positioner == null || !horizontal_positioner.Equals(null, xOff, cPosDir.LEFT_SIDE_OF)) horizontal_positioner = new ControlPositioner(null, xOff, cPosDir.LEFT_SIDE_OF);
         }
 
+        /// <summary>
+        /// Repositions the control so it's right edge sits on it's parent's right edge.
+        /// </summary>
+        /// <param name="xOff">Offset from the edge where we will be positioned</param>
         public void alignRightSide(float xOff = 0f)
         {
             float val = Screen.width;
             if(isChild) val = parent.Get_Content_Area().width;
 
-            Vector2 offset = clamp_pos(new Vector2(val - size.x - xOff, area.position.y));
-            maybeUpdate_Pos(offset);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            Vector2 offset = clamp_pos(new Vector2(val - size.x - xOff, Area.position.y));
+            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (horizontal_positioner == null || !horizontal_positioner.Equals(null, xOff, cPosDir.RIGHT_SIDE_OF)) horizontal_positioner = new ControlPositioner(null, xOff, cPosDir.RIGHT_SIDE_OF);
@@ -1161,8 +1240,8 @@ namespace SR_PluginLoader
             float val = Screen.height;
             if (isChild) val = parent.Get_Content_Area().height;
 
-            Vector2 offset = clamp_pos(new Vector2(area.position.x, (val / 2) - (size.y / 2) - yOff));
-            maybeUpdate_Pos(offset);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            Vector2 offset = clamp_pos(new Vector2(Area.position.x, (val / 2) - (size.y / 2) - yOff));
+            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (vertical_positioner == null || !vertical_positioner.Equals(null, 0f, cPosDir.CENTER_Y)) vertical_positioner = new ControlPositioner(null, 0f, cPosDir.CENTER_Y);
@@ -1177,8 +1256,8 @@ namespace SR_PluginLoader
             float val = Screen.width;
             if (isChild) val = parent.Get_Content_Area().width;
 
-            Vector2 offset = clamp_pos(new Vector2((val / 2) - (size.x / 2) - xOff, area.position.y));
-            maybeUpdate_Pos(offset);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
+            Vector2 offset = clamp_pos(new Vector2((val / 2) - (size.x / 2) - xOff, Area.position.y));
+            maybeUpdate_Pos(offset.x, offset.y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
             if (isChild) return;
             else if (horizontal_positioner == null || !horizontal_positioner.Equals(null, 0f, cPosDir.CENTER_X)) horizontal_positioner = new ControlPositioner(null, 0f, cPosDir.CENTER_X);
@@ -1202,14 +1281,20 @@ namespace SR_PluginLoader
                 Vector2 csz = styleText.CalcSize(content);
                 if(isChild)
                 {
-                    // Constrain our content width to the parents bounds
-                    Vector2 cosz = inner_size_to_outter(content_size_to_inner(csz));// content outter size
-                    Vector2 cpsz = parent.constrain_size(cosz);// content parent constrained size
-                    csz = outter_size_to_inner(cpsz);
+                    if (isSizeConstrained)
+                    {
+                        // Constrain our content width to the parents bounds
+                        Vector2 cosz = inner_size_to_outter(content_size_to_inner(csz));// content outter size
+                        Vector2 cpsz = parent.Constrain_Child_Size(this, cosz);// content parent constrained size
+                        csz = outter_size_to_inner(cpsz);
 
-                    float h = styleText.CalcHeight(content, csz.x - _padding.horizontal);
-                    //if (type == uiControlType.TextArea) DebugHud.Log("{0}  Autosize  |  Content Height: {1}  |  Height(unwrapped): {2}", this, h, csz.y);
-                    csz.y = h;
+                        if (styleText.wordWrap)
+                        {
+                            float h = styleText.CalcHeight(content, csz.x - _padding.horizontal);
+                            //if (type == uiControlType.TextArea) DebugHud.Log("{0}  Autosize  |  Content Height: {1}  |  Height(unwrapped): {2}", this, h, csz.y);
+                            csz.y = h;
+                        }
+                    }
                 }
                 sz = inner_size_to_outter(content_size_to_inner(csz));
             }
@@ -1219,27 +1304,27 @@ namespace SR_PluginLoader
             {
                 case AutosizeMethod.ICON_FILL:// Expand to fill the remaining space within the parent's X axis
                     if (isChild)
-                        sz.y = (parent.Get_Content_Area().height - area.y);
+                        sz.y = (parent.Get_Content_Area().height - Area.y);
                     else
-                        sz.y = (Screen.height - area.y);
+                        sz.y = (Screen.height - Area.y);
 
                     sz.x = sz.y;
                     break;
                 case AutosizeMethod.FILL:// Expand to fill the remaining space within the parent's X axis
                     if (isChild)
                     {
-                        sz.x = (parent.Get_Content_Area().width - area.x);
-                        sz.y = (parent.Get_Content_Area().height - area.y);
+                        sz.x = (parent.Get_Content_Area().width - Area.x);
+                        sz.y = (parent.Get_Content_Area().height - Area.y);
                     }
                     else
                     {
-                        sz.x = (Screen.width - area.x);
-                        sz.y = (Screen.height - area.y);
+                        sz.x = (Screen.width - Area.x);
+                        sz.y = (Screen.height - Area.y);
                     }
                     break;
                 case AutosizeMethod.BLOCK:// Expand to fill the remaining space within the parent's X axis
-                    if (isChild) sz.x = (parent.Get_Content_Area().width - area.x);
-                    else sz.x = (Screen.width - area.x);
+                    if (isChild) sz.x = (parent.Get_Content_Area().width - Area.x);
+                    else sz.x = (Screen.width - Area.x);
                     break;
                 case AutosizeMethod.GROW:// Treat the user-specified size as the MINIMUM size we can be.
                     if (sz.x < _size.x) sz.x = _size.x;
@@ -1273,13 +1358,14 @@ namespace SR_PluginLoader
 
         #region Size
 
-        protected bool maybeUpdate_Size(Vector2 new_size)
+        protected bool maybeUpdate_Size(Vector2 newsize)
         {
             // Check if the size that was SET for the control matches the new size we WANT to set.
-            if (!Util.floatEq(_area.width, new_size.x) || !Util.floatEq(_area.height, new_size.y))
+            if (!Util.floatEq(set_area.width, newsize.x) || !Util.floatEq(set_area.height, newsize.y))
             {
-                if (CONFIRM_SIZE) DebugHud.Log("{0}  Size Changed | size {1} | new_size {2}", this, _area.size, new_size);
-                area = new Rect(_area.position, new_size);
+                if (CONFIRM_SIZE) DebugHud.Log("{0}  Size Changed | size {1} | new_size {2}", this, set_area.size, newsize);
+                _alter_area(set_area.position.x, set_area.position.y, newsize);
+                //Area = new Rect(set_area.position, newsize);
                 return true;
             }
 
@@ -1308,9 +1394,10 @@ namespace SR_PluginLoader
             if (isChild)
             {
                 Vector2 sz = parent.available_area;
-                //Vector2 sz = parent._size;
-                Vector2 parent_max_inner_size = parent.outter_size_to_inner(sz);
-                sz = constrain_size(parent_max_inner_size);
+                sz = parent.outter_size_to_inner(sz);
+                if (Max_Width.HasValue && sz.x > Max_Width.Value) sz.x = Max_Width.Value;
+                if (Max_Height.HasValue && sz.y > Max_Height.Value) sz.y = Max_Height.Value;
+
                 // Update the cached value!
                 _potential_area_max_cached = sz;
                 return sz;
@@ -1321,8 +1408,21 @@ namespace SR_PluginLoader
             return _potential_area_max_cached.Value;
         }
 
-        public float Get_Width() { return area.width; }
-        public float Get_Height() { return area.height; }
+        /// <summary>
+        /// Returns the current area size of the control. 
+        /// </summary>
+        public Vector2 Get_Size() { return Area.size; }
+
+        /// <summary>
+        /// Returns the current area width of the control. 
+        /// </summary>
+        public float Get_Width() { return Area.width; }
+
+        /// <summary>
+        /// Returns the current area height of the control. 
+        /// </summary>
+        public float Get_Height() { return Area.height; }
+        
 
         public void Set_Size(float w, float h)
         {
@@ -1343,13 +1443,13 @@ namespace SR_PluginLoader
         public void Set_Width(float val)
         {
             has_explicit_W = true;
-            area = new Rect(_area.position, new Vector2(val, _area.size.y));
+            Area = new Rect(set_area.position, new Vector2(val, set_area.size.y));
         }
 
         public void Set_Height(float val)
         {
             has_explicit_H = true;
-            area = new Rect(_area.position, new Vector2(_area.size.x, val));
+            Area = new Rect(set_area.position, new Vector2(set_area.size.x, val));
         }
 
         /// <summary>
@@ -1359,7 +1459,7 @@ namespace SR_PluginLoader
         {
             has_explicit_W = false;
             has_explicit_H = false;
-            area = new Rect(_area.position, size);
+            Area = new Rect(set_area.position, size);
         }
 
         /// <summary>
@@ -1368,7 +1468,7 @@ namespace SR_PluginLoader
         public void Unset_Width()
         {
             has_explicit_W = false;
-            area = new Rect(_area.position, new Vector2(size.x, _area.size.y));
+            Area = new Rect(set_area.position, new Vector2(size.x, set_area.size.y));
         }
 
         /// <summary>
@@ -1377,7 +1477,7 @@ namespace SR_PluginLoader
         public void Unset_Height()
         {
             has_explicit_H = false;
-            area = new Rect(_area.position, new Vector2(_area.size.x, size.y));
+            Area = new Rect(set_area.position, new Vector2(set_area.size.x, size.y));
         }
 
         /// <summary>
@@ -1385,7 +1485,7 @@ namespace SR_PluginLoader
         /// </summary>
         public void snapBottomSideTo(uiControl targ, float yOff = 0f)
         {
-            maybeUpdate_Size(new Vector2(this._size.x, targ.area.yMin - this.area.yMin - yOff));
+            maybeUpdate_Size(new Vector2(_size.x, targ.Area.yMin - this.Area.yMin - yOff));
         }
         
         /// <summary>
@@ -1393,7 +1493,7 @@ namespace SR_PluginLoader
         /// </summary>
         public void snapRightSideTo(uiControl targ, float xOff = 0f)
         {
-            maybeUpdate_Size(new Vector2(targ.area.xMin - this.area.xMin - xOff, this._size.y));
+            maybeUpdate_Size(new Vector2(targ.Area.xMin - this.Area.xMin - xOff, this._size.y));
         }
 
         public void FloodX(float xOff = 0f)
@@ -1401,7 +1501,7 @@ namespace SR_PluginLoader
             float val = Screen.width;
             if (isChild) val = parent.Get_Content_Area().width;
 
-            maybeUpdate_Size(new Vector2(val - area.x - xOff, _size.y));
+            maybeUpdate_Size(new Vector2(val - Area.x - xOff, _size.y));
             if (width_sizer == null || !width_sizer.Equals(xOff, cSizeMode.FLOOD_X)) width_sizer = new ControlSizer(xOff, cSizeMode.FLOOD_X);
         }
 
@@ -1410,7 +1510,7 @@ namespace SR_PluginLoader
             float val = Screen.height;
             if (isChild) val = parent.Get_Content_Area().height;
 
-            maybeUpdate_Size(new Vector2(_size.x, val - area.y - yOff));
+            maybeUpdate_Size(new Vector2(_size.x, val - Area.y - yOff));
             if (height_sizer == null || !height_sizer.Equals(yOff, cSizeMode.FLOOD_Y)) height_sizer = new ControlSizer(yOff, cSizeMode.FLOOD_Y);
         }
         
@@ -1427,7 +1527,6 @@ namespace SR_PluginLoader
         /// Restricts a given size to be within this controls set min/max size range if any.
         /// </summary>
         /// <param name="sz"></param>
-        /// <returns></returns>
         protected Vector2 constrain_size(Vector2 sz)
         {
             float x = sz.x;
@@ -1451,7 +1550,7 @@ namespace SR_PluginLoader
         public bool isPointWithin(Vector2 p) { return absArea.Contains(p); }
         #endregion
 
-        #region Styling
+        #region Styling Logic
 
         protected void check_style()
         {
@@ -1508,7 +1607,7 @@ namespace SR_PluginLoader
         }
         #endregion
 
-        #region Layout
+        #region Layout Logic
 
         /// <summary>
         /// Usage: Responding to changes in child-control position/sizes
@@ -1530,7 +1629,7 @@ namespace SR_PluginLoader
             // inevitably cause this var to set to true, which is invalid in this context because we just updated all the ontrols around them anyway
             // which is the entire point of them doing so.
             dirty_layout = false;
-            cached_area = null;
+            //area = null;
             if (dirty_area)
             {
                 dirty_area = false;
@@ -1539,7 +1638,7 @@ namespace SR_PluginLoader
         }
         #endregion
 
-        #region Event Handling
+        #region GUI Event Handling
 
         /// <summary>
         /// Returns <c>TRUE</c> if this control could potentially consume a given event if it was a mouse event.
@@ -1641,7 +1740,7 @@ namespace SR_PluginLoader
         public virtual void TryDisplay()
         {
             if (!isVisible) return;
-            if (CONFIRM_DRAW) { DebugHud.Log("{0}  Confirm Display  |  area: {1}", this, area); }
+            if (CONFIRM_DRAW) { DebugHud.Log("{0}  Confirm Display  |  area: {1}", this, Area); }
 
             Color? prevClr = null;
             if(Tint.HasValue)
@@ -1686,7 +1785,7 @@ namespace SR_PluginLoader
             if (Border.type == uiBorderType.NONE) return;
             if (cached_borderStyle == null) return;
             if (cached_borderStyle.size.vertical == 0 && cached_borderStyle.size.horizontal == 0) return;
-            if (cached_borderStyle.texture == null) cached_borderStyle.prepare_texture(area.size);
+            if (cached_borderStyle.texture == null) cached_borderStyle.prepare_texture(Area.size);
             if (cached_borderStyle.texture == null) return;
 
             GUI.DrawTexture(border_area, cached_borderStyle.texture);

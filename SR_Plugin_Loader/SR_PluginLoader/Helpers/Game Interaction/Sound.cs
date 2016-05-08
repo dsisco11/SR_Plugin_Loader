@@ -19,7 +19,7 @@ namespace SR_PluginLoader
 
             { SoundId.ERROR, () => { return SRSingleton<GameContext>.Instance.UITemplates.errorCue; } },
             { SoundId.NEGATIVE, () => { return SRSingleton<GameContext>.Instance.UITemplates.errorCue; } },
-            { SoundId.CLICK, () => { return SRSingleton<GameContext>.Instance.UITemplates.clickCue; } },
+            { SoundId.BTN_CLICK, () => { return SRSingleton<GameContext>.Instance.UITemplates.clickCue; } },
             { SoundId.POSITIVE, () => { return SRSingleton<GameContext>.Instance.UITemplates.purchasePersonalUpgradeCue; } },
         };
 
@@ -72,7 +72,7 @@ namespace SR_PluginLoader
 
     public class SoundId : SafeEnum
     {
-        public static SoundId CLICK = new SoundId();
+        public static SoundId BTN_CLICK = new SoundId();
         public static SoundId NEGATIVE = new SoundId();
         public static SoundId POSITIVE = new SoundId();
         public static SoundId ERROR = new SoundId();

@@ -18,6 +18,17 @@ namespace SR_PluginLoader
             Description = desc;
         }
     }
+    
+    public enum SpawnCategory
+    {
+        NONE = 0,
+        SLIMES,
+        PLORTS,
+        ANIMALS,
+        FRUITS,
+        VEGETABLES,
+        MISC
+    }
 
     enum Dev_Menu_Type
     {
@@ -37,16 +48,17 @@ namespace SR_PluginLoader
         };
 
 
-        public DevMenu() : base()
+        public DevMenu()
         {
+            onLayout += DevMenu_onLayout;
             Title = "Developer Tools";
             Set_Size(800, 600);
             Center();
-            onLayout += DevMenu_onLayout;
 
             list = uiControl.Create<uiListView>(this);
             list.alignTop();
             list.alignLeftSide();
+            list.Set_Margin(0, 4, 0, 0);
 
             tabPanel = uiControl.Create<uiTabPanel>(this);
             tabPanel.Autosize_Method = AutosizeMethod.FILL;
@@ -56,13 +68,14 @@ namespace SR_PluginLoader
             {
                 string eStr = Enum.GetName(typeof(Dev_Menu_Type), kvp.Key);
                 var tab = tabPanel.Add_Tab();
+                tab.Scrollable = false;
                 Menus[kvp.Key].Tab = tab;
                 Menus[kvp.Key].Type = kvp.Key;
 
                 switch (kvp.Key)
                 {
                     case Dev_Menu_Type.SPAWN:
-                        //Create_Spawn_Panel(tab);
+                        Create_Spawn_Panel(tab);
                         break;
                     default:
                         DebugHud.Log("Unhandled Dev_Menu type: {0}", eStr);
@@ -72,7 +85,7 @@ namespace SR_PluginLoader
                 var itm = uiControl.Create<uiListItem>();
                 itm.Title = kvp.Value.Title;
                 itm.Description = kvp.Value.Description;
-                itm.onSelected += (uiControl c) => { this.Set_Active_Menu(kvp.Value.Type); };
+                itm.onSelected += (uiControl c) => { Set_Active_Menu(kvp.Value.Type); };
                 list.Add(itm);
             }
         }
@@ -83,7 +96,7 @@ namespace SR_PluginLoader
             list.FloodY();
 
             tabPanel.alignTop();
-            tabPanel.moveRightOf(list, 4f);
+            tabPanel.moveRightOf(list);
         }
 
         private void Set_Active_Menu(Dev_Menu_Type newMenu)
@@ -106,56 +119,61 @@ namespace SR_PluginLoader
         private void Create_Spawn_Panel(uiTab tab)
         {
             // This list will contain different categories of spawnable items
-            uiListView cat_list = uiControl.Create<uiListView>(tab);
+            uiListView cList = uiControl.Create<uiListView>(tab);
+            cList.Set_Margin(0, 4, 0, 0);
+            cList.Set_Width(130f);
             tab.onLayout += (uiPanel p) =>
             {
-                cat_list.alignTop();
-                cat_list.alignLeftSide();
-                cat_list.FloodY();
-                cat_list.Set_Width(150f);
+                cList.alignTop();
+                cList.alignLeftSide();
+                cList.FloodY();
+            };
+            
+            uiTabPanel catPanel = uiControl.Create<uiTabPanel>(tab);
+            tab.onLayout += (uiPanel p) =>
+            {
+                catPanel.moveRightOf(cList);
+                catPanel.FloodXY();
             };
 
-            Spawn_Category_Panels_Container cat_panel = uiControl.Create<Spawn_Category_Panels_Container>(tab);
-            tab.onLayout += (uiPanel p) =>
-            {
-                cat_panel.moveRightOf(cat_list, 2f);
-                cat_panel.FloodXY();
-            };
             foreach (SpawnCategory cty in Enum.GetValues(typeof(SpawnCategory)))
             {
                 if (cty == SpawnCategory.NONE) continue;
                 string catStr = Enum.GetName(typeof(SpawnCategory), cty);
-                var cat = uiControl.Create<uiListItem>(String.Concat("category_", catStr.ToLower()), cat_list);
-                cat.Title = catStr.ToLower().CapitalizeFirst();
-                cat.onSelected += (uiControl c) => { cat_panel.Category = cty; };
+                var catBtn = uiControl.Create<uiListItem>(String.Concat("category_", catStr.ToLower()), cList);
+                catBtn.Title = catStr.ToLower().CapitalizeFirst();
+                catBtn.Description = null;
 
-                /*
-                    switch(cty)
-                    {
-                        case SpawnCategory.SLIMES:
-                            Create_Spawn_Category_Menu(tab, cat_panel, cty, Ident.ALL_SLIMES);
-                            break;
-                        case SpawnCategory.PLORTS:
-                            Create_Spawn_Category_Menu(tab, cat_panel, cty, Identifiable.PLORT_CLASS);
-                            break;
-                        case SpawnCategory.ANIMALS:
-                            Create_Spawn_Category_Menu(tab, cat_panel, cty, Ident.ALL_ANIMALS);
-                            break;
-                        case SpawnCategory.FRUITS:
-                            Create_Spawn_Category_Menu(tab, cat_panel, cty, Identifiable.FRUIT_CLASS);
-                            break;
-                        case SpawnCategory.VEGETABLES:
-                            Create_Spawn_Category_Menu(tab, cat_panel, cty, Identifiable.VEGGIE_CLASS);
-                            break;
+                uiTab cTab = null;
+                switch(cty)
+                {
+                    case SpawnCategory.SLIMES:
+                        cTab = Create_Spawn_Category_Menu(tab, catPanel, cty, Ident.ALL_SLIMES);
+                        break;
+                    case SpawnCategory.PLORTS:
+                        cTab = Create_Spawn_Category_Menu(tab, catPanel, cty, Identifiable.PLORT_CLASS);
+                        break;
+                    case SpawnCategory.ANIMALS:
+                        cTab = Create_Spawn_Category_Menu(tab, catPanel, cty, Ident.ALL_ANIMALS);
+                        break;
+                    case SpawnCategory.FRUITS:
+                        cTab = Create_Spawn_Category_Menu(tab, catPanel, cty, Identifiable.FRUIT_CLASS);
+                        break;
+                    case SpawnCategory.VEGETABLES:
+                        cTab = Create_Spawn_Category_Menu(tab, catPanel, cty, Identifiable.VEGGIE_CLASS);
+                        break;
 
-                        default:
-                            DebugHud.Log("Unhandled Spawn menu category: {0}", catStr);
-                            break;
-                    }
-                    */
+                    default:
+                        DebugHud.Log("Unhandled Spawn menu category: {0}", catStr);
+                        break;
+                }
+
+                catBtn.onSelected += (uiControl c) => {
+                    Sound.Play(SoundId.BTN_CLICK);
+                    cTab.Select();
+                };
+
             }
-
-            //cat_list.Category = SpawnCategory.SLIMES;
         }
 
         private void Dev_Spawn_Item(Identifiable.Id ID)
@@ -179,25 +197,19 @@ namespace SR_PluginLoader
                 Sound.Play(SoundId.ERROR);
                 DebugHud.Log("Failed to spawn item: {0}, An unknown error occured", ID);
             }
-            else Sound.Play(SoundId.POSITIVE);
+            else Sound.Play(SoundId.BTN_CLICK);
         }
         
-        private void Create_Spawn_Category_Menu(uiPanel panel, Spawn_Category_Panels_Container container, SpawnCategory cty, HashSet<Identifiable.Id> ITEMS)
+        private uiTab Create_Spawn_Category_Menu(uiPanel panel, uiTabPanel container, SpawnCategory cty, HashSet<Identifiable.Id> ITEMS)
         {
             // This list will just have a bunch of pictures of slimes that can be spawned
             string catStr = Enum.GetName(typeof(SpawnCategory), cty);
             float ICON_SIZE = 100f;
-            uiListView menu = null;
-            menu = uiControl.Create<uiListView>(catStr, container);
-            menu.Layout = new Layout_IconList(ICON_SIZE);
-            menu.isVisible = false;// Hidden by default
-            menu.alignTop();
-            menu.alignLeftSide();
-
-            container.onLayout += (uiPanel p) =>
-            {
-                menu.FloodXY();
-            };
+            uiTab tab = container.Add_Tab(catStr);
+            uiListView list = uiControl.Create<uiListView>(catStr, tab);
+            list.Layout = new Layout_IconList(ICON_SIZE);
+            list.Autosize_Method = AutosizeMethod.FILL;
+            list.Autosize = true;
 
 
             foreach (Identifiable.Id ID in ITEMS)
@@ -218,7 +230,7 @@ namespace SR_PluginLoader
 
                 if (sprite == null) continue;// Exclude anything without an icon out of respect for the devs, we will just assume things without an icon aren't in the game just yet I suppose...
 
-                var itm = uiControl.Create<uiListIcon>(menu);
+                var itm = uiControl.Create<uiListIcon>(list);
                 if (sprite != null) itm.Icon = sprite.texture;
                 else itm.Icon = TextureHelper.icon_unknown;
 
@@ -227,45 +239,8 @@ namespace SR_PluginLoader
                 itm.onClicked += (uiControl c) => { Dev_Spawn_Item(ID); };
                 itm.Selectable = false;
             }
+
+            return tab;
         }
     }
-
-
-    #region Spawner Menu
-    public enum SpawnCategory
-    {
-        NONE = 0,
-        SLIMES,
-        PLORTS,
-        ANIMALS,
-        FRUITS,
-        VEGETABLES,
-        MISC
-    }
-
-    public class Spawn_Category_Panels_Container : uiPanel
-    {
-        private SpawnCategory _category = SpawnCategory.NONE;
-        public SpawnCategory Category { get { return _category; } set { var old = _category; _category = value; change_categorys(old, _category); } }
-
-
-        public Spawn_Category_Panels_Container() { }
-
-        private void change_categorys(SpawnCategory old, SpawnCategory curr)
-        {
-            if (old != SpawnCategory.NONE)
-            {
-                string oCatStr = Enum.GetName(typeof(SpawnCategory), old);
-                var o = this[oCatStr];
-                if (o == null) DebugHud.Log("Cannot find control named: {0}", oCatStr);
-                else o.isVisible = false;
-            }
-            
-            string nCatStr = Enum.GetName(typeof(SpawnCategory), curr);
-            var n = this[nCatStr];
-            if (n == null) DebugHud.Log("Cannot find control named: {0}", nCatStr);
-            else n.isVisible = true;
-        }
-    }
-    #endregion
 }

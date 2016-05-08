@@ -42,7 +42,7 @@ namespace SR_PluginLoader
                 // Setup all of the default font values
                 skin.box = defaultFont(skin.box, Color.white);
                 skin.button = defaultFont(skin.button, Color.white);
-                skin.window = defaultFont(skin.window, Color.white);
+                skin.window = defaultFont(skin.window, new Color(0.7f, 0.7f, 0.7f));
                 skin.label = defaultFont(skin.label, Color.white);
                 skin.textArea = defaultFont(skin.textArea, Color.white);
                 skin.textField = defaultFont(skin.textField, Color.white);
@@ -56,7 +56,7 @@ namespace SR_PluginLoader
                 skin.label.alignment = TextAnchor.MiddleLeft;
                 skin.button.alignment = TextAnchor.MiddleCenter;
 
-                skin.window.fontSize = 12;
+                skin.window.fontSize = 16;
                 skin.button.fontSize = 16;
 
                 skin.button.fontStyle = FontStyle.Bold;

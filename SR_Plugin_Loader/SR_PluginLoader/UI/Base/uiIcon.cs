@@ -10,7 +10,8 @@ namespace SR_PluginLoader
     public class uiIcon : uiControl
     {
         public Texture2D image { get { return (Texture2D)content.image; } set { content.image = value; update_size(); } }
-        public override Vector2 size { get { if (image == null) { return new Vector2(0f, 0f); } return base.size; } }
+        public override bool isDisplayed { get { if (image == null) { return false; } return base.isDisplayed; } set { base.isDisplayed = value; } } 
+        protected override Vector2 size { get { if (image == null) { return new Vector2(0f, 0f); } return base.size; } }
         protected override Vector2 Get_Autosize(Vector2? starting_size = null)
         {
             if (image != null) return base.Get_Autosize(content_size_to_inner(new Vector2(image.width, image.height)));
@@ -20,6 +21,7 @@ namespace SR_PluginLoader
         public uiIcon() : base(uiControlType.Icon)
         {
             Autosize = true;//auto size by default until the user gives us an explicit size
+            Set_Background(Color.clear);
         }
 
         protected override void Display()

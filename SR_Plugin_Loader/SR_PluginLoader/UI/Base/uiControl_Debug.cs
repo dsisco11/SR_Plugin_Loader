@@ -90,7 +90,7 @@ namespace SR_PluginLoader
 
                     GL.Color(white_trans);
                     //DebugUI.Draw_Rect(control.absArea);
-                    DebugUI.Draw_Rect(control.internalToAbsolute(control.area));
+                    DebugUI.Draw_Rect(control.internalToAbsolute(control.Area));
                     /*
                     GL.Color(yellow_trans);
                     DebugUI.Draw_Rect(control.internalToAbsolute(control.content_area));

@@ -43,7 +43,7 @@ namespace SR_PluginLoader
 
         private void Clicked_Snd_Handler(uiControl c)
         {
-            if (playClickSound) Sound.Play(SoundId.CLICK);
+            if (playClickSound) Sound.Play(SoundId.BTN_CLICK);
         }
 
         public override void doLayout()

@@ -148,6 +148,12 @@ namespace SR_PluginLoader
 
         private void PluginStore_onLayout(uiPanel c)
         {
+        }
+
+        public override void doLayout()
+        {
+            base.doLayout();
+
             btn_config.alignTop();
             btn_config.alignLeftSide();
 
@@ -158,7 +164,7 @@ namespace SR_PluginLoader
             search.alignTop(10f);
             search.moveRightOf(lbl_search);
             search.FloodX(12f);
-            if (search.size.y != lbl_search.size.y) lbl_search.Set_Height(search.size.y);
+            if (search.Area.size.y != lbl_search.Area.size.y) lbl_search.Set_Height(search.Area.size.y);
 
             statusPanel.moveBelow(search, 10f);
             statusPanel.FloodY();
@@ -245,8 +251,8 @@ namespace SR_PluginLoader
                 selected_plugin.Active = false;
             selected_plugin = pl;
 
-            if (c != null) tabPanel.Set_Tab(MAIN_TAB_NAME);
-            else tabPanel.Set_Tab(INSTRUCTION_TAB_NAME);
+            if (c != null) tabPanel.Select_Tab(MAIN_TAB_NAME);
+            else tabPanel.Select_Tab(INSTRUCTION_TAB_NAME);
 
             if (c == null)
             {
@@ -419,7 +425,7 @@ namespace SR_PluginLoader
                 {
                     //Select nothing, show instructions instead
                     //Select_Plugin(list.Get_Children()[0]);
-                    tabPanel.Set_Tab(INSTRUCTION_TAB_NAME);
+                    tabPanel.Select_Tab(INSTRUCTION_TAB_NAME);
                 }
                 else
                 {

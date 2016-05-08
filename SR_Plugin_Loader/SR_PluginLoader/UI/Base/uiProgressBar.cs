@@ -43,7 +43,7 @@ namespace SR_PluginLoader
             update_progress_area();
         }
 
-        protected void update_progress_area() { bar.Set_Width(area.width * _progress); }
+        protected void update_progress_area() { bar.Set_Width(Area.width * _progress); }
 
         public override void doLayout() { update_progress_area(); }
     }

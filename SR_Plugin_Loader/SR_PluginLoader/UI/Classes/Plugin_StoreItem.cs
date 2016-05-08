@@ -86,13 +86,14 @@ namespace SR_PluginLoader
         public void Set_Plugin_Data(Plugin_Data data)
         {
             _plugin_hash = data.Hash;
-            ((uiText)this["name"]).Text = data.NAME;
-            ((uiText)this["author"]).Text = data.AUTHOR;
-            this.progress_bar.progress = 0f;
+            this["name"].Text = data.NAME;
+            this["author"].Text = data.AUTHOR;
+            progress_bar.progress = 0f;
         }
 
         public override void doLayout()
         {
+            base.doLayout();
             uiControl name = this["name"];
             uiControl auth = this["author"];
 

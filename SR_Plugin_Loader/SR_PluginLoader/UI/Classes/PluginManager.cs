@@ -131,6 +131,12 @@ namespace SR_PluginLoader
 
         private void PluginManager_onLayout(uiPanel c)
         {
+        }
+
+        public override void doLayout()
+        {
+            base.doLayout();
+
             btn_store.alignTop(2);
             btn_store.alignLeftSide(2);
 

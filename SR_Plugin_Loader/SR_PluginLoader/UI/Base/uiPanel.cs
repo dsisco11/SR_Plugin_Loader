@@ -31,6 +31,7 @@ namespace SR_PluginLoader
         public Vector2 Get_ScrollPos() { return ScrollPos; }
         #endregion
 
+        public event Action<uiControl> onChildAdded;
         /// <summary>
         /// Panels are one type of parenting control which can have a layout director assigned to them.
         /// A layout director manages positioning all of the child controls in a predetermined fashion.
@@ -118,10 +119,11 @@ namespace SR_PluginLoader
             c.Set_Parent(this);
             if (c.gameObject != null && this.gameObject != null)
             {
-                c.gameObject.transform.SetParent(base.gameObject.transform);
+                c.gameObject.transform.SetParent(base.gameObject.transform, false);
                 //c.rect.SetParent(base.gameObject.transform, false);
             }
 
+            onChildAdded?.Invoke(c);
             update_area();
         }
 
@@ -146,8 +148,8 @@ namespace SR_PluginLoader
 
             if (CONFIRM_SIZE) DebugHud.Log("{0}  Confirm Child Size Constraint  |  Available Area: {1}  |  Requested Size: {2}  ", this, max, requested_size);
 
-            if ((requested_size.x + c.pos.x) > max.x) requested_size.x = (max.x - c.pos.x);
-            if ((requested_size.y + c.pos.y) > max.y) requested_size.y = (max.y - c.pos.y);
+            if ((requested_size.x + c.Pos.x) > max.x) requested_size.x = (max.x - c.Pos.x);
+            if ((requested_size.y + c.Pos.y) > max.y) requested_size.y = (max.y - c.Pos.y);
 
             return requested_size;
         }
@@ -156,7 +158,7 @@ namespace SR_PluginLoader
         {
             foreach (var child in children)
             {
-                if (child.area.Contains(p)) return true;
+                if (child.Area.Contains(p)) return true;
             }
 
             return false;
@@ -184,8 +186,8 @@ namespace SR_PluginLoader
                 //float cmX = (child.area.xMax - Padding.horizontal);
                 //float cmY = (child.area.yMax - Padding.vertical);
 
-                float cmX = child.area.xMax;
-                float cmY = child.area.yMax;
+                float cmX = child.Area.xMax;
+                float cmY = child.Area.yMax;
                 //if (CONFIRM_LAYOUT && cmY > _content_area.yMax) DebugHud.Log("{0}  Child Y OOB  |  yMax: {1}  |  area: {2}  |  child.yMax: {3}", this, _content_area.yMax, area, cmY);
                 xMax = Math.Max(xMax, cmX);
                 yMax = Math.Max(yMax, cmY);

@@ -15,48 +15,49 @@ namespace SR_PluginLoader
         protected uiText title = null, description = null;
         protected uiIcon icon = null;
 
-        public string Title { get { return this.title.Text; } set { this.title.Text = value; } }
-        public string Description { get { return this.description.Text; } set { this.description.Text = value; } }
-        public Texture2D Icon { get { return this.icon.image; } set { this.icon.image = value; } }
+        public string Title { get { return title.Text; } set { title.Text = value; } }
+        public string Description { get { return description.Text; } set { description.Text = value; } }
+        public Texture2D Icon { get { return icon.image; } set { icon.image = value; } }
 
-        public bool Selected { get { return Active; } set { Active = value; } }
-        public bool Selectable { get { return _selectable; } set { _selectable = value; if (!value) { Selected = false; } } }
-        protected bool _selectable = true;
 
 
         public uiListItem() : base(uiControlType.ListItem)
         {
-            this.Autosize = true;
-            Padding = new RectOffset(2, 2, 2, 2);
-            Margin = new RectOffset(2, 2, 2, 0);
-            Util.Set_BG_Color(local_style.normal, new Color32(32, 32, 32, 200));
-            Util.Set_BG_Color(local_style.hover, new Color32(42, 42, 42, 255));
-            Util.Set_BG_Color(local_style.active, new Color32(55, 55, 55, 255));
+            _selectable = true;
+            onClicked += (uiControl c) => { if (_selectable) { Selected = !Selected; } };
+            Autosize = true;
+            //Autosize_Method = AutosizeMethod.BLOCK;
+
+            Set_Padding(2, 2, 2, 2);
+            Set_Margin(2, 2, 2, 2);
+
+            Util.Set_BG_Color(local_style.normal, new Color32(32, 32, 32, 150));
+            Util.Set_BG_Color(local_style.hover, new Color32(36, 36, 36, 255));
+            Util.Set_BG_Color(local_style.active, new Color(0.2f, 0.4f, 1f, 1f));
+            //Util.Set_BG_Color(local_style.active, new Color32(55, 55, 55, 255));
 
             Border.active.color = new Color32(255, 255, 255, 200);
 
-            icon = uiControl.Create<uiIcon>(this);
-            icon.Padding = new RectOffset(2, 2, 2, 2);
+            icon = uiControl.Create<uiIcon>("icon", this);
+            icon.Set_Padding(2, 2, 2, 2);
             icon.Autosize = true;
 
-            title = uiControl.Create<uiText>(this);
-            title.local_style.fontSize = 16;
-            title.local_style.fontStyle = FontStyle.Bold;
+            title = uiControl.Create<uiText>("title", this);
+            title.TextSize = 16;
+            title.TextStyle = FontStyle.Bold;
 
-            description = uiControl.Create<uiText>(this);
-            description.Margin = new RectOffset(1, 1, 1, 1);
-            description.local_style.fontSize = 12;
-            description.local_style.fontStyle = FontStyle.Italic;
-            description.local_style.normal.textColor = new Color32(255, 255, 255, 180);
+            description = uiControl.Create<uiText>("desc", this);
+            description.Set_Margin(1, 1, 1, 1);
+            description.TextSize = 12;
+            description.TextStyle = FontStyle.Italic;
+            description.TextColor = new Color32(255, 255, 255, 180);
 
-
-            this.onClicked += (uiControl c) => { if (Selectable) { this.Selected = true; } };
         }
-
+        
         protected override Vector2 Get_Autosize(Vector2? starting_size = null)
         {
             var sz = base.Get_Autosize(starting_size);
-            if(parent != null) sz.x = outter_area_to_inner(parent.area).width;
+            if(parent != null) sz.x = outter_area_to_inner(parent.Area).width;
 
             return sz;
         }
@@ -69,7 +70,7 @@ namespace SR_PluginLoader
             else
             {
                 icon.FloodY();
-                icon.Set_Width(icon.size.y);
+                icon.Set_Width(icon.Area.size.y);
             }
 
             title.alignTop();

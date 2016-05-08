@@ -10,12 +10,12 @@ namespace SR_PluginLoader
         /// Tracks all uiWindow instances by their ID.
         /// </summary>
         private static List<int> ALL = new List<int>();
+        private static Texture2D title_bar_texture = null;
 
         #region Components
 
         protected uiScrollPanel content_panel = null;
         private GUIStyle style_title = null, style_titlebar = null;
-        private Texture2D title_bar_texture = null;
         private int title_bar_height { get { return 26; } }
         private bool dragging = false;
         private uiButton closeBtn = null;
@@ -115,29 +115,31 @@ namespace SR_PluginLoader
             style_title.clipping = TextClipping.Clip;
             //style_title.fontSize = 32;
 
-
-            var tex = new Texture2D(stipple_pattern_w, title_bar_height);
-            tex.wrapMode = TextureWrapMode.Repeat;
-            Color clearClr = new Color(0f, 0f, 0f, 0f);
-
-            // Clear the textures pixels so they are all transparent
-            for (int x = 0; x < tex.width; x++)
+            if (title_bar_texture == null)
             {
-                for (int y = 0; y < tex.height; y++)
+                var tex = new Texture2D(stipple_pattern_w, title_bar_height);
+                tex.wrapMode = TextureWrapMode.Repeat;
+                Color clearClr = new Color(0f, 0f, 0f, 0f);
+
+                // Clear the textures pixels so they are all transparent
+                for (int x = 0; x < tex.width; x++)
                 {
-                    tex.SetPixel(x, y, clearClr);
+                    for (int y = 0; y < tex.height; y++)
+                    {
+                        tex.SetPixel(x, y, clearClr);
+                    }
                 }
+
+                Color pClr = new Color(1f, 1f, 1f, 0.3f);
+                // Now create the stippled pattern we want
+                int cY = (int)(((float)tex.height / 2f) - ((float)stipple_pattern_h / 2f) + 1);
+                tex.SetPixel(0, cY - 2, pClr);
+                tex.SetPixel(2, cY, pClr);
+                tex.SetPixel(0, cY + 2, pClr);
+
+                tex.Apply();
+                title_bar_texture = tex;
             }
-
-            Color pClr = new Color(1f, 1f, 1f, 0.3f);
-            // Now write the stippled pattern we want
-            int cY = (int)(((float)tex.height / 2f) - ((float)stipple_pattern_h / 2f) + 1);
-            tex.SetPixel(0, cY - 2, pClr);
-            tex.SetPixel(2, cY, pClr);
-            tex.SetPixel(0, cY + 2, pClr);
-
-            tex.Apply();
-            title_bar_texture = tex;
         }
         
         private void CloseBtn_onClicked(uiControl c) { this.Close(); }
@@ -195,8 +197,8 @@ namespace SR_PluginLoader
 
         public void Center()
         {
-            float X = (Screen.width * 0.5f) - (area.width * 0.5f);
-            float Y = (Screen.height * 0.5f) - (area.height * 0.5f);
+            float X = (Screen.width * 0.5f) - (Area.width * 0.5f);
+            float Y = (Screen.height * 0.5f) - (Area.height * 0.5f);
 
             this.Set_Pos(new Vector2(X, Y));
         }
@@ -216,7 +218,7 @@ namespace SR_PluginLoader
 
         public override bool withinChild(Vector2 p)
         {
-            if (closeBtn.area.Contains(p)) return true;
+            if (closeBtn.Area.Contains(p)) return true;
             return content_panel.withinChild(p);
         }
 
@@ -225,7 +227,7 @@ namespace SR_PluginLoader
 
         public override void doLayout()
         {
-            titlebar_area = new Rect(0, 0, area.width, title_bar_height);
+            titlebar_area = new Rect(0, 0, Area.width, title_bar_height);
 
             int btn_area_width = (title_bar_height + 4);
             titlebar_buttons_area = new Rect(titlebar_area.width-btn_area_width, 0, btn_area_width, titlebar_area.height);
@@ -235,7 +237,7 @@ namespace SR_PluginLoader
 
             //ensure the stipple pattern always ends on the first column of the next repetition
             int stipple_width = (int)(titlebar_buttons_area.xMin - title_area.xMax - 6f);
-            if ((stipple_width % stipple_pattern_w) != 1) stipple_width = (((stipple_width / stipple_pattern_w) * stipple_pattern_w) + 1);
+            if ((stipple_width % stipple_pattern_w) != 0) stipple_width = (((stipple_width / stipple_pattern_w) * stipple_pattern_w) + 0);// Make sure the drawn texture always ends on the last pixel no matter how many times it repeats
 
             title_stipple_area = new Rect(title_area.xMax, 0f, stipple_width, titlebar_area.height);
             title_stipple_coords = new Rect(0f, 0f, (title_stipple_area.width/(float)stipple_pattern_w), 1f);
@@ -273,7 +275,7 @@ namespace SR_PluginLoader
                     {
                         use_event = true;
                         Vector2 dtPos = evt.delta;
-                        Set_Pos(dtPos.x+area.x, dtPos.y+area.y);
+                        Set_Pos(dtPos.x+Area.x, dtPos.y+Area.y);
                     }
                     break;
                 case EventType.MouseDown:

@@ -15,18 +15,17 @@ namespace SR_PluginLoader
 
         private void init()
         {
+            onChildAdded += UiListView_onChildAdded;
             Scrollable = true;
             Layout = new Layout_Default();
             Set_Margin(1);
         }
 
-        public override uiControl Add(uiControl child)
+        private void UiListView_onChildAdded(uiControl child)
         {
-            base.Add(child);
             child.onSelected += (uiControl c) => {
                 change_selection(c);
             };
-            return child;
         }
 
         private void change_selection(uiControl select)

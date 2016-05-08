@@ -81,7 +81,7 @@ namespace SR_PluginLoader
             }
         }
 
-        public void Set_Tab(string name)
+        public void Select_Tab(string name)
         {
             uiControl p;
             if (!child_map.TryGetValue(name, out p)) throw new KeyNotFoundException(nameof(uiTabPanel)+" Could not find tab with name: "+name);

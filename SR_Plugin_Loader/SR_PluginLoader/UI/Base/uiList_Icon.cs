@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using UnityEngine;
 
 namespace SR_PluginLoader
 {
@@ -12,17 +9,21 @@ namespace SR_PluginLoader
     {
         public uiListIcon() : base()
         {
-            title.local_style.fontSize = 12;
+            title.TextSize = 12;
             title.local_style.wordWrap = true;
+            title.Autosize_Method = AutosizeMethod.BLOCK;
+            title.Autosize = true;
+            title.TextAlign = TextAnchor.MiddleCenter;
+
             icon.Autosize = false;
         }
         
         public override void doLayout()
         {
             icon.alignTop();
-            icon.Set_Width(icon.size.y);
+            icon.Set_Width(icon.Area.height);//match width to height
             icon.CenterHorizontally();
-            icon.FloodY(title.size.y);
+            icon.FloodY(title.Area.size.y);
 
             title.CenterHorizontally();
             title.moveBelow(icon);
