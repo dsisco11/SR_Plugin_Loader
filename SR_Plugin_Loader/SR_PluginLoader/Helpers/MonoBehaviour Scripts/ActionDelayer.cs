@@ -17,7 +17,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Tells the script to destroy it's GameObject when it destroys itself.
         /// </summary>
-        public ActionDelayer Set_Temporary() { destroy_gameobject = true; return this; }
+        public ActionDelayer SelfDestruct() { destroy_gameobject = true; return this; }
 
         private void Start()
         {
@@ -36,7 +36,11 @@ namespace SR_PluginLoader
             onFirstUpdate = null;
 
             // Check if all of our events are handled yet, if they are then we can destroy ourself
-            if (ALL_EVENTS_HANDLED) GameObject.Destroy(this);
+            if (ALL_EVENTS_HANDLED)
+            {
+                if (destroy_gameobject) GameObject.Destroy(this);
+                else Destroy(this);
+            }
         }
     }
 }

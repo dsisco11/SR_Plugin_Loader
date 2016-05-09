@@ -10,7 +10,7 @@ namespace SR_PluginLoader
     /// An item that goes into a uiListView.
     /// Has: an icon, title, and description
     /// </summary>
-    class uiListItem : uiPanel
+    public class uiListItem : uiPanel
     {
         protected uiText title = null, description = null;
         protected uiIcon icon = null;
@@ -21,7 +21,11 @@ namespace SR_PluginLoader
 
 
 
-        public uiListItem() : base(uiControlType.ListItem)
+        public uiListItem() : base(uiControlType.ListItem) { init(); }
+        public uiListItem(uiControlType ty) : base(ty) { init(); }
+
+
+        private void init()
         {
             _selectable = true;
             onClicked += (uiControl c) => { if (_selectable) { Selected = !Selected; } };
@@ -51,6 +55,7 @@ namespace SR_PluginLoader
             description.TextSize = 12;
             description.TextStyle = FontStyle.Italic;
             description.TextColor = new Color32(255, 255, 255, 180);
+            description.Text = null;// collapsed by default.
 
         }
         
@@ -66,12 +71,14 @@ namespace SR_PluginLoader
         {
             icon.alignTop();
             icon.alignLeftSide();
+            /*
             if (Icon == null) icon.Set_Size(0f, 0f);
             else
             {
                 icon.FloodY();
                 icon.Set_Width(icon.Area.size.y);
             }
+            */
 
             title.alignTop();
             title.moveRightOf(icon);

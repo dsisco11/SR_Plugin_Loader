@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SR_PluginLoader
 {
-    // TODO: uiTextArea doesn't seems to ignore it's padding when rendering it's text.
+    // TODO: uiTextArea seems to ignore it's padding when rendering text.
 
     public delegate void controlEvent<T>(T c) where T : uiControl;
     public delegate void parentEvent(uiPanel c);
@@ -1601,15 +1601,11 @@ namespace SR_PluginLoader
             }
         }
 
-        public void Set_Background(Color clr)
-        {
-            Util.Set_BG_Color(local_style.normal, clr);
-        }
+        public void Set_Background(Color clr) { Util.Set_BG_Color(local_style.normal, clr); }
 
-        public void Set_Background(Color clrA, Color clrB, GRADIENT_DIR dir, float? exp = null)
-        {
-            Util.Set_BG_Gradient(local_style.normal, 128, dir, clrA, clrB, exp);
-        }
+        public void Set_Background(Color clrA, Color clrB, GRADIENT_DIR dir, float? exp = null) { Util.Set_BG_Gradient(local_style.normal, 128, dir, clrA, clrB, exp); }
+
+        public void Set_Background(Texture2D tex) { local_style.normal.background = tex; }
         #endregion
 
         #region Layout Logic

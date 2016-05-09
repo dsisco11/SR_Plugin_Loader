@@ -68,7 +68,7 @@ namespace SR_PluginLoader
 
             // We need to delay hookinh into the main menu until we are sure all of the buttons have been styled and initialized by the game's default logic.
             // Otherwise the buttons are invisible and people catch on fire and it's just a big legal ordeal really...
-            new GameObject().AddComponent<ActionDelayer>().Set_Temporary().onStart += () => { Hook_MainMenu(); };
+            new GameObject().AddComponent<ActionDelayer>().SelfDestruct().onStart += () => { Hook_MainMenu(); };
             return null;
         }
 

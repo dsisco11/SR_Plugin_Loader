@@ -498,7 +498,7 @@ namespace SR_PluginLoader
                    if (prog != null)
                    {
                        float p = (float)current / (float)total;
-                       prog.progress = p;
+                       prog.Value = p;
                    }
                },
                (string file) => 

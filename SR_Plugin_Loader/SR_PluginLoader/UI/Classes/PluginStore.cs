@@ -483,7 +483,7 @@ namespace SR_PluginLoader
                if (pl != null)
                {
                    float pct = ((float)read / (float)total);
-                   pl.progress_bar.progress = pct;
+                   pl.progress_bar.Value = pct;
                    pl.progress_text.Value = String.Format("{0:p}", pct);
                }
             },
