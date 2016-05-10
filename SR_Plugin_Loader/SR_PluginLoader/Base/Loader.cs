@@ -416,23 +416,6 @@ namespace SR_PluginLoader
         public static void Auto_Update()
         {
             new GameObject().AddComponent<PluginLoader_AutoUpdater>().Files = available_updates;
-            /*
-            foreach(GitFile file in available_updates)
-            {
-                DebugHud.Log("Updating plugin loader...");
-                byte[] buf = web.DownloadData(file.URL);
-
-                string filename = file.LOCAL_PATH;// String.Concat(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), Path.GetFileName(url));
-                string new_file = String.Format("{0}.tmp", filename);
-                string old_file = String.Format("{0}.old", filename);
-
-                File.WriteAllBytes(new_file, buf);
-                if (File.Exists(old_file)) File.Delete(old_file);
-                File.Replace(new_file, filename, old_file);
-            }
-            // We have to restart the game for this to take effect.
-            Restart_App();
-            */
         }
 
         /// <summary>
@@ -453,7 +436,7 @@ namespace SR_PluginLoader
                     string local_path = Path.Combine(dir, FN);
                     file.LOCAL_PATH = local_path;
                     FILE_UPDATE_STATUS status = Git_Updater.instance.Get_Update_Status(file.FULLNAME, local_path);
-                    status = FILE_UPDATE_STATUS.OUT_OF_DATE;
+                    //status = FILE_UPDATE_STATUS.OUT_OF_DATE;// DEBUG
 
                     //DebugHud.Log("{0}  |  LOCAL_PATH: {1}  |  REMOTE_PATH: {2}", file.FULLNAME, local_path, file.URL);
                     if (status == FILE_UPDATE_STATUS.OUT_OF_DATE)
@@ -462,27 +445,6 @@ namespace SR_PluginLoader
                         available_updates.Add(file);
                     }
                 }
-
-                /*
-                string assembly_url = "https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer/SR_PluginLoader.dll";
-                var assembly_status = Git_Updater.instance.Get_Update_Status(assembly_url, Assembly.GetExecutingAssembly().Location);
-                if (assembly_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
-                {
-                    available_updates.Add(assembly_url);
-                    //the assembly is out of date!
-                    DebugHud.Log("[AutoUpdate] The plugin loader is out of date!");
-                }
-
-                string installer_path = String.Format("{0}\\SR_PluginLoader_Installer.exe", Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
-                string installer_url = "https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer/SR_PluginLoader_Installer.exe";
-                var installer_status = Git_Updater.instance.Get_Update_Status(installer_url, installer_path);
-                if (installer_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
-                {
-                    available_updates.Add(installer_url);
-                    //the installer is out of date!
-                    DebugHud.Log("[AutoUpdate] The installer is out of date!");
-                }
-                */
                 return (available_updates.Count > 0);
             }
             catch(Exception ex)
