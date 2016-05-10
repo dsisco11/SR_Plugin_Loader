@@ -49,7 +49,7 @@ namespace SR_PluginLoader
             if (_setup) throw new NotSupportedException("Blocked attempt to call MainMenu.Setup() a second time.");
             _setup = true;//now we have run setup!
 
-            SiscosHooks.register(null, HOOK_ID.Level_Loaded, MainMenu.onLevelLoaded);
+            SiscosHooks.register(HOOK_ID.Level_Loaded, MainMenu.onLevelLoaded);
 
             State = new Active_State_Tracker("MAIN_MENU");
             // Create our handler game object

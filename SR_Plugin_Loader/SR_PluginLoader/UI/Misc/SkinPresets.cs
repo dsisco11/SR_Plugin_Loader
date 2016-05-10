@@ -9,7 +9,8 @@ namespace SR_PluginLoader
         {
             style.clipping = TextClipping.Overflow;
             //style.clipping = TextClipping.Clip;// Clipping results in ugly text usually.
-            style.alignment = TextAnchor.MiddleLeft;
+            //style.alignment = TextAnchor.MiddleLeft;
+            style.alignment = TextAnchor.UpperLeft;
             style.fontSize = font_size;
 
             style.normal.textColor = color;

@@ -63,7 +63,9 @@
     <Compile Include="Base\SettingsFile.cs" />
     <Compile Include="Helpers\Extensions\ColorExt.cs" />
     <Compile Include="Helpers\Extensions\TypeExt.cs" />
+    <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
+    <Compile Include="UI\Enums\SizeConstraint.cs" />
     <Compile Include="UI\Base\uiEmpty.cs" />
     <Compile Include="UI\Base\uiList_ItemProgress.cs" />
     <Compile Include="UI\Base\uiTextLine.cs" />
@@ -154,7 +156,7 @@
     <Compile Include="UI\Base\uiList_Item.cs" />
     <Compile Include="Helpers\Upgrades\IUpgrade.cs" />
     <Compile Include="UI\Interfaces\IScrollableUI.cs" />
-    <Compile Include="UI\Utility\ButtonStyler_Overrider.cs" />
+    <Compile Include="Helpers\MonoBehaviour Scripts\ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
     <Compile Include="Helpers\Game Interaction\GameTime.cs" />
@@ -162,8 +164,8 @@
     <Compile Include="UI\Classes\Plugin_Update_Item.cs" />
     <Compile Include="UI\Base\uiCheckbox.cs" />
     <Compile Include="UI\Base\uiTextArea.cs" />
-    <Compile Include="UI\Classes\Plugin_Update_Viewer.cs" />
-    <Compile Include="UI\Classes\PluginManager.cs" />
+    <Compile Include="UI\Menus\Plugin_Update_Viewer.cs" />
+    <Compile Include="UI\Menus\Plugin_Manager.cs" />
     <Compile Include="UI\Classes\Plugin_Manager_List_Item.cs" />
     <Compile Include="UI\Base\uiScrollPanel.cs" />
     <Compile Include="UI\Base\uiToggle.cs" />
@@ -174,7 +176,7 @@
     <Compile Include="Plugins\Plugin_Update_Method.cs" />
     <Compile Include="UI\Base\uiTextbox.cs" />
     <Compile Include="UI\Classes\Plugin_StoreItem.cs" />
-    <Compile Include="UI\Classes\PluginStore.cs" />
+    <Compile Include="UI\Menus\Plugin_Store.cs" />
     <Compile Include="UI\Base\uiButton.cs" />
     <Compile Include="UI\Base\uiList_View.cs" />
     <Compile Include="UI\Base\uiControl.cs" />

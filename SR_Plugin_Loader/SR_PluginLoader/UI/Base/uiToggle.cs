@@ -7,8 +7,13 @@ using UnityEngine;
 
 namespace SR_PluginLoader
 {
+    /// <summary>
+    /// A button that can be visually toggled on or off.
+    /// </summary>
     public class uiToggle : uiButton
     {
+        #region Variables
+
         private string[] text = new string[2] { "Enable", "Disable" };
 
         /// <summary>
@@ -31,9 +36,11 @@ namespace SR_PluginLoader
         public event Action<uiToggle, bool> onChange;
 
         private Color[] text_clr = new Color[2] { new Color(0.7f, 0.7f, 0.7f), new Color32(16, 16, 16, 255) };
+        #endregion
 
         public uiToggle() : base()
         {
+            Clickable = true;
             onClicked += UiToggle_onClicked;
 
             //set the default text styling

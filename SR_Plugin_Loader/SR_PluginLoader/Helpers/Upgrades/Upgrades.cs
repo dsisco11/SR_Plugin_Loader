@@ -52,13 +52,13 @@ namespace SR_PluginLoader
 
             SiscosHooks.unregister_all(registrar);
 
-            SiscosHooks.register(registrar, HOOK_ID.Game_Saved, onGameSaved);
-            SiscosHooks.register(registrar, HOOK_ID.Pre_Game_Loaded, onPreGameLoaded);
-            SiscosHooks.register(registrar, HOOK_ID.Post_Game_Loaded, onPostGameLoaded);
-            SiscosHooks.register(registrar, HOOK_ID.Spawn_Player_Upgrades_UI, onSpawn_PlayerUpgrades_Kiosk);
-            SiscosHooks.register(registrar, HOOK_ID.Spawn_Plot_Upgrades_UI, onSpawn_PlotUpgrades_Kiosk);
-            SiscosHooks.register(registrar, HOOK_ID.Plot_Load_Upgrades, onPlot_Loaded_Upgrades);
-            SiscosHooks.register(registrar, HOOK_ID.Level_Loaded, onLevelLoaded);
+            SiscosHooks.register(HOOK_ID.Game_Saved, onGameSaved, registrar);
+            SiscosHooks.register(HOOK_ID.Pre_Game_Loaded, onPreGameLoaded, registrar);
+            SiscosHooks.register(HOOK_ID.Post_Game_Loaded, onPostGameLoaded, registrar);
+            SiscosHooks.register(HOOK_ID.Spawn_Player_Upgrades_UI, onSpawn_PlayerUpgrades_Kiosk, registrar);
+            SiscosHooks.register(HOOK_ID.Spawn_Plot_Upgrades_UI, onSpawn_PlotUpgrades_Kiosk, registrar);
+            SiscosHooks.register(HOOK_ID.Plot_Load_Upgrades, onPlot_Loaded_Upgrades, registrar);
+            SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded, registrar);
         }
 
         #region Misc

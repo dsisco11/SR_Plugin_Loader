@@ -41,8 +41,14 @@ namespace SR_PluginLoader
         private ILayoutDirector layout = null;
 
         #region Constructors
-        protected uiPanel() : base(uiControlType.Panel) { Autosize_Method = AutosizeMethod.GROW; }
-        protected uiPanel(uiControlType ty) : base(ty) { Autosize_Method = AutosizeMethod.GROW; }
+        protected uiPanel() : base(uiControlType.Panel) { init(); }
+        protected uiPanel(uiControlType ty) : base(ty) { init(); }
+
+        private void init()
+        {
+            Clickable = true;
+            Autosize_Method = AutosizeMethod.GROW;
+        }
         #endregion
 
         /// <summary>

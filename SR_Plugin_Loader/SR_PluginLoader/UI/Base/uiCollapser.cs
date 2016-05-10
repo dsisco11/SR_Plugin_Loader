@@ -7,6 +7,8 @@ namespace SR_PluginLoader
     /// </summary>
     public class uiCollapser : uiWrapperPanel
     {
+        #region State Sizes (Collapsed/Expanded)
+
         protected float? size_width_expanded = null;
         public float? Size_Width_Expanded { get { return size_width_expanded; } set { size_width_expanded = value; resize(); } }
 
@@ -18,16 +20,22 @@ namespace SR_PluginLoader
 
         protected float? size_height_collapsed = null;
         public float? Size_Height_Collapsed { get { return size_height_collapsed; } set { size_height_collapsed = value; resize(); } }
+        #endregion
 
-        
-        protected bool collapsed = true;
+
+        protected bool collapsed = false;
         public bool isCollapsed { get { return collapsed; } }
 
         public override bool isVisible { get { return (!isCollapsed && base.isVisible); }  set { base.isVisible = value; } }
 
 
-        public uiCollapser() : base() { }
-        public uiCollapser(uiControlType type) : base(type) { }
+        public uiCollapser() : base() { init();  }
+        public uiCollapser(uiControlType type) : base(type) { init(); }
+
+        private void init()
+        {
+            Clickable = true;
+        }
 
 
         /// <summary>

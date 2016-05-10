@@ -9,6 +9,8 @@ namespace SR_PluginLoader
 {
     class uiCheckbox : uiPanel
     {
+        #region Variables
+
         public const float CHECKBOX_SIZE = 16f;
         /// <summary>
         /// The styling for the check MARK, please note that the style is only drawn when the control's isChecked property is TRUE, so the styles 'normal' state is what you wan't to set to define it's appearence.
@@ -30,13 +32,14 @@ namespace SR_PluginLoader
 
         public uiText label = null;
         private Rect checkbox_area = new Rect(0, 0, CHECKBOX_SIZE, CHECKBOX_SIZE);
+        #endregion
 
 
         public uiCheckbox() : base (uiControlType.Checkbox)
         {
-            _typename = "uiCheckbox";
-            this.Autosize = true;
-            Padding = new RectOffset(1, 1, 1, 1);
+            Clickable = true;
+            Autosize = true;
+            Set_Padding(1, 1, 1, 1);
             onClicked += UiCheckbox_onClicked;
             Min_Width = CHECKBOX_SIZE;
             Min_Height = CHECKBOX_SIZE;

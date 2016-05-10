@@ -27,7 +27,8 @@ namespace SR_PluginLoader
 
         private void init()
         {
-            _selectable = true;
+            Clickable = true;
+            Selectable = true;
             onClicked += (uiControl c) => { if (_selectable) { Selected = !Selected; } };
             Autosize = true;
             //Autosize_Method = AutosizeMethod.BLOCK;
@@ -43,6 +44,7 @@ namespace SR_PluginLoader
             Border.active.color = new Color32(255, 255, 255, 200);
 
             icon = uiControl.Create<uiIcon>("icon", this);
+            icon.SizeConstraint = uiSizeConstraint.WIDTH_MATCHES_HEIGHT;
             icon.Set_Padding(2, 2, 2, 2);
             icon.Autosize = true;
 
@@ -73,11 +75,7 @@ namespace SR_PluginLoader
             icon.alignLeftSide();
             /*
             if (Icon == null) icon.Set_Size(0f, 0f);
-            else
-            {
-                icon.FloodY();
-                icon.Set_Width(icon.Area.size.y);
-            }
+            else icon.FloodY();
             */
 
             title.alignTop();

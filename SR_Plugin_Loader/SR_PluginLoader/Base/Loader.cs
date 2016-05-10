@@ -334,7 +334,7 @@ namespace SR_PluginLoader
                 }
                 
                 // Select the keynames of all non-null, enabled plugins from our dictionary.
-                List<string> list = Loader.plugins.Where(kv => (kv.Value != null && kv.Value.enabled)).Select(kv => kv.Key).ToList();
+                List<string> list = Loader.plugins.Where(kv => (kv.Value != null && kv.Value.Enabled)).Select(kv => kv.Key).ToList();
 
                 Config.Set_Array<string>("ENABLED_PLUGINS", list);
                 Config.Save();
@@ -394,7 +394,14 @@ namespace SR_PluginLoader
             if (has_updates == true)
             {
                 updatesView.onResult += (DialogResult res) => { if (res == DialogResult.OK) { Loader.Auto_Update(); } };
-                new GameObject().AddComponent<ActionDelayer>().SelfDestruct().onStart += () => { updatesView.Show(); };
+
+                SiscosHooks.Once(HOOK_ID.MainMenu_Loaded, (ref object sender, ref object[] args, ref object retn) => {
+                    updatesView.Show();
+                    return null;
+                });
+
+                //new GameObject().AddComponent<ActionDelayer>().SelfDestruct().onStart += () => { updatesView.Show(); };
+
                 /*
                 new UI_Notification()
                 {

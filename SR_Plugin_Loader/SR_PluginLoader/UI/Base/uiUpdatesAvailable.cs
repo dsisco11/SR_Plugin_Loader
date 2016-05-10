@@ -19,7 +19,7 @@ namespace SR_PluginLoader
 
             contentPanel.onLayout += ContentPanel_onLayout;
 
-            message.Text = "There are updates available!\nAll files which have updates are listed below.";
+            message.Text = "Updates are available!\nThe files which will be updated are listed below.";
             message.TextAlign = TextAnchor.UpperCenter;
 
             list = Create<uiListView>("list", contentPanel);
@@ -38,6 +38,8 @@ namespace SR_PluginLoader
         public void Add_File(string filename)
         {
             var itm = Create<uiListItem_Progress>(filename, list);
+            itm.Selectable = false;
+            itm.Clickable = false;
             itm.Text = Path.GetFileName(filename);
             itm.TextStyle = FontStyle.Bold;
             itm.TextSize = 14;
