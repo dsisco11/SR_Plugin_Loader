@@ -23,7 +23,7 @@ namespace SR_PluginLoader
         private float progress = 0f;
 
         #region Accessors
-        public float Value { get { return progress; } set { progress = value; prog_text.Text = String.Format("{0:0p}", value); update_progress_area(); onProgress?.Invoke(this, progress, prog_text.Text); } }
+        public float Value { get { return progress; } set { progress = value; prog_text.Text = value.ToString("P0"); update_progress_area(); onProgress?.Invoke(this, progress, prog_text.Text); } }
         public override string Text { get { return title.Text; } set { title.Text = value; } }
         #endregion
 
@@ -34,8 +34,10 @@ namespace SR_PluginLoader
             title.inherits_text_style = true;
             // Create the progress bar first so it renders behind everything else.
             prog_bar = Create<uiEmpty>("progress_bar", this);
-            prog_bar.Set_Background(Util.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, new Color(0.1f, 0.5f, 1.0f), new Color(1f, 1f, 1f, 1f), true, 0.3f));
+            prog_bar.Set_Background(new Color(0.1f, 0.5f, 1.0f));
+            //prog_bar.Set_Background(Util.Get_Gradient_Texture(64, GRADIENT_DIR.TOP_BOTTOM, new Color(0.1f, 0.5f, 1.0f), new Color(0.2f, 0.6f, 1f, 1f), true, 0.3f));
             prog_bar.FloodY();
+            this.Set_Child_Index(prog_bar, 0);// Move the progress bar to the back so it draws underneath all of the other controls here.
 
             prog_text = Create<uiText>(this);
             prog_text.Autosize_Method = AutosizeMethod.FILL;
@@ -47,7 +49,7 @@ namespace SR_PluginLoader
             update_progress_area();
         }
 
-        protected void update_progress_area() { prog_bar.Set_Width(Area.width * progress); }
+        protected void update_progress_area() { prog_bar.Set_Width(Area.width * progress); prog_bar.FloodY(); }
 
         public override void doLayout()
         {

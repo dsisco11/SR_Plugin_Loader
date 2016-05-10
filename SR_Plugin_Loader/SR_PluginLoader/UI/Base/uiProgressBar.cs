@@ -16,7 +16,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// The current progress to be displayed stored as a floating point value from 0.0 to 1.0
         /// </summary>
-        public float Value { get { return progress; } set { progress = value; text.Text = String.Format("{0:0p}", value); update_progress_area(); onProgress?.Invoke(this, progress, text.Text); } }
+        public float Value { get { return progress; } set { progress = value; text.Text = value.ToString("P0"); update_progress_area(); onProgress?.Invoke(this, progress, text.Text); } }
         protected float progress = 0f;
 
         public uiText text;

@@ -10,11 +10,12 @@ namespace SR_PluginLoader
     public class uiUpdatesAvailable : uiDialogResult
     {
         private uiListView list = null;
+        public override uiControl this[string key] { get { return list[key]; } }
 
-        public uiUpdatesAvailable()
+        public uiUpdatesAvailable() : base()
         {
             Title = "Updates Available";
-            Set_Size(300, 600);
+            Set_Size(300, 450);
             Center();
 
             contentPanel.onLayout += ContentPanel_onLayout;

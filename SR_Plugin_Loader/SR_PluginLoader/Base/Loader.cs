@@ -38,7 +38,7 @@ namespace SR_PluginLoader
         public static SettingsFile Config = null;
         
         private static Plugin_Update_Viewer plugin_updater = null;
-        private static uiUpdatesAvailable updatesView = null;
+        internal static uiUpdatesAvailable updatesView = null;
         private static DevMenu dev_tools = null;
 
 
@@ -415,6 +415,8 @@ namespace SR_PluginLoader
 
         public static void Auto_Update()
         {
+            new GameObject().AddComponent<PluginLoader_AutoUpdater>().Files = available_updates;
+            /*
             foreach(GitFile file in available_updates)
             {
                 DebugHud.Log("Updating plugin loader...");
@@ -430,6 +432,7 @@ namespace SR_PluginLoader
             }
             // We have to restart the game for this to take effect.
             Restart_App();
+            */
         }
 
         /// <summary>
@@ -455,7 +458,7 @@ namespace SR_PluginLoader
                     //DebugHud.Log("{0}  |  LOCAL_PATH: {1}  |  REMOTE_PATH: {2}", file.FULLNAME, local_path, file.URL);
                     if (status == FILE_UPDATE_STATUS.OUT_OF_DATE)
                     {
-                        updatesView.Add_File(file.FULLNAME);
+                        updatesView.Add_File(file.FILE);
                         available_updates.Add(file);
                     }
                 }

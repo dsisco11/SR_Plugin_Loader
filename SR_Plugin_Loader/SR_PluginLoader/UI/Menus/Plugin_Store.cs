@@ -475,7 +475,7 @@ namespace SR_PluginLoader
                DebugHud.Log("The download url for the plugin \"{0}\" returns content of type \"{1}\" rather than the plugin file itself.\nThis may indicate that the url for this plugin leads to a download PAGE as opposed to giving the actual file, the plugin creator should supply a valid url leading DIRECTLY to the file.", pl_title, ContentType);
                return false;//This file is not ok to download.
            },
-           (int read, int total) =>
+           (float read, float total) =>
            {
                if (list == null) return;
 
@@ -484,7 +484,7 @@ namespace SR_PluginLoader
                {
                    float pct = ((float)read / (float)total);
                    pl.progress_bar.Value = pct;
-                   pl.progress_text.Value = String.Format("{0:p}", pct);
+                   pl.progress_text.Value = pct.ToString("P0");
                }
             },
            (string filename) =>

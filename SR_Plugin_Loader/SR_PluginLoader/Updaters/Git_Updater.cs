@@ -70,6 +70,20 @@ namespace SR_PluginLoader
             return result;
         }
 
+        private static string Format_As_Raw_GitHub_Url(string url)
+        {
+            var uri = new Uri(url);
+            if (!host_is_github(uri.Host)) return uri.AbsolutePath;
+
+            var reg = new Regex(@"^(/\w+/\w+)/.+$");
+            Match match = reg.Match(uri.AbsolutePath);
+
+            string result = url;
+            if (match.Success) result = String.Concat("https://raw.github.com/", match.Groups[1].Value.TrimStart(new char[] {  '\\', '/'}));
+
+            return result;
+        }
+
         private static WebClient GetClient()
         {
             // Add a handler for SSL certs because mono doesnt have any trusted ones by default
@@ -168,21 +182,33 @@ namespace SR_PluginLoader
             return Cache_Git_Repo(repo_url);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="repo_url">The Raw CName GitHub repository url eg: https://raw.github.com/dsisco11/SR_Plugin_Loader/master/</param>
+        /// <param name="folder"></param>
+        /// <returns></returns>
         public static List<GitFile> Get_Repo_Folder_Files(string repo_url, string folder)
         {
             string fldr = folder.Trim(new char[] { '/', '\\' });
             JSONArray repo = Get_Repo(repo_url);
             List<GitFile> list = new List<GitFile>();
+            string raw_url = Format_As_Raw_GitHub_Url(repo_url).TrimEnd(new char[] { '\\', '/' });
             // Find the plugin loaders DLL installation file
             foreach (JSONNode file in repo)
             {
                 string path = file["path"];
-                string url = file["url"];
+                //string url = file["url"];
+                string url = String.Format("{0}/{1}", repo_url.TrimEnd(new char[] { '/', '\\' }), path.TrimStart(new char[] { '/', '\\' }));
                 string dir = Path.GetDirectoryName(path);
                 int size = string.IsNullOrEmpty(file["size"]) ? 0 : int.Parse(file["size"]);
 
                 if (String.Compare("blob", file["type"].Value.ToLower()) != 0) continue;
-                if (String.Compare(dir, fldr) == 0) list.Add(new GitFile(Path.Combine(repo_url, path), path, url, size));
+                if (String.Compare(dir, fldr) == 0)
+                {
+                    //DebugHud.Log("{0}  |  URL: {1}", path, url);
+                    list.Add(new GitFile(Path.Combine(repo_url, path), path, url, size));
+                }
             }
 
             return list;

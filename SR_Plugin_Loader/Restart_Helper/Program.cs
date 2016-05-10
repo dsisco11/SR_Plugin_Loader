@@ -26,8 +26,11 @@ namespace Restart_Helper
             proc.Kill();
             Console.WriteLine("Waiting for exit.");
             proc.WaitForExit();
+            Console.WriteLine("Searching for installer.");
+            string installerPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "./SR_PluginLoader_Installer.exe"));
+            Console.WriteLine("Found Installer Path: " + installerPath);
             Console.WriteLine("Reinstalling the plugin loader");
-            var installer = Process.Start(String.Format("{0}/SR_PluginLoader_Installer.exe", Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location)), "-fast");
+            var installer = Process.Start(installerPath, "-fast");
             installer.WaitForExit();
             Console.WriteLine("Restarting");
 
