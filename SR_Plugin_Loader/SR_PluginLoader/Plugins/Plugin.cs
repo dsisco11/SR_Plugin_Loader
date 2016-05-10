@@ -34,11 +34,11 @@ namespace SR_PluginLoader
         /// <summary>
         /// The game object assigned to manage this plugin.
         /// </summary>
-        private GameObject root = null;
+        private GameObject GM = null;
         private string Unique_GameObject_Name { get { return this.ToString(); } }
 
         private bool is_update_available = false;
-        public bool enabled = false;
+        public bool Enabled = false;
         /// <summary>
         /// Does this plugin have dependencys that arent currently met?
         /// </summary>
@@ -51,7 +51,9 @@ namespace SR_PluginLoader
         public string dir = null;
         private string dll_name = null;
 
-        public List<string> errors = new List<string>();
+        public List<string> Errors = new List<string>();
+        public bool HasErrors { get { return (Errors.Count > 0); } }
+        public Action onError;
 
         public Texture2D icon = null;
         public Texture2D thumbnail = null;
@@ -68,7 +70,7 @@ namespace SR_PluginLoader
             this.dir = Path.GetDirectoryName(file);
             this.dll_name = Path.GetFileName(file);
 
-            this.enabled = en;
+            this.Enabled = en;
         }
 
 
@@ -137,15 +139,17 @@ namespace SR_PluginLoader
         private void Add_Error(string format, params object[] args)
         {
             string str = DebugHud.Format_Log(format, 1, args);
-            this.errors.Add(str);
+            Errors.Add(str);
             DebugHud.Log("[ <b>{0}</b> ] {1}", this.dll_name, str);
+            onError?.Invoke();
         }
 
         private void Add_Error(Exception ex)
         {
-            string str = DebugHud.Format_Log(ex.Message, 1);
-            this.errors.Add(str);
+            string str = DebugHud.Format_Exception_Log(ex, 1);
+            Errors.Add(str);
             DebugHud.Log("[ <b>{0}</b> ] {1}", this.dll_name, str);
+            onError?.Invoke();
         }
 
         private bool Load_DLL()
@@ -293,17 +297,28 @@ namespace SR_PluginLoader
             }
         }
 
-        public void Enable()
+        public bool Enable()
         {
-            this.enabled = false;//default it and if we successfully load THEN we can make it true.
+            Enabled = false;//default it and if we successfully load THEN we can make it true.
             if (this.has_dependency_issues == true)
             {
-                this.enabled = false;
-                return;
+                Enabled = false;
+                return false;
             }
 
+            if ( this.Load() )
+            {
+                Enabled = true;
+                Loader.Plugin_Status_Change(this, Enabled);
+            }
+
+            return Enabled;
+        }
+
+        private bool Load()
+        {
             var dupe = GameObject.Find(Unique_GameObject_Name);
-            if(dupe != null)
+            if (dupe != null)
             {
                 GameObject.DestroyImmediate(dupe);
                 DebugHud.Log("Destroyed pre-existing plugin manager GameObject instance!");
@@ -314,46 +329,46 @@ namespace SR_PluginLoader
 
             try
             {
-                bool loaded = false;
-
                 if (this.load_funct != null)
                 {
                     object[] args = new object[load_funct.GetParameters().Length];
                     var paramz = load_funct.GetParameters();
-                    for(int i=0; i<paramz.Length; i++)
+                    for (int i = 0; i < paramz.Length; i++)
                     {
                         ParameterInfo param = paramz[i];
                         if (typeof(GameObject) == param.ParameterType) args[i] = gmObj;
                         else if (typeof(Plugin) == param.ParameterType) args[i] = this;
 
                     }
-                    
-                    this.load_funct.Invoke(null, args);
-                    loaded = true;
-                }
 
-                if(loaded)
-                {
-                    this.enabled = true;
-                    this.root = gmObj;
-                    Loader.Plugin_Status_Change(this, enabled);
+                    this.load_funct.Invoke(null, args);
                 }
+                else return false;
+
+                GM = gmObj;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                this.Add_Error(ex);
+                Add_Error(ex);
+                Unload();
                 //let's try and unload the things it might have loaded
+                /*
                 if (this.unload_funct != null)
                 {
                     this.unload_funct.Invoke(null, new object[] { gmObj });
                 }
                 UnityEngine.GameObject.Destroy(gmObj);
+                */
+                return false;
             }
+            return true;
         }
 
-        public void Disable()
+        /// <summary>
+        /// Attempts to execute the plugins unload logic.
+        /// </summary>
+        private void Unload()
         {
-            this.enabled = false;// Unloading doesn't follow the same rules as loading, we just assume it's unloaded for the user's sake.
             try
             {
                 if (this.unload_funct != null)
@@ -363,7 +378,7 @@ namespace SR_PluginLoader
                     for (int i = 0; i < paramz.Length; i++)
                     {
                         ParameterInfo param = paramz[i];
-                        if (typeof(GameObject) == param.ParameterType) args[i] = root;
+                        if (typeof(GameObject) == param.ParameterType) args[i] = GM;
                         else if (typeof(Plugin) == param.ParameterType) args[i] = this;
 
                     }
@@ -373,19 +388,28 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                this.Add_Error(ex);
+                Add_Error(ex);
             }
             finally
             {
-                if (this.root != null) UnityEngine.GameObject.Destroy(this.root);
-                this.root = null;
-                Loader.Plugin_Status_Change(this, enabled);
+                if (GM != null) UnityEngine.GameObject.Destroy(GM);
+                GM = null;
+                Loader.Plugin_Status_Change(this, Enabled);
             }
+        }
+
+        /// <summary>
+        /// unloads the plugin and sets Enabled to false
+        /// </summary>
+        public void Disable()
+        {
+            Enabled = false;// Unloading doesn't follow the same rules as loading, we just assume it's unloaded for the user's sake.
+            Unload();
         }
 
         public void Toggle()
         {
-            if (this.enabled == true)
+            if (this.Enabled == true)
             {
                 this.Disable();
             }
@@ -491,14 +515,14 @@ namespace SR_PluginLoader
             if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException(String.Format("{0} Plugin has no UPDATE_METHOD specified!", this));
             
             IEnumerator iter = this.Updater.Download(this.data.UPDATE_METHOD.URL, this.file, null,
-               (int current, int total) =>
+               (float current, float total) =>
                {//Download progress
                     float f = (float)current / (float)total;
 
                    if (prog != null)
                    {
                        float p = (float)current / (float)total;
-                       prog.progress = p;
+                       prog.Value = p;
                    }
                },
                (string file) => 

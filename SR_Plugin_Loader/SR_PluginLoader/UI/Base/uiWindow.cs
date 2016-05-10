@@ -222,7 +222,7 @@ namespace SR_PluginLoader
             return content_panel.withinChild(p);
         }
 
-        public override IEnumerable<uiControl> Get_Children() { return content_panel.Get_Children(); }
+        public override IList<uiControl> Get_Children() { return content_panel.Get_Children(); }
         #endregion
 
         public override void doLayout()

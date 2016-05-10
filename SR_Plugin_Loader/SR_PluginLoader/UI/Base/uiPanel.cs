@@ -41,8 +41,14 @@ namespace SR_PluginLoader
         private ILayoutDirector layout = null;
 
         #region Constructors
-        protected uiPanel() : base(uiControlType.Panel) { Autosize_Method = AutosizeMethod.GROW; }
-        protected uiPanel(uiControlType ty) : base(ty) { Autosize_Method = AutosizeMethod.GROW; }
+        protected uiPanel() : base(uiControlType.Panel) { init(); }
+        protected uiPanel(uiControlType ty) : base(ty) { init(); }
+
+        private void init()
+        {
+            Clickable = true;
+            Autosize_Method = AutosizeMethod.GROW;
+        }
         #endregion
 
         /// <summary>
@@ -59,7 +65,16 @@ namespace SR_PluginLoader
 
         #region Child Management
 
-        public virtual IEnumerable<uiControl> Get_Children() { return (children as IEnumerable<uiControl>); }
+        public virtual IList<uiControl> Get_Children() { return (children as IList<uiControl>); }
+        public virtual void Set_Child_Index(uiControl child, int i)
+        {
+            int cidx = Get_Children().IndexOf(child);
+            if(cidx > -1)
+            {
+                if (i < 0) i += cidx;
+                if(Get_Children().Remove(child)) Get_Children().Insert(i, child);
+            }
+        }
 
         public virtual void Clear_Children()
         {

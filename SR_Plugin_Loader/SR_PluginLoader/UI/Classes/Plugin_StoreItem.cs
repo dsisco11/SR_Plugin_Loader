@@ -59,9 +59,9 @@ namespace SR_PluginLoader
 
             progress_bar = Create<uiProgressBar>("progress", download_info);
             progress_bar.Set_Height(4f);
-            progress_bar.progress = 0;
+            progress_bar.Value = 0;
             progress_bar.show_progress_text = false;
-            Util.Set_BG_Color(progress_bar.bar_style.normal, new Color(0.1f, 0.5f, 1.0f));
+            Util.Set_BG_Color(progress_bar.prog_bar.local_style.normal, new Color(0.1f, 0.5f, 1.0f));
             Util.Set_BG_Color(progress_bar.local_style.normal, new Color(0.1f, 0.1f, 0.1f));
 
 
@@ -88,7 +88,7 @@ namespace SR_PluginLoader
             _plugin_hash = data.Hash;
             this["name"].Text = data.NAME;
             this["author"].Text = data.AUTHOR;
-            progress_bar.progress = 0f;
+            progress_bar.Value = 0f;
         }
 
         public override void doLayout()

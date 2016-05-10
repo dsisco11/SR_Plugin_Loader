@@ -22,7 +22,7 @@ namespace SR_PluginLoader
         private uiIconButton btn_store = null;
         private uiWrapperPanel nop_wrapper = null;
         private uiTab pl_tab = null, tab_need_plugins = null, tab_ins = null;
-        private uiCollapser control_panel = null;
+        private uiCollapser control_panel = null, pl_errors=null;
 
         const string PLUGIN_TAB_NAME = "plugins_tab";
         const string INSTRUCTION_TAB_NAME = "instructions_tab";
@@ -61,6 +61,7 @@ namespace SR_PluginLoader
             control_panel.onLayout += Control_panel_onLayout;
             control_panel.Collapse();
 
+
             pl_toggle = Create<uiToggle>("pl_toggle", control_panel);
             pl_toggle.onChange += Pl_toggle_onChange;
 
@@ -81,16 +82,35 @@ namespace SR_PluginLoader
 
             pl_tab.Set_Padding(3);// so we can distinguish where the plugin thumbnail's borders are
 
-            pl_title = Create<uiText>("pl_title", tabPanel);
+
+            // PLUGIN ERRORS PANEL
+            pl_errors = Create<uiCollapser>(pl_tab);
+            pl_errors.onLayout += Clps_errors_onLayout;
+            pl_errors.Collapse();
+
+            var err_ico = Create<uiIcon>("err_ico", pl_errors);
+            err_ico.image = TextureHelper.icon_alert;
+            err_ico.Set_Height(26);
+
+            var err_lbl = Create<uiText>("err_lbl", pl_errors);
+            err_lbl.TextColor = Color.red;
+            err_lbl.Text = "Plugin experienced errors while loading!";
+            err_lbl.TextAlign = TextAnchor.MiddleLeft;
+            err_lbl.Set_Margin(2, 0, 0, 0);
+
+
+            // PLUGIN INFO
+
+            pl_title = Create<uiText>("pl_title", pl_tab);
             pl_title.local_style.fontSize = 22;
             pl_title.local_style.fontStyle = FontStyle.Bold;
 
 
-            pl_auth = Create<uiText>("pl_author", tabPanel);
-            pl_vers = Create<uiText>("pl_vers", tabPanel);
-            pl_desc = Create<uiTextArea>("pl_desc", tabPanel);
+            pl_auth = Create<uiText>("pl_author", pl_tab);
+            pl_vers = Create<uiText>("pl_vers", pl_tab);
+            pl_desc = Create<uiTextArea>("pl_desc", pl_tab);
 
-            pl_thumb = Create<uiIcon>("pl_thumb", tabPanel);
+            pl_thumb = Create<uiIcon>("pl_thumb", pl_tab);
             pl_thumb.Border.normal.color = new Color(0f, 0f, 0f, 0.3f);
 
             pl_desc.Set_Margin(2);
@@ -129,13 +149,24 @@ namespace SR_PluginLoader
             ins_no_plugins_text.Autosize = true;
         }
 
-        private void PluginManager_onLayout(uiPanel c)
+        private void Clps_errors_onLayout(uiPanel c)
         {
+            var err_ico = c["err_ico"];
+            var err_lbl = c["err_lbl"];
+            
+            err_lbl.moveRightOf(err_ico);
+            err_lbl.CenterVertically();
         }
 
+        private void PluginManager_onLayout(uiPanel c)
+        {
+            /*
+        }
+        
         public override void doLayout()
         {
             base.doLayout();
+            */
 
             btn_store.alignTop(2);
             btn_store.alignLeftSide(2);
@@ -193,7 +224,11 @@ namespace SR_PluginLoader
 
         private void tabPanel_onLayout(uiControl c)
         {
-            pl_thumb.alignTop();
+            pl_errors.alignTop();
+            pl_errors.CenterHorizontally();
+
+            //pl_thumb.alignTop();
+            pl_thumb.moveBelow(pl_errors, 2);
             pl_thumb.CenterHorizontally();
             
             //pl_toggle.CenterHorizontally();
@@ -278,7 +313,7 @@ namespace SR_PluginLoader
         private void Sel_onClicked(uiControl c)
         {
             Plugin_Manager_List_Item sel = c as Plugin_Manager_List_Item;
-            this.Select_Plugin(sel.Get_Plugin());
+            Select_Plugin(sel.Get_Plugin());
         }
 
         private void Select_Plugin(Plugin p)
@@ -298,6 +333,9 @@ namespace SR_PluginLoader
                 tab_ins.Select();
             }
 
+            // Unregister our error event hook for the last plugin we had selected
+            Plugin last = GetPlugin();
+            if (last != null) last.onError -= onPluginError;
 
             selected = null;
             if (p != null)
@@ -306,6 +344,7 @@ namespace SR_PluginLoader
                 Plugin_Manager_List_Item sel = list[p.Hash] as Plugin_Manager_List_Item;
                 if(sel != null) sel.Active = true;
             }
+            p.onError += onPluginError;
 
             control_panel.Set_Collapsed(selected==null);
 
@@ -323,6 +362,7 @@ namespace SR_PluginLoader
                 this.pl_thumb.image = null;
                 this.pl_toggle.isVisible = false;
                 this.pl_toggle.isChecked = false;
+                this.pl_errors.Collapse();
             }
             else
             {
@@ -334,7 +374,8 @@ namespace SR_PluginLoader
                 this.pl_vers.Text = p.data.VERSION.ToString();
                 this.pl_thumb.image = p.thumbnail;
                 this.pl_toggle.isVisible = true;
-                this.pl_toggle.isChecked = p.enabled;
+                this.pl_toggle.isChecked = p.Enabled;
+                this.pl_errors.Set_Collapsed(!p.HasErrors);
             }
 
             if (this.pl_thumb.image == null) thumb_sz = 0f;
@@ -343,6 +384,8 @@ namespace SR_PluginLoader
             float thumb_height = (thumb_sz * thumb_aspect);
             pl_thumb.Set_Size(thumb_sz, thumb_height);
         }
+
+        private void onPluginError() { pl_errors.Expand(); }
 
         private Plugin GetPlugin()
         {

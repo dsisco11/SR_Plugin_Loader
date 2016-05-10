@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SR_PluginLoader
 {
-    // TODO: uiTextArea doesn't seems to ignore it's padding when rendering it's text.
+    // TODO: uiTextArea seems to ignore it's padding when rendering text.
 
     public delegate void controlEvent<T>(T c) where T : uiControl;
     public delegate void parentEvent(uiPanel c);
@@ -88,15 +88,23 @@ namespace SR_PluginLoader
         #endregion
 
         #region Control Type variables
-
-        public readonly uiControlType type;
+        /// <summary>
+        /// What kind of control we are.
+        /// </summary>
+        public readonly uiControlType Kind;
         protected string _typename = null;
         public string Typename { get { if (_typename == null) { return this.GetType().Name; } return _typename; } }
         protected FocusType FocusType = FocusType.Passive;// Almost all controls will be using this FocusType, the only different ones will be ones that need keyboard input.
+
+        /// <summary>
+        /// Only clickable controls can fire clicked events.
+        /// </summary>
+        public bool Clickable = false;
         /// <summary>
         /// Only controls where isClickable returns true will perform handling for mouse events
         /// </summary>
-        protected bool isClickable { get { return ((type == uiControlType.Button || type == uiControlType.Checkbox || type == uiControlType.Textbox || type == uiControlType.TextArea || type == uiControlType.Panel || type == uiControlType.Panel_Dark || type == uiControlType.Window) || onClicked != null); } }
+        protected bool isClickable { get { return (Clickable || onClicked != null); } }
+        //protected bool isClickable { get { return ((type == uiControlType.Button || type == uiControlType.Checkbox || type == uiControlType.Textbox || type == uiControlType.TextArea || type == uiControlType.Panel || type == uiControlType.Panel_Dark || type == uiControlType.Window) || onClicked != null); } }
         /// <summary>
         /// Can the user click and drag this control?
         /// </summary>
@@ -222,16 +230,16 @@ namespace SR_PluginLoader
             {
                 if (inherits_style && isChild) { return styleCombo; }
                 else if (inherits_text_style && isChild) { return styleText; }
-                return (_local_style != null ? _local_style : get_skin_style_for_type(this.type));
+                return (_local_style != null ? _local_style : get_skin_style_for_type(Kind));
             }
         }
-        public GUIStyle defaultStyle { get { return get_skin_style_for_type(type); } }
-        public GUIStyle local_style { get { if (_local_style == null) { _local_style = new GUIStyle(get_skin_style_for_type(type)); update_area(); } set_style_dirty(); return _local_style; } set { _local_style = value; _style_text = null; _style_combo = null; } }
+        public GUIStyle defaultStyle { get { return get_skin_style_for_type(Kind); } }
+        public GUIStyle local_style { get { if (_local_style == null) { _local_style = new GUIStyle(Style); update_area(); } set_style_dirty(); return _local_style; } set { _local_style = value; _style_text = null; _style_combo = null; } }
         public GUIStyle styleText { get { if (_style_text == null) { styleText = null; } return _style_text; }
             set
             {
                 if (inherits_text_style && isChild) _style_text = new GUIStyle(parent.styleText);
-                else _style_text = new GUIStyle(_local_style != null ? _local_style : get_skin_style_for_type(this.type));
+                else _style_text = new GUIStyle(_local_style != null ? _local_style : get_skin_style_for_type(Kind));
 
                 _style_text.normal.background = null;
                 _style_text.active.background = null;
@@ -252,7 +260,7 @@ namespace SR_PluginLoader
             {
                 //_style_combo = new GUIStyle(parent.Style);
                 if (inherits_text_style && isChild) _style_combo = new GUIStyle(styleText);
-                else _style_combo = new GUIStyle(_local_style != null ? _local_style : get_skin_style_for_type(this.type));
+                else _style_combo = new GUIStyle(_local_style != null ? _local_style : get_skin_style_for_type(Kind));
 
                 _style_combo.normal.background = parent.Style.normal.background;
                 _style_combo.active.background = parent.Style.normal.background;
@@ -276,7 +284,7 @@ namespace SR_PluginLoader
                 if (Border.type != uiBorderType.NONE)
                 {
                     Border._cached.take(Border.normal);
-                    if (isMouseOver) Border._cached.take(Border.hover);
+                    if (isHovered) Border._cached.take(Border.hover);
                     if (isActive) Border._cached.take(Border.active);
                     if (isFocused) Border._cached.take(Border.focused);
                 }
@@ -312,11 +320,23 @@ namespace SR_PluginLoader
         protected bool isMouseDown = false;
         protected bool isMouseOver = false;
 
-        protected bool isFocused { get { return (GUIUtility.hotControl == this.unity_id || GUIUtility.keyboardControl == this.unity_id); } }// Focused means the control is receiving user input
+        /// <summary>
+        /// Focused means the control is receiving user keyboard input
+        /// </summary>
+        protected bool isFocused { get { return (GUIUtility.hotControl == this.unity_id || GUIUtility.keyboardControl == this.unity_id); } }
+        /// <summary>
+        /// Hovered means that the mouse is overtop the control and it will use it's 'hover' <see cref="GUIStyleState"/> to draw with.
+        /// </summary>
+        protected virtual bool isHovered { get { return (isMouseOver || _active); } }
         /// <summary>
         /// The meaning of 'Active' differs with each control type but means something similar to being toggled 'on' or being the active selection in a list.
+        /// Eg: Visually Activated
         /// </summary>
-        protected virtual bool isActive { get { return (this.isMouseDown || this._active); } }
+        protected virtual bool isActive { get { return _active; } }
+        /// <summary>
+        /// Depressed, here, means that the control is in a visually active/toggled/inset state.
+        /// </summary>
+        protected virtual bool isDepressed { get { return ((isMouseDown && isClickable) || _active); } }
         protected virtual bool hasScrollbar { get { return false; } }
         #endregion
 
@@ -351,6 +371,9 @@ namespace SR_PluginLoader
 
         private bool has_explicit_W = false;// Tracks whether the control has had an explicit width set
         private bool has_explicit_H = false;// Tracks whether the control has had an explicit height set
+
+        protected bool Explicit_W { get { return has_explicit_W; } }
+        protected bool Explicit_H { get { return has_explicit_H; } }
 
         #endregion
 
@@ -443,7 +466,9 @@ namespace SR_PluginLoader
         #endregion
 
         #region Size
-
+        
+        private uiSizeConstraint _sizeConstraint = uiSizeConstraint.NONE;
+        public uiSizeConstraint SizeConstraint { get { return _sizeConstraint; } set { _sizeConstraint = value; update_area(); } }
         /// <summary>
         /// The unconstrained size which this control should currently be BEFORE adding margin, padding, or border offsets.
         /// When the controls Area is updated it's size will be set to this value and constrained to be within the controls set min/max size values.
@@ -586,7 +611,7 @@ namespace SR_PluginLoader
             ID = ++lastUID;
             ALL.Add(ID, this);
 
-            type = ty;
+            Kind = ty;
         }
 
         protected virtual void OnDestroy()
@@ -704,7 +729,7 @@ namespace SR_PluginLoader
                 if (area.HasValue) _last_cached_area = area.Value;// Track what the area WAS so we can tell when it updates and only trigger extra logic when it's needed.
                 
                 Vector2 nowpos = set_area.position;
-                Vector2 nowsize = constrain_size(size);
+                Vector2 nowsize = constrain_size(apply_size_constraints(size));
 
                 area = null;// For SOME REASON Rect.Set(x,y, w,h) doesn't seem to actually change it's values. so we have to trash memory a bit and create a new Rect anytime we wanna get something done.
                 area = new Rect(nowpos, nowsize);
@@ -1307,7 +1332,7 @@ namespace SR_PluginLoader
 
             switch (Autosize_Method)
             {
-                case AutosizeMethod.ICON_FILL:// Expand to fill the remaining space within the parent's X axis
+                case AutosizeMethod.ICON_FILL:// Expand to fill the remaining space within the parent's Y axis
                     if (isChild)
                         sz.y = (parent.Get_Content_Area().height - Area.y);
                     else
@@ -1548,6 +1573,21 @@ namespace SR_PluginLoader
 
             return sz;
         }
+
+        protected Vector2 apply_size_constraints(Vector2 sz)
+        {
+            switch(_sizeConstraint)
+            {
+                case uiSizeConstraint.WIDTH_MATCHES_HEIGHT:
+                    sz.x = sz.y;
+                    break;
+                case uiSizeConstraint.HEIGHT_MATCHES_WIDTH:
+                    sz.y = sz.x;
+                    break;
+            }
+
+            return sz;
+        }
         #endregion
 
         #region HELPER STUFF
@@ -1601,15 +1641,11 @@ namespace SR_PluginLoader
             }
         }
 
-        public void Set_Background(Color clr)
-        {
-            Util.Set_BG_Color(local_style.normal, clr);
-        }
+        public void Set_Background(Color clr) { Util.Set_BG_Color(local_style.normal, clr); }
 
-        public void Set_Background(Color clrA, Color clrB, GRADIENT_DIR dir, float? exp = null)
-        {
-            Util.Set_BG_Gradient(local_style.normal, 128, dir, clrA, clrB, exp);
-        }
+        public void Set_Background(Color clrA, Color clrB, GRADIENT_DIR dir, float? exp = null) { Util.Set_BG_Gradient(local_style.normal, 128, dir, clrA, clrB, exp); }
+
+        public void Set_Background(Texture2D tex) { local_style.normal.background = tex; }
         #endregion
 
         #region Layout Logic
@@ -1774,13 +1810,13 @@ namespace SR_PluginLoader
         /// </summary>
         protected virtual void Display_BG()
         {
-            if(!disableBG) Style.Draw(draw_area, GUIContent.none, isMouseOver || isActive, isActive, false, isFocused);
+            if(!disableBG) Style.Draw(draw_area, GUIContent.none, isHovered, isActive, false, isFocused);
             draw_border();
         }
 
         protected virtual void Display_Text()
         {
-            if(content != null && content.text != null && content.text.Length>0) styleText.Draw(inner_area, content, isMouseOver || isActive, isActive, false, isFocused);
+            if(content != null && content.text != null && content.text.Length>0) styleText.Draw(inner_area, content, isHovered, isActive, false, isFocused);
         }
 
         protected abstract void Display();

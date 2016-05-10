@@ -28,7 +28,7 @@ namespace SR_PluginLoader
 
         public static void Setup()
         {
-            SiscosHooks.register(null, HOOK_ID.Level_Loaded, onLevelLoaded);
+            SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded);
             Create_Mat();
             Init();
 

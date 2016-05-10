@@ -49,7 +49,7 @@ namespace SR_PluginLoader
             if (_setup) throw new NotSupportedException("Blocked attempt to call MainMenu.Setup() a second time.");
             _setup = true;//now we have run setup!
 
-            SiscosHooks.register(null, HOOK_ID.Level_Loaded, MainMenu.onLevelLoaded);
+            SiscosHooks.register(HOOK_ID.Level_Loaded, MainMenu.onLevelLoaded);
 
             State = new Active_State_Tracker("MAIN_MENU");
             // Create our handler game object
@@ -68,7 +68,7 @@ namespace SR_PluginLoader
 
             // We need to delay hookinh into the main menu until we are sure all of the buttons have been styled and initialized by the game's default logic.
             // Otherwise the buttons are invisible and people catch on fire and it's just a big legal ordeal really...
-            new GameObject().AddComponent<ActionDelayer>().Set_Temporary().onStart += () => { Hook_MainMenu(); };
+            new GameObject().AddComponent<ActionDelayer>().SelfDestruct().onStart += () => { Hook_MainMenu(); };
             return null;
         }
 

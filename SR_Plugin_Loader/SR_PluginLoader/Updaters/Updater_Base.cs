@@ -41,7 +41,7 @@ namespace SR_PluginLoader
     }
 
     public delegate bool Updater_File_Type_Confirm(string ContentType);
-    public delegate void Updater_File_Download_Progress(int read, int total_bytes);
+    public delegate void Updater_File_Download_Progress(float read, float total_bytes);
     public delegate void Updater_File_Download_Completed(string filename);
     public delegate void Updater_Cache_Or_Open_File_Callback(FileStream stream);
     public delegate void Updater_Get_Result(byte[] buf);
@@ -93,7 +93,7 @@ namespace SR_PluginLoader
             WebAsync webAsync = new WebAsync();
             IEnumerator e = webAsync.GetResponse(webRequest);
             while (e.MoveNext()) { yield return e.Current; }// wait for response to arrive
-            while (!webAsync.isResponseCompleted) yield return 0;// double check for clarity & safety
+            while (!webAsync.isResponseCompleted) yield return null;// double check for clarity & safety
 
             RequestState result = webAsync.requestState;
             resp = result.webResponse;
@@ -168,16 +168,12 @@ namespace SR_PluginLoader
                 yield return null;
                 yield break;
             }
-            DebugHud.Log("Updater_Base.Get() Stage 1");
 
             while (e.MoveNext()) { yield return null; }// wait for response to arrive
-            DebugHud.Log("Updater_Base.Get() Stage 2");
             while (!webAsync.isResponseCompleted) yield return null;// double check for clarity & safety
 
-            DebugHud.Log("Updater_Base.Get() Stage 3");
             RequestState result = webAsync.requestState;
             resp = result.webResponse;
-            DebugHud.Log("Updater_Base.Get() Got Response!");
 
             if (confirm != null)
             {
@@ -218,6 +214,7 @@ namespace SR_PluginLoader
             
             callback?.Invoke(buf);
             yield return buf;
+            yield break;
         }
     }
 }

@@ -16,6 +16,7 @@ namespace SR_PluginLoader
 
         public uiButton() : base(uiControlType.Button)
         {
+            Clickable = true;
             Autosize = true;
             Autosize_Method = AutosizeMethod.GROW;
             Set_Padding(2, 2, 1, 1);

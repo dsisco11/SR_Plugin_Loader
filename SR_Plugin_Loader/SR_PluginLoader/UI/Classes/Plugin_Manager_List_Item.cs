@@ -23,7 +23,7 @@ namespace SR_PluginLoader
             Autosize_Method = AutosizeMethod.BLOCK;
             Set_Height(50);
             Set_Margin(4, 4, 2, 0);
-            Set_Padding(2);
+            Set_Padding(2, 0, 2, 0);
             Border.normal = new uiBorderStyleState() { color = new Color32(10, 10, 10, 255) };
             //Border.hover = new uiBorderStyleState() { color = new Color32(255, 255, 255, 255) };
 
@@ -62,10 +62,10 @@ namespace SR_PluginLoader
         private void Update()
         {
             if (plugin == null) return;
-            if (plugin.enabled != last_plugin_en_state || !plugin_state_init)
+            if (plugin.Enabled != last_plugin_en_state || !plugin_state_init)
             {
                 plugin_state_init = true;
-                last_plugin_en_state = plugin.enabled;
+                last_plugin_en_state = plugin.Enabled;
                 Plugin_State_Changed();
             }
         }
@@ -73,8 +73,8 @@ namespace SR_PluginLoader
         private void Plugin_State_Changed()
         {
             //this.pl_status.Active = plugin.enabled;
-            pl_status.TextColor = (plugin.enabled ? Color.green : Color.red);
-            pl_status.Text = (plugin.enabled ? "Enabled" : "Disabled");
+            pl_status.TextColor = (plugin.Enabled ? Color.green : Color.red);
+            pl_status.Text = (plugin.Enabled ? "Enabled" : "Disabled");
         }
 
         public override void doLayout()

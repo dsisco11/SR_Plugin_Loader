@@ -18,7 +18,7 @@ namespace SR_PluginLoader
         /// </summary>
         public uiBorderStyleState hover = new uiBorderStyleState();
         /// <summary>
-        /// Style to use when the control is in an 'on' or 'activated' state
+        /// Style to use when the control is in an 'activated' state
         /// </summary>
         public uiBorderStyleState active = new uiBorderStyleState();
         /// <summary>

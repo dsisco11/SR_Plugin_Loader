@@ -16,12 +16,12 @@ namespace SR_PluginLoader
             title.TextAlign = TextAnchor.MiddleCenter;
 
             icon.Autosize = false;
+            icon.SizeConstraint = uiSizeConstraint.WIDTH_MATCHES_HEIGHT;
         }
         
         public override void doLayout()
         {
             icon.alignTop();
-            icon.Set_Width(icon.Area.height);//match width to height
             icon.CenterHorizontally();
             icon.FloodY(title.Area.size.y);
 

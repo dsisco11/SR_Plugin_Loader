@@ -30,7 +30,7 @@ namespace SR_PluginLoader
 
             progress_bar = Create<uiProgressBar>(this);
             progress_bar.show_progress_text = false;
-            Util.Set_BG_Color(progress_bar.bar_style.normal, new Color(0.1f, 0.4f, 0.8f, 0.7f));
+            Util.Set_BG_Color(progress_bar.prog_bar.local_style.normal, new Color(0.1f, 0.4f, 0.8f, 0.7f));
             progress_bar.onProgress += Progress_bar_onProgress;
 
             checkbox = Create<uiCheckbox>(this);
@@ -55,7 +55,7 @@ namespace SR_PluginLoader
         public void Set_Plugin_Data(Plugin_Data data)
         {
             _plugin_hash = data.Hash;
-            this.progress_bar.progress = 0f;
+            this.progress_bar.Value = 0f;
             checkbox.text = String.Format("<b>{0}</b>  <color=#BBBBBB>By</color> <i>{1}</i>", data.NAME, data.AUTHOR);
             update_area();
         }
