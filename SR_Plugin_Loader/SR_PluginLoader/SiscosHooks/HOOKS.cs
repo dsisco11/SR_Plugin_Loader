@@ -115,6 +115,7 @@ namespace SR_PluginLoader
 
         public static readonly HOOK_ID Pre_Economy_Init = new HOOK_ID();
         public static readonly HOOK_ID Post_Economy_Init = new HOOK_ID();
+        public static readonly HOOK_ID Economy_Updated = new HOOK_ID();
 
         #region Player Events
         public static readonly HOOK_ID Player_ApplyUpgrade = new HOOK_ID();
