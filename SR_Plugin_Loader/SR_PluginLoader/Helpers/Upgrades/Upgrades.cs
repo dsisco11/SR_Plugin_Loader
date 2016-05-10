@@ -185,9 +185,9 @@ namespace SR_PluginLoader
             }
             return false;
         }
-        #endregion
+#endregion
         
-        #region Event Handlers
+#region Event Handlers
         private static Sisco_Return onPostGameLoaded(ref object sender, ref object[] args, ref object return_value)
         {
             string gameName = (string)args[0];
@@ -324,9 +324,9 @@ namespace SR_PluginLoader
             }
             return null;
         }
-        #endregion
+#endregion
 
-        #region Saving / Loading
+#region Saving / Loading
         private static void Load_Plot_Upgrades(string fileName)
         {
             // LOAD PLOT UPGRADES
@@ -416,7 +416,7 @@ namespace SR_PluginLoader
             File.Copy(tempFile, fileName, true);
             File.Delete(tempFile);
         }
-        #endregion
+#endregion
     }
 
     /// <summary>
@@ -538,7 +538,7 @@ namespace SR_PluginLoader
             return Upgrades.Has_Upgrade_Data_Value(pid, upgradeName, key);
         }
 
-        #region Setters
+#region Setters
         public void Set_Bool(string key, bool v)
         {
             Upgrades.Write_Upgrade_Data_Value(pid, upgradeName, key, BitConverter.GetBytes(v));
@@ -563,9 +563,9 @@ namespace SR_PluginLoader
         {
             Upgrades.Write_Upgrade_Data_Value(pid, upgradeName, key, UTF8Encoding.UTF8.GetBytes(str));
         }
-        #endregion
+#endregion
 
-        #region Getters
+#region Getters
         public bool Get_Bool(string key)
         {
             return BitConverter.ToBoolean(Upgrades.Read_Upgrade_Data_Value(pid, upgradeName, key), 0);
@@ -593,6 +593,6 @@ namespace SR_PluginLoader
 
             return UTF8Encoding.UTF8.GetString(buf);
         }
-        #endregion
+#endregion
     }
 }
