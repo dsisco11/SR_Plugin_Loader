@@ -10,6 +10,7 @@ namespace SR_PluginLoader
         public static LookupDirector lookupDirector { get { return SRSingleton<GameContext>.Instance.LookupDirector; } }
         public static MessageDirector messageDirector { get { return SRSingleton<GameContext>.Instance.MessageDirector; } }
         public static OptionsDirector optionsDirector { get { return SRSingleton<GameContext>.Instance.OptionsDirector; } }
+        public static EconomyDirector economyDirector { get { return SRSingleton<SceneContext>.Instance.EconomyDirector; } }
 
         public static TimeDirector timeDirector { get { return SRSingleton<SceneContext>.Instance.TimeDirector; } }
     }
