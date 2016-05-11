@@ -92,6 +92,7 @@ namespace SR_PluginLoader
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Economy_Init, name = "EconomyDirector.InitForLevel", pos=0 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Economy_Init, name = "EconomyDirector.InitForLevel", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Economy_Updated, name = "EconomyDirector.Update", pos=-1, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Silo_Input, name = "SiloCatcher.OnTriggerEnter", pos=-2, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Silo_Input, name = "SiloCatcher.OnTriggerEnter", pos=-2, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative=-1 },

@@ -64,7 +64,7 @@
     <Compile Include="Helpers\Extensions\ColorExt.cs" />
     <Compile Include="Helpers\Extensions\TypeExt.cs" />
     <Compile Include="Base\PluginLoader_AutoUpdater.cs" />
-    <Compile Include="PluginLoader_Info.cs" />
+    <Compile Include="Base\PluginLoader_Info.cs" />
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
     <Compile Include="UI\Enums\SizeConstraint.cs" />

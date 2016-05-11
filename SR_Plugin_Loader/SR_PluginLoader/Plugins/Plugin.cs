@@ -474,13 +474,19 @@ namespace SR_PluginLoader
         {
             if (is_update_available) return true;
 
-            if (this.data.UPDATE_METHOD == null)
+            if(data==null)
+            {
+                DebugHud.Log("{0} Plugin has no DATA structure!", this);
+                return false;
+            }
+
+            if (data.UPDATE_METHOD == null || data.UPDATE_METHOD.METHOD == UPDATER_TYPE.NONE)
             {
                 DebugHud.Log("{0} Plugin has no UPDATE_METHOD specified!", this);
                 return false;
             }
 
-            var status = this.Updater.Get_Update_Status(this.data.UPDATE_METHOD.URL, this.file);
+            var status = Updater.Get_Update_Status(data.UPDATE_METHOD.URL, file);
             is_update_available = (status == FILE_UPDATE_STATUS.OUT_OF_DATE);
 
             //DebugHud.Log("{0}  update_status: {1}", this, Enum.GetName(typeof(FILE_UPDATE_STATUS), status));
