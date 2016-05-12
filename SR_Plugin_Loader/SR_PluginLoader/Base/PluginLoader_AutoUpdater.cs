@@ -10,7 +10,8 @@ namespace SR_PluginLoader
 {
     public class PluginLoader_AutoUpdater : MonoBehaviour
     {
-        public List<GitFile> Files = new List<GitFile>();
+        public uiUpdatesAvailable updatesView = null;
+        public List<UpdateFile> Files = new List<UpdateFile>();
         
         private void Start()
         {
@@ -19,14 +20,15 @@ namespace SR_PluginLoader
         
         IEnumerator Start_Update()
         {
-            Loader.updatesView.Show();
-
-            foreach (GitFile file in Files)
+            foreach (UpdateFile file in Files)
             {
                 byte[] buf = null;
                 IEnumerator iter = Updater_Base.Get(file.URL, null, (float read, float total) => {
-                    var prog = (Loader.updatesView[file.FILE] as uiListItem_Progress);
-                    if(prog != null) prog.Value = ((float)read / (float)total);
+                    if (updatesView != null)
+                    {
+                        var prog = (updatesView[file.FILE] as uiListItem_Progress);
+                        if (prog != null) prog.Value = ((float)read / (float)total);
+                    }
                 });
                 while (iter.MoveNext()) yield return null;
 

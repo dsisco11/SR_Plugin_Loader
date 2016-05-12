@@ -36,6 +36,7 @@ namespace SR_PluginLoader
         public static Texture2D icon_close = null;
         public static Texture2D icon_close_dark = null;
         public static Texture2D icon_logo = null;
+        public static Texture2D icon_logo_sad = null;
         public static Texture2D icon_checkbox = null;
         public static Texture2D icon_checkmark = null;
         public static Texture2D icon_arrow_left = null;
@@ -279,6 +280,7 @@ namespace SR_PluginLoader
             TextureOpFlags FLAGS = (TextureOpFlags.NO_MIPMAPPING & TextureOpFlags.NO_WRAPPING);
 
             TextureHelper.icon_logo = (Texture2D)TextureHelper.Load_From_Resource("logo.png", myNamespace, FLAGS);
+            TextureHelper.icon_logo_sad = (Texture2D)TextureHelper.Load_From_Resource("logo_sad.png", myNamespace, FLAGS);
             TextureHelper.icon_unknown = (Texture2D)TextureHelper.Load_From_Resource("mystery.png", myNamespace, FLAGS);
             TextureHelper.icon_alert = (Texture2D)TextureHelper.Load_From_Resource("alert.png", myNamespace, FLAGS);
             TextureHelper.icon_close = (Texture2D)TextureHelper.Load_From_Resource("close.png", myNamespace, FLAGS);

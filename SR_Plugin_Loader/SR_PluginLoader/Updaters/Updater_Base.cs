@@ -210,8 +210,10 @@ namespace SR_PluginLoader
                 }
                 yield return null;// yield execution until next frame
             }
-            remote_file_cache.Add(url, buf);
-            
+
+            if (!remote_file_cache.ContainsKey(url)) remote_file_cache.Add(url, buf);
+            else remote_file_cache[url] = buf;
+
             callback?.Invoke(buf);
             yield return buf;
             yield break;

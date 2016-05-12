@@ -54,52 +54,56 @@ namespace SR_PluginLoader
             StringBuilder sb = new StringBuilder();
             // Format our pre-spacing string
             string space = "";
-            for (int i = 0; i < nest_level; i++) space += "  ";
-            // Create a map of all sub-components this object has
-            Dictionary<string, List<Component>> map = new Dictionary<string, List<Component>>();
-            List<Component> ccomps = targ.GetComponentsInChildren<Component>().ToList();
-            foreach(Component c in ccomps)
-            {
-                if (!map.ContainsKey(c.name)) map.Add(c.name, new List<Component>());
-                map[c.name].Add(c);
-            }
+            for (int i = 0; i < nest_level; i++) space += "   ";
 
-            // First let's print this objects name 
-            sb.AppendFormat("{0}GameObject(\"{1}\")  Layer<{2}>  Children<{3}>", space, targ.name, targ.layer, targ.transform.childCount);
-            sb.Append("  Components: {");
-            // Now let's list all of the script components attached to it
+            // First let's print this objects name
+            sb.AppendFormat("{0}- \"{1}\"  Children<{2}>", space, targ.name, targ.transform.childCount);
+
             List<Component> comps = targ.GetComponents<Component>().ToList();
+            sb.Append("  Components("+comps.Count+"): {");
+            // Now let's list all of the script components attached to it
             sb.Append(String.Join(", ", comps.Select(c => c.GetType().Name).ToArray()));
             // End the components list
             sb.AppendLine("}");
 
-            const string spacing = "   ";
-            foreach(KeyValuePair<string, List<Component>> kvp in map)
+            if (nest_level < 9)
             {
-                sb.AppendLine(String.Format("{0}\"{1}\" {{{2}}}", spacing, kvp.Key, String.Join(", ", kvp.Value.Select(c => c.GetType().FullName).ToArray())));
+                // Start the process of listing all attached GameObjects
+                for (int idx = 0; idx < targ.transform.childCount; idx++)// start at offset 1 to avoid printing ourself again!
+                {
+                    Transform trans = targ.transform.GetChild(idx);
+                    if (trans.gameObject == trans.parent || trans.parent == null) continue;
+                    string str = Get_Unity_GameObject_Hierarchy_String(trans.gameObject, nest_level + 1);
+                    if(!String.IsNullOrEmpty(str)) sb.AppendLine(str.TrimEnd(new char[] { '\n' }));
+                }
             }
-            /*
-            // Start the process of listing all attached GameObjects
-            for (int idx = 1; idx < targ.transform.childCount; idx++)// start at offset 1 to avoid printing ourself again!
-            {
-                GameObject obj = targ.transform.GetChild(idx).gameObject;
-                sb.AppendLine(Get_Unity_GameObject_Hierarchy_String(targ, nest_level+1));
-            }
-            */
 
-            return sb.ToString();
+            return sb.ToString().TrimEnd(new char[] { '\n' });
         }
-        
+
         /// <summary>
         /// Translates a Unity GUI object's transforms into a screenspace Rect area.
         /// </summary>
         public static Rect Get_Unity_UI_Object_Area(GameObject obj)
         {
             RectTransform rt = obj.GetComponent<RectTransform>();
-            if (rt == null) return new Rect(obj.transform.localPosition, new Vector2(5,5));
+            if (rt == null) return new Rect(obj.transform.localPosition, new Vector2(5, 5));
 
             Vector2 hSZ = (rt.sizeDelta * 0.5f);
             return new Rect(new Vector2(rt.position.x - hSZ.x, Screen.height - (rt.position.y + hSZ.y)), rt.sizeDelta);
+            //return new Rect(rt.anchoredPosition + new Vector2(rt.position.x, rt.position.y), rt.sizeDelta);
+        }
+
+        /// <summary>
+        /// Translates a Unity GUI object's transforms into a screenspace Rect area.
+        /// </summary>
+        public static Vector2 Get_Unity_UI_Object_AnchorPos(GameObject obj)
+        {
+            if (obj == null) return Vector2.zero;
+            RectTransform rt = (obj.transform as RectTransform);
+            if (rt == null) return Vector2.zero;
+            
+            return new Vector2(rt.anchoredPosition.x, Screen.height - (rt.anchoredPosition.y));
             //return new Rect(rt.anchoredPosition + new Vector2(rt.position.x, rt.position.y), rt.sizeDelta);
         }
 

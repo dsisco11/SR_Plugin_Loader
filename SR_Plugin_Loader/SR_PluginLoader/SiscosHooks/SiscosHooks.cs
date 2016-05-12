@@ -232,6 +232,17 @@ namespace SR_PluginLoader
             return hook;
         }
 
+        /// <summary>
+        /// Allows registering single-use hook with a void callback.
+        /// </summary>
+        /// <param name="evt"></param>
+        /// <param name="cb"></param>
+        /// <returns></returns>
+        public static HookUID Once(HOOK_ID evt, Action cb)
+        {
+            return Once(evt, (ref object sender, ref object[] args, ref object retVal) => { cb(); return null; });
+        }
+
         [Obsolete("Use unregister(HookUID) instead, All registered hooks are now assigned a unique HookUID value to identify them. Removing a hook based on it's assigned callback function can result in unexpected behaviour!")]
         /// <summary>
         /// Unhook a previous hook you installed.

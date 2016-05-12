@@ -109,6 +109,39 @@ namespace SR_PluginLoader
             GL.Vertex3(rx + o, ry + 0, Z);
         }
 
+        public static void Draw_Point(Vector2 pos)
+        {
+            const float Z = 0f;
+            const float o = 0f;// 1f;
+            float rx = (float)Math.Round(pos.x) + 0.5f;// center of the pixel
+            float ry = (float)Math.Round(pos.y) + 0.5f;// center of the pixel
+            float rw = (float)Math.Round(6f) - 1;
+            float rh = (float)Math.Round(6f) - 1;
+            
+            // Left
+            GL.Vertex3(rx + 0 , ry - rh, Z);// Top
+            GL.Vertex3(rx - rw, ry + rh, Z);// Left Bottom
+            // Bottom
+            GL.Vertex3(rx - rw, ry + rh, Z);// Left Bottom
+            GL.Vertex3(rx + rw, ry + rh, Z);// Right Bottom
+            // Right
+            GL.Vertex3(rx + rw, ry + rh, Z);// Right Bottom
+            GL.Vertex3(rx + 0 , ry - rh, Z);// Top
+        }
+
+        public static void Draw_GameObj_Bounds(GameObject obj)
+        {
+            if (obj == null) return;
+            RectTransform trans = (obj.transform as RectTransform);
+
+            Rect area = Util.Get_Unity_UI_Object_Area(obj);
+            GL.Color(uiControl.color_purple);
+            DebugUI.Draw_Rect(area);
+
+            GL.Color(uiControl.color_orange);
+            DebugUI.Draw_Point(Util.Get_Unity_UI_Object_AnchorPos(trans.gameObject));
+        }
+
         public static bool isVisible { get { return Root.isVisible; } }
 
         public static void Hide() { Root.isVisible = false; }
@@ -169,7 +202,6 @@ namespace SR_PluginLoader
                 {
                     //RaycastHit hit = new RaycastHit();
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                    GameObject obj = null;
                     List<RaycastResult> hits = new List<RaycastResult>();
                     var pointer = new PointerEventData(EventSystem.current);
                     pointer.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
@@ -178,19 +210,21 @@ namespace SR_PluginLoader
                     GL.PushMatrix();
                     DebugUI.DEBUG_LINE_MAT.SetPass(0);
                     GL.Begin(GL.LINES);
-                    GL.Color(uiControl.color_purple);
                     if (hits.Count > 0)
                     {
                         //DebugHud.Log("Drawing: {0} {{{1}}}", hits.Count, String.Join(", ", hits.Select(h => String.Format("{0}({1})[p:{2}]", h.gameObject.name, h.gameObject.GetType().Name, h.gameObject.transform.parent.gameObject.name)).ToArray()));
                         foreach (RaycastResult res in hits)
                         {
-                            obj = res.gameObject;
-                            if (obj == null) continue;
-                            Rect area = Util.Get_Unity_UI_Object_Area(obj);
-                            DebugUI.Draw_Rect(area);
+                            DebugUI.Draw_GameObj_Bounds(res.gameObject);
                         }
                     }
 
+
+                    if (MainMenu.Instance != null)
+                    {
+                        Transform MenuPanel = MainMenu.Instance.transform.FindChild("StandardModePanel");
+                        if(MenuPanel != null) DebugUI.Draw_GameObj_Bounds(MenuPanel.gameObject);
+                    }
                     GL.End();
                     GL.PopMatrix();
                 }

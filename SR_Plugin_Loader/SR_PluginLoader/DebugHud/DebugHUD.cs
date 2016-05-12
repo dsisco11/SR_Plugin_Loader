@@ -215,6 +215,15 @@ namespace SR_PluginLoader
             return str;
         }
 
+        /// <summary>
+        /// Asserts that a condition is true, if it is not then outputs a specified log message and returns <c>FALSE</c>
+        /// </summary>
+        public static bool Assert(bool b, string failure_msg, params object[] args)
+        {
+            if(!b) Log(new Exception(String.Format(failure_msg, args)));
+
+            return b;
+        }
 
         public static void Reset()
         {
