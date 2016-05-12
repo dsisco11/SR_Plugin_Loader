@@ -17,7 +17,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Tells the script to destroy it's GameObject when it destroys itself.
         /// </summary>
-        public ActionDelayer SelfDestruct() { destroy_gameobject = true; return this; }
+        public ActionDelayer SelfDestruct() { destroy_gameobject = true; UnityEngine.GameObject.DontDestroyOnLoad(this.gameObject); return this; }
 
         private void Start()
         {

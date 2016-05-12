@@ -60,13 +60,20 @@ namespace SR_PluginLoader
         {
             var uri = new Uri(url);
             if (!host_is_github(uri.Host)) return uri.AbsolutePath;
-            
+            string repo_url = null;
+
+            if (String.Compare("repos", uri.Segments[1].TrimEnd(new char[] { '\\', '/' })) == 0) { repo_url = String.Concat(uri.Segments[2], uri.Segments[3]); }
+            else { repo_url = String.Concat(uri.Segments[1], uri.Segments[2]); }
+
+            string result = url;
+            result = String.Concat("https://api.github.com/repos/", repo_url);
+            /*
             var reg = new Regex(@"^(/\w+/\w+)/.+$");
             Match match = reg.Match(uri.AbsolutePath);
 
             string result = url;
-            if (match.Success) result = String.Concat("https://api.github.com/repos", match.Groups[1].Value);
-
+            if (match.Success) { result = String.Concat("https://api.github.com/repos", match.Groups[1].Value); }
+            */
             return result;
         }
 
@@ -74,13 +81,16 @@ namespace SR_PluginLoader
         {
             var uri = new Uri(url);
             if (!host_is_github(uri.Host)) return uri.AbsolutePath;
-
+            /*
             var reg = new Regex(@"^(/\w+/\w+)/.+$");
             Match match = reg.Match(uri.AbsolutePath);
 
             string result = url;
             if (match.Success) result = String.Concat("https://raw.github.com/", match.Groups[1].Value.TrimStart(new char[] {  '\\', '/'}));
-
+            return result;
+            */
+            string result = String.Concat("https://raw.github.com/", uri.PathAndQuery);
+            //DebugHud.Log("Format_As_Raw_GitHub_Url:  {0}", result);
             return result;
         }
 
@@ -126,7 +136,8 @@ namespace SR_PluginLoader
         private static IEnumerator Cache_Git_Repo_Async(string repo_url)
         {
             //EXAMPLE:  https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1
-            string url = String.Format("{0}/git/trees/master?recursive=1", repo_url.TrimEnd(new char[] { '\\', '/' }));
+            string ghurl = Extract_Repository_URL_From_Github_URL(repo_url.TrimEnd(new char[] { '\\', '/' }));
+            string url = String.Format("{0}/git/trees/master?recursive=1", ghurl);
 
             byte[] buf = null;
             string jsonStr = null;
@@ -158,7 +169,10 @@ namespace SR_PluginLoader
                     yield break;
                 }
 
-                remote_file_cache.Add(url, MEMENC.GetBytes(jsonStr));
+                //Check again just to make sure, because async methods could screw us up here.
+                if(!remote_file_cache.ContainsKey(url)) remote_file_cache.Add(url, MEMENC.GetBytes(jsonStr));
+                remote_file_cache[url] = MEMENC.GetBytes(jsonStr);
+
                 DebugHud.LogSilent("Cached repository: {0}", repo_url);
             }
             else
@@ -182,17 +196,13 @@ namespace SR_PluginLoader
             return Cache_Git_Repo(repo_url);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="repo_url">The Raw CName GitHub repository url eg: https://raw.github.com/dsisco11/SR_Plugin_Loader/master/</param>
         /// <param name="folder"></param>
-        /// <returns></returns>
-        public static List<GitFile> Get_Repo_Folder_Files(string repo_url, string folder)
+        public static List<UpdateFile> Get_Repo_Folder_Files(string repo_url, string folder)
         {
             string fldr = folder.Trim(new char[] { '/', '\\' });
             JSONArray repo = Get_Repo(repo_url);
-            List<GitFile> list = new List<GitFile>();
+            List<UpdateFile> list = new List<UpdateFile>();
             string raw_url = Format_As_Raw_GitHub_Url(repo_url).TrimEnd(new char[] { '\\', '/' });
             // Find the plugin loaders DLL installation file
             foreach (JSONNode file in repo)
@@ -207,11 +217,45 @@ namespace SR_PluginLoader
                 if (String.Compare(dir, fldr) == 0)
                 {
                     //DebugHud.Log("{0}  |  URL: {1}", path, url);
-                    list.Add(new GitFile(Path.Combine(repo_url, path), path, url, size));
+                    list.Add(new UpdateFile(Path.Combine(repo_url, path), path, url, size));
                 }
             }
 
             return list;
+        }
+
+        /// <param name="repo_url">The Raw CName GitHub repository url eg: https://raw.github.com/dsisco11/SR_Plugin_Loader/master/</param>
+        /// <param name="folder"></param>
+        /// <returns>List<GitFile></returns>
+        public static IEnumerator Get_Repo_Folder_Files_Async(string repo_url, string folder)
+        {
+            string fldr = folder.Trim(new char[] { '/', '\\' });
+
+            var iter = Cache_Git_Repo_Async(repo_url);
+            while (iter.MoveNext()) yield return null;
+
+            JSONArray repo = iter.Current as JSONArray;
+            List<UpdateFile> list = new List<UpdateFile>();
+            string raw_url = Format_As_Raw_GitHub_Url(repo_url).TrimEnd(new char[] { '\\', '/' });
+            // Find the plugin loaders DLL installation file
+            foreach (JSONNode file in repo)
+            {
+                string path = file["path"];
+                //string url = file["url"];
+                string url = String.Format("{0}/{1}", repo_url.TrimEnd(new char[] { '/', '\\' }), path.TrimStart(new char[] { '/', '\\' }));
+                string dir = Path.GetDirectoryName(path);
+                int size = string.IsNullOrEmpty(file["size"]) ? 0 : int.Parse(file["size"]);
+
+                if (String.Compare("blob", file["type"].Value.ToLower()) != 0) continue;
+                if (String.Compare(dir, fldr) == 0)
+                {
+                    //DebugHud.Log("{0}  |  URL: {1}", path, url);
+                    list.Add(new UpdateFile(Path.Combine(repo_url, path), path, url, size));
+                }
+            }
+
+            yield return list;
+            yield break;
         }
 
         public static string Get_Repo_SHA(string repo_url)
@@ -310,7 +354,7 @@ namespace SR_PluginLoader
 
             string repo_url = Extract_Repository_URL_From_Github_URL(remote_path);
             string remote_file = Extract_File_Path_From_Github_URL(remote_path);
-            
+
             // Time to check with GitHub and see if there is a newer version of the plugin loader out!
             try
             {
@@ -333,7 +377,7 @@ namespace SR_PluginLoader
                     DebugHud.Log("[AutoUpdater] Unable to cache git repository!");
                     return FILE_UPDATE_STATUS.ERROR;
                 }
-                
+
                 // Find the plugin loaders DLL installation file
                 foreach (JSONNode file in repo)
                 {
@@ -358,9 +402,9 @@ namespace SR_PluginLoader
                                 exist = Query_Remote_File_Exists(tmpurl);
                                 //DebugHud.Log("Query_Remote_File_Exists: {0}  = {1}", tmpurl, (exist ? "TRUE" : "FALSE"));
                             }
-                            catch(WebException wex)
+                            catch (WebException wex)
                             {
-                                if(wex.Status == WebExceptionStatus.ProtocolError)
+                                if (wex.Status == WebExceptionStatus.ProtocolError)
                                 {
                                     var response = wex.Response as HttpWebResponse;
                                     if (response != null)
@@ -373,7 +417,7 @@ namespace SR_PluginLoader
                                 }
                             }
 
-                            if(!exist)
+                            if (!exist)
                             {
                                 //DebugHud.Log("[Updater] Dev file: {0}", Path.GetFileName(local_file));
                                 Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.DEV_FILE);
@@ -392,7 +436,7 @@ namespace SR_PluginLoader
                     }
                 }
             }
-            catch(WebException wex)
+            catch (WebException wex)
             {
             }
             catch (Exception ex)
@@ -402,6 +446,113 @@ namespace SR_PluginLoader
 
             DebugHud.Log("[Git_Updater] Unable to find file in repository: {0}", remote_file);
             return FILE_UPDATE_STATUS.NOT_FOUND;//no update
+        }
+
+        public IEnumerator Get_Update_Status_Async(string remote_path, string local_file)
+        {
+            if (!File.Exists(local_file))
+            {
+                yield return FILE_UPDATE_STATUS.OUT_OF_DATE;
+                yield break;// ensure we stop here
+            }
+
+            string repo_url = Extract_Repository_URL_From_Github_URL(remote_path);
+            string remote_file = Extract_File_Path_From_Github_URL(remote_path);
+
+            // Time to check with GitHub and see if there is a newer version of the plugin loader out!
+            JSONArray repo = Cache_Git_Repo(repo_url);
+            // Go ahead and get the hash for the file we're checking on.
+            string cSHA = Util.Git_File_Sha1_Hash(local_file);
+            // Let's make sure we didn't already check on this same file in the past.
+            FILE_UPDATE_STATUS? lastResult = Get_Cached_Result(remote_path, local_file);
+
+            //if we DID cache the result from a past check against this file then return it here and don't waste time.
+            if (lastResult.HasValue)
+            {
+                DebugHud.LogSilent("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
+                yield return lastResult.Value;
+                yield break;// ensure we stop here
+            }
+
+
+            if (repo == null)
+            {
+                DebugHud.Log("[AutoUpdater] Unable to cache git repository!");
+                yield return FILE_UPDATE_STATUS.ERROR;
+                yield break;// ensure we stop here
+            }
+
+            // Find the plugin loaders DLL installation file
+            foreach (JSONNode file in repo)
+            {
+                if (String.Compare(file["path"], remote_file) == 0)
+                {
+                    // Compare the SHA1 hash for the dll on GitHub to the hash for the one currently installed
+                    string nSHA = file["sha"];
+                    //DebugHud.Log("nSHA({0})  cSHA({1})  local_file: {2}", nSHA, cSHA, local_file);
+
+                    if (String.Compare(nSHA, cSHA) != 0)
+                    {
+                        // ok they don't match, now let's just make double sure that it isn't because we are using an unreleased developer version
+                        // First find the url for the file on GitHub
+                        string tmpurl = file["url"];
+                        // now we want to replace it's hash with ours and check if it exists!
+                        tmpurl = tmpurl.Replace(nSHA, cSHA);
+
+                        // Check if the file for the currently installed loaders sha1 hash exists.
+                        bool exist = false;
+                        var it = Query_Remote_File_Exists_Async(tmpurl);
+                        bool fail = false;
+                        do
+                        {
+                            yield return null;
+
+                            try
+                            {
+                                if (!it.MoveNext()) fail = true;//stop
+                            }
+                            catch (WebException wex)
+                            {
+                                fail = true;//stop
+                                if (wex.Status == WebExceptionStatus.ProtocolError)
+                                {
+                                    var response = wex.Response as HttpWebResponse;
+                                    if (response != null)
+                                    {
+                                        if (response.StatusCode == HttpStatusCode.NotFound)// A file for this hash does not exhist on the github repo. So this must be a Dev version.
+                                        {
+                                            exist = false;
+                                        }
+                                    }
+                                }
+                            }
+                        } while (!fail);
+
+                        if (!exist)
+                        {
+                            //DebugHud.Log("[Updater] Dev file: {0}", Path.GetFileName(local_file));
+                            Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.DEV_FILE);
+                            yield return FILE_UPDATE_STATUS.DEV_FILE;
+                            yield break;// ensure we stop here
+                        }
+
+                        //DebugHud.Log("[Updater] Outdated file: {0}", Path.GetFileName(local_file));
+                        Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.OUT_OF_DATE);
+                        yield return FILE_UPDATE_STATUS.OUT_OF_DATE;
+                        yield break;// ensure we stop here
+                    }
+                    else
+                    {
+                        Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.UP_TO_DATE);
+                        yield return FILE_UPDATE_STATUS.UP_TO_DATE;
+                        yield break;// ensure we stop here
+                    }
+                }
+            }
+
+            DebugHud.Log("[Git_Updater] Unable to find file in repository: {0}", remote_file);
+            yield return FILE_UPDATE_STATUS.NOT_FOUND;//no update
+            yield break;// ensure we stop here
         }
         #endregion
 
@@ -431,18 +582,7 @@ namespace SR_PluginLoader
             yield return File.OpenRead(local_file);
             yield break;
         }
-
-        /*
-        public override System.Collections.IEnumerator Download(string remote_file, string local_file, Updater_File_Download_Progress cb = null)
-        {
-            if (local_file == null) local_file = String.Format("{0}\\{1}", UnityEngine.Application.dataPath, Path.GetFileName(remote_file));
-
-            byte[] data = webClient.DownloadData(remote_file);
-            File.WriteAllBytes(local_file, data);
-
-            yield return null;
-        }
-        */
+        
 
         /// <summary>
         /// Checks if a specified file exists in the project GIT repository.
@@ -489,37 +629,67 @@ namespace SR_PluginLoader
 
             return true;
         }
-    }
-
-    public class GitFile
-    {
+        
         /// <summary>
-        /// The full repo path for this file.
+        /// Checks if a specified file exists in the project GIT repository.
         /// </summary>
-        public string FULLNAME;
-        /// <summary>
-        /// The relative file path.
-        /// </summary>
-        public string FILE;
-        /// <summary>
-        /// The blob download url for this file.
-        /// </summary>
-        public string URL;
-        /// <summary>
-        /// Size of the file in bytes.
-        /// </summary>
-        public int SIZE;
-        /// <summary>
-        /// The local path where this file should be located.
-        /// </summary>
-        public string LOCAL_PATH = null;
-
-        public GitFile(string _fullname, string _file, string _url, int byteCount)
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public static IEnumerator Query_Remote_File_Exists_Async(string url)
         {
-            FULLNAME = _fullname;
-            FILE = _file;
-            URL = _url;
-            SIZE = byteCount;
+            HttpWebResponse response = null;
+            HttpWebRequest webRequest = WebRequest.Create(url) as HttpWebRequest;
+            if (webRequest == null)
+            {
+                DebugHud.Log("Unable to create an instance of HttpWebRequest!");
+                yield return false;
+            }
+
+            webRequest.UserAgent = USER_AGENT;
+            webRequest.Method = "HEAD";
+
+            WebAsync webAsync = new WebAsync();
+            IEnumerator e = webAsync.GetResponse(webRequest);
+            if (e == null)
+            {
+                DebugHud.Log("Updater_Base.Get() Enumerator is NULL!");
+                yield return null;
+                yield break;
+            }
+
+            while (e.MoveNext()) { yield return null; }// wait for response to arrive
+            while (!webAsync.isResponseCompleted) yield return null;// double check for clarity & safety
+
+            bool failed = false;
+            try
+            {
+                RequestState result = webAsync.requestState;
+                response = (HttpWebResponse)result.webResponse;
+            }
+            catch (WebException wex)
+            {
+                if (wex.Status == WebExceptionStatus.ProtocolError)
+                {
+                    var wres = wex.Response as HttpWebResponse;
+                    if (wres != null)
+                    {
+                        if (wres.StatusCode == HttpStatusCode.NotFound)// A file for this hash does not exist on the github repo. So this must be a Dev version.
+                        {
+                            failed = true;
+                        }
+                    }
+                }
+                
+                failed = true;
+            }
+            finally
+            {
+                if (response != null) response.Close();
+            }
+
+            yield return !failed;
+            yield break;
         }
     }
+
 }

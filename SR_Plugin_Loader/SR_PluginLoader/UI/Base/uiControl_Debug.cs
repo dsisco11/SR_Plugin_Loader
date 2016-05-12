@@ -59,6 +59,7 @@ namespace SR_PluginLoader
         internal static Color white_dark = new Color(trClr_G, trClr_G, trClr_G, 1f);
         internal static Color grey_dark = new Color(0.5f * trClr_G, 0.5f * trClr_G, 0.5f * trClr_G, 1f);
 
+        internal static Color color_cyan = new Color(0f, 1f, 1f, 1f);
         internal static Color color_orange = new Color(1f, 0.5f, 0f, 1f);
         internal static Color color_purple = new Color(1f, 0f, 1f, 1f);
         #endregion

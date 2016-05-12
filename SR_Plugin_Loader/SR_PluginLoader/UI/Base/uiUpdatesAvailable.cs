@@ -11,6 +11,9 @@ namespace SR_PluginLoader
     {
         private uiListView list = null;
         public override uiControl this[string key] { get { return list[key]; } }
+        private List<UpdateFile> file_list = new List<UpdateFile>();
+        public List<UpdateFile> Files { get { return file_list; } }
+
 
         public uiUpdatesAvailable() : base()
         {
@@ -36,14 +39,50 @@ namespace SR_PluginLoader
             list.FloodXY();
         }
 
-        public void Add_File(string filename)
+        public void Add_File(UpdateFile file)
         {
+            file_list.Add(file);
+            string filename = Path.GetFileName(file.FILE);
+
             var itm = Create<uiListItem_Progress>(filename, list);
             itm.Selectable = false;
             itm.Clickable = false;
-            itm.Text = Path.GetFileName(filename);
+            itm.Text = filename;
             itm.TextStyle = FontStyle.Bold;
             itm.TextSize = 14;
+        }
+    }
+
+
+    public class UpdateFile
+    {
+        /// <summary>
+        /// The full repo path for this file.
+        /// </summary>
+        public string FULLNAME;
+        /// <summary>
+        /// The relative file path.
+        /// </summary>
+        public string FILE;
+        /// <summary>
+        /// The blob download url for this file.
+        /// </summary>
+        public string URL;
+        /// <summary>
+        /// Size of the file in bytes.
+        /// </summary>
+        public int SIZE;
+        /// <summary>
+        /// The local path where this file should be located.
+        /// </summary>
+        public string LOCAL_PATH = null;
+
+        public UpdateFile(string _fullname, string _file, string _url, int byteCount)
+        {
+            FULLNAME = _fullname;
+            FILE = _file;
+            URL = _url;
+            SIZE = byteCount;
         }
     }
 }

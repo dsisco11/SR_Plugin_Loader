@@ -57,7 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\MonoBehaviour Scripts\ActionDelayer.cs" />
+    <Compile Include="Helpers\Unity Scripts\ActionDelayer.cs" />
     <Compile Include="Base\SafeEnum.cs" />
     <Compile Include="Base\DDS_HEADER.cs" />
     <Compile Include="Base\SettingsFile.cs" />
@@ -65,8 +65,10 @@
     <Compile Include="Helpers\Extensions\TypeExt.cs" />
     <Compile Include="Base\PluginLoader_AutoUpdater.cs" />
     <Compile Include="Base\PluginLoader_Info.cs" />
+    <Compile Include="Base\Loader_AsyncUpdatesCheck.cs" />
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
+    <Compile Include="SiscosHooks\HOOK_SHAS.cs" />
     <Compile Include="UI\Enums\SizeConstraint.cs" />
     <Compile Include="UI\Base\uiEmpty.cs" />
     <Compile Include="UI\Base\uiList_ItemProgress.cs" />
@@ -86,21 +88,21 @@
     <Compile Include="UI\Base\uiBorderStyleState.cs" />
     <Compile Include="UI\Base\uiBorderStyle.cs" />
     <Compile Include="UI\Misc\ControlPositioner.cs" />
-    <Compile Include="Helpers\MonoBehaviour Scripts\BoxCollider_Draw.cs" />
+    <Compile Include="Helpers\Unity Scripts\BoxCollider_Draw.cs" />
     <Compile Include="Dev_Menu\DevMenu.cs" />
-    <Compile Include="Helpers\MonoBehaviour Scripts\FollowPlayerSight.cs" />
+    <Compile Include="Helpers\Unity Scripts\FollowPlayerSight.cs" />
     <Compile Include="Base\Extensions.cs" />
-    <Compile Include="Helpers\Game Interaction\Game.cs" />
-    <Compile Include="Helpers\Game Interaction\Directors.cs" />
-    <Compile Include="Helpers\Game Interaction\Sound.cs" />
-    <Compile Include="Helpers\MonoBehaviour Scripts\ObjectFlags.cs" />
+    <Compile Include="Helpers\Game.cs" />
+    <Compile Include="Helpers\Directors.cs" />
+    <Compile Include="Helpers\Sound.cs" />
+    <Compile Include="Helpers\Unity Scripts\ObjectFlags.cs" />
     <Compile Include="Helpers\Extensions\ResourceExt.cs" />
-    <Compile Include="Helpers\Game Interaction\Language.cs" />
+    <Compile Include="Helpers\Language.cs" />
     <Compile Include="Experiments\Misc_Experiments.cs" />
-    <Compile Include="Helpers\Game Interaction\Ident.cs" />
+    <Compile Include="Helpers\Ident.cs" />
     <Compile Include="Helpers\ModelHelper.cs" />
-    <Compile Include="Helpers\Game Interaction\HUD.cs" />
-    <Compile Include="Helpers\MonoBehaviour Scripts\ModelData.cs" />
+    <Compile Include="Helpers\HUD.cs" />
+    <Compile Include="Helpers\Unity Scripts\ModelData.cs" />
     <Compile Include="ObjLoader\Common\StringExtensions.cs" />
     <Compile Include="ObjLoader\Data\DataStore\DataStore.cs" />
     <Compile Include="ObjLoader\Data\DataStore\IDataStore.cs" />
@@ -150,18 +152,18 @@
     <Compile Include="ObjLoader\TypeParsers\TypeParserBase.cs" />
     <Compile Include="ObjLoader\TypeParsers\UseMaterialParser.cs" />
     <Compile Include="ObjLoader\TypeParsers\VertexParser.cs" />
-    <Compile Include="Helpers\Game Interaction\TextureHelper.cs" />
-    <Compile Include="Helpers\Upgrades\PlotUpgradeTracker.cs" />
+    <Compile Include="Helpers\TextureHelper.cs" />
+    <Compile Include="Helpers\Upgrade System\PlotUpgradeTracker.cs" />
     <Compile Include="SiscosHooks\Prefab_Spawn_Hook.cs" />
     <Compile Include="UI\Base\uiLayoutDirector.cs" />
     <Compile Include="UI\Base\uiList_Icon.cs" />
     <Compile Include="UI\Base\uiList_Item.cs" />
-    <Compile Include="Helpers\Upgrades\IUpgrade.cs" />
+    <Compile Include="Helpers\Upgrade System\IUpgrade.cs" />
     <Compile Include="UI\Interfaces\IScrollableUI.cs" />
-    <Compile Include="Helpers\MonoBehaviour Scripts\ButtonStyler_Overrider.cs" />
+    <Compile Include="Helpers\Unity Scripts\ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
     <Compile Include="DebugHud\DebugHUD_Renderer.cs" />
-    <Compile Include="Helpers\Game Interaction\GameTime.cs" />
+    <Compile Include="Helpers\GameTime.cs" />
     <Compile Include="UI\Base\uiVarText.cs" />
     <Compile Include="UI\Classes\Plugin_Update_Item.cs" />
     <Compile Include="UI\Base\uiCheckbox.cs" />
@@ -174,7 +176,7 @@
     <Compile Include="UI\Base\uiIcon.cs" />
     <Compile Include="UI\Base\uiProgressBar.cs" />
     <Compile Include="UI\Utility\Drawing.cs" />
-    <Compile Include="Helpers\Game Interaction\Player.cs" />
+    <Compile Include="Helpers\Player.cs" />
     <Compile Include="Plugins\Plugin_Update_Method.cs" />
     <Compile Include="UI\Base\uiTextbox.cs" />
     <Compile Include="UI\Classes\Plugin_StoreItem.cs" />
@@ -187,12 +189,12 @@
     <Compile Include="UI\Base\uiWindow.cs" />
     <Compile Include="UI\Enums\uiSkinPreset.cs" />
     <Compile Include="Updaters\Git_Updater.cs" />
-    <Compile Include="Helpers\MonoBehaviour Scripts\Singleton.cs" />
+    <Compile Include="Helpers\Unity Scripts\Singleton.cs" />
     <Compile Include="UI\Legacy\Notice_Manager.cs" />
     <Compile Include="SiscosHooks\HOOKS.cs" />
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
     <Compile Include="Base\Loader.cs" />
-    <Compile Include="Helpers\Game Interaction\MainMenu.cs" />
+    <Compile Include="Helpers\MainMenu.cs" />
     <Compile Include="Plugins\Plugin.cs" />
     <Compile Include="Plugins\Plugin_Dependency.cs" />
     <Compile Include="Plugins\Plugin_Download_Data.cs" />
@@ -215,8 +217,8 @@
     <Compile Include="SiscosHooks\_hook_result.cs" />
     <Compile Include="Updaters\Web_Updater.cs" />
     <Compile Include="Updaters\WebAsync.cs" />
-    <Compile Include="Helpers\Upgrades\Upgrades.cs" />
-    <Compile Include="Helpers\Game Interaction\ViewModel.cs" />
+    <Compile Include="Helpers\Upgrade System\Upgrades.cs" />
+    <Compile Include="Helpers\ViewModel.cs" />
     <Compile Include="Base\Watermark_UI.cs" />
     <Compile Include="Base\Active_State_Tracker.cs" />
     <Compile Include="Helpers\Extensions\VectorExt.cs" />
@@ -250,6 +252,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\arrow_right.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\logo_sad.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

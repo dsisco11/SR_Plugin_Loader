@@ -44,6 +44,7 @@ namespace SR_PluginLoader
         #endregion
         
         #region Setup Logic
+
         internal static void Setup()// This is the initial setup function, it should only be called a single time, and only by the loader itself.
         {
             if (_setup) throw new NotSupportedException("Blocked attempt to call MainMenu.Setup() a second time.");
@@ -66,31 +67,33 @@ namespace SR_PluginLoader
             TrySpawn_PluginPanel();
             TrySpawn_PluginStore();
 
-            // We need to delay hookinh into the main menu until we are sure all of the buttons have been styled and initialized by the game's default logic.
+            // We need to delay hooking into the main menu until we are sure all of the buttons have been styled and initialized by the game's default logic.
             // Otherwise the buttons are invisible and people catch on fire and it's just a big legal ordeal really...
             new GameObject().AddComponent<ActionDelayer>().SelfDestruct().onStart += () => { Hook_MainMenu(); };
             return null;
         }
 
-        internal static void TrySpawn_PluginPanel()
-        {
-            if(PluginManager.Instance == null) PluginManager.Instance = uiControl.Create<PluginManager>();
-        }
+        internal static void TrySpawn_PluginPanel() { if(PluginManager.Instance == null) PluginManager.Instance = uiControl.Create<PluginManager>(); }
 
-        internal static void TrySpawn_PluginStore()
-        {
-            if(PluginStore.Instance == null) PluginStore.Instance = uiControl.Create<PluginStore>();
-        }
+        internal static void TrySpawn_PluginStore() { if(PluginStore.Instance == null) PluginStore.Instance = uiControl.Create<PluginStore>(); }
 
         private static void Hook_MainMenu()
         {
             if (Instance != null) return;// If the instance isn't null then we will have already added all of our buttons and stuff
             Instance = UnityEngine.Object.FindObjectOfType<MainMenuUI>();
             if (Instance == null) throw new Exception("Cannot find MainMenuUI!");
+            if (Instance.gameObject == null) throw new Exception("MainMenuUI component has no GameObject!");
+
+            //Output_Hierarchy();
+
             var tracker = Instance.gameObject.AddComponent<MainMenuUI_Tracking_Script>();// Attach our tracking script to it.
             if (tracker == null) throw new Exception("Cannot attach MainMenu tracking script!");
+            // Reset the MainMenu visibility state because we JUST found it so theres no way we have it hidden yet.
             State.Reset();
 
+            //Add_Button("Manage Plugins", "PluginsMenu", new UnityAction(Show_PluginManager));
+            //Add_Button("Manage Plugins", "PluginsMenu", new UnityAction(Show_PluginManager));
+            //Add_Button("Manage Plugins", "PluginsMenu", new UnityAction(Show_PluginManager));
             //Add_Button("Manage Plugins", "PluginsMenu", new UnityAction(Show_PluginManager));
             Add_Button("Plugins", "Plugins", new UnityAction(Show_PluginManager), clr_gold_light, clr_gold, clr_brown);
             
@@ -112,24 +115,41 @@ namespace SR_PluginLoader
         {
             if (Instance != null)
             {
-                Transform MenuPanel = Instance.transform.GetChild(0);
+                Transform MenuPanel = Instance.transform.FindChild("StandardModePanel");
+                if (!DebugHud.Assert(MenuPanel != null, "MenuPanel is NULL!")) return;
+
+                Transform Status = Instance.transform.FindChild("Status");
+                RectTransform statusTrans = (Status as RectTransform);
+                DebugHud.Log("StatusTrans.anchoredPos: {0}", statusTrans.anchoredPosition);
+
                 VerticalLayoutGroup layout = MenuPanel.GetComponent<VerticalLayoutGroup>();
+                if (!DebugHud.Assert(layout != null, "Cannot find VerticalLayoutGroup component in MenuPanel")) return;
                 // Locate the last button in the menu
                 Transform lastBtnTrans = MenuPanel.transform.GetChild(MenuPanel.childCount - 1);
+                //Transform lastBtnTrans = MenuPanel.transform.FindChild("QuitButton");
+                if (!DebugHud.Assert(lastBtnTrans != null, "Cannot find last button in MenuPanel")) return;
                 GameObject lastBtn = lastBtnTrans.gameObject;
                 RectTransform lastBtnSize = lastBtnTrans.GetComponent<RectTransform>();
+                if (!DebugHud.Assert(lastBtnSize != null, "Cannot find RectTransform in reference button")) return;
 
                 // Create a copy of the button so we can alter it to do our bidding. (We want to make a copy so we don't need to re-apply all the same styling and whatnot, thus ensuring it won't break as easily in the future)
                 GameObject newButton = UnityEngine.Object.Instantiate<GameObject>(lastBtnTrans.gameObject);
+                if (!DebugHud.Assert(newButton!= null, "Failed to clone last button in MenuPanel!")) return;
                 newButton.transform.SetParent(MenuPanel);
 
                 // We need to make the Menu panel taller now so it properly fits the buttons
                 var menuTrans = (MenuPanel as RectTransform);
                 // Since the height of the menu buttons is relative to the height of the menu itself we want to increase the menus height by the size of a single button + the VerticalLayoutGroup's padding value + the set spacing value
-                float yInc = ((menuTrans.sizeDelta.y / (MenuPanel.transform.childCount - 1)) + layout.padding.vertical + layout.spacing);
-                MenuPanel.GetComponent<RectTransform>().sizeDelta = new Vector2(menuTrans.sizeDelta.x, menuTrans.sizeDelta.y + yInc);
+                float btnH = (menuTrans.sizeDelta.y / (MenuPanel.transform.childCount - 1)) * 0.5f;
+                float yInc = (btnH + layout.padding.vertical + layout.spacing);
+                //MenuPanel.GetComponent<RectTransform>().sizeDelta = new Vector2(menuTrans.sizeDelta.x, menuTrans.sizeDelta.y + yInc);
+                menuTrans.anchorMin = new Vector2(menuTrans.anchorMin.x, 1f);
+                menuTrans.anchorMax = new Vector2(menuTrans.anchorMax.x, 1f);
 
+                menuTrans.sizeDelta = new Vector2(menuTrans.sizeDelta.x, menuTrans.sizeDelta.y + yInc);
+                menuTrans.anchoredPosition = new Vector2(menuTrans.anchoredPosition.x, ((Screen.height * -1.0f) + (menuTrans.sizeDelta.y * 0.5f)) + ((Screen.height * 0.5f) + statusTrans.anchoredPosition.y) + (statusTrans.sizeDelta.y * 0.5f)+2f);
 
+                /*
                 // Move ALL GUI elements on the MainMenuUI down so they don't overlap the now expanded panel
                 for (int i=1; i<Instance.transform.childCount; i++)
                 {
@@ -137,9 +157,10 @@ namespace SR_PluginLoader
                     Vector2 sz = ((RectTransform)lastBtnTrans).sizeDelta;
                     RectTransform rt = (RectTransform)e;
                     
-                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, rt.anchoredPosition.y - (yInc * 0.5f));
+                    rt.anchoredPosition = new Vector2(rt.anchoredPosition.x, rt.anchoredPosition.y - yInc);
                 }
-                
+                */
+
                 // Set the plugins button text.
                 newButton.name = name;
                 newButton.GetComponentInChildren<Text>().text = text;
@@ -159,8 +180,18 @@ namespace SR_PluginLoader
         }
         #endregion
 
+        #region Debugging Functions
+
+        /// <summary>
+        /// Prints the MainMenu root object's child hierarchy
+        /// </summary>
+        public static void Output_Hierarchy()
+        {
+            DebugHud.Log("Main Menu Hierarchy:\n{0}", Util.Get_Unity_GameObject_Hierarchy_String(Instance.gameObject));
+        }
+        #endregion
     }
-    
+
     /// <summary>
     /// Helper script to handle the Level_Loaded event
     /// </summary>

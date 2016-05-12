@@ -28,6 +28,9 @@ namespace SR_PluginLoader
         public HOOK_ID ext = HOOK_ID.NONE;
         public int id { get { return (int)hook; } set { this.hook = (HOOK_ID)value; } }
         public string name = null;
+        /// <summary>
+        /// Means the hook cannot cancel the event.
+        /// </summary>
         public bool is_post = false;
         public debug_positioning method = debug_positioning.Instruction;
         public debug_positioning relative_method = debug_positioning.Instruction;
@@ -72,7 +75,7 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_Death, name = "PlayerDeathHandler.OnDeath", pos=-1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Player_Sleep, name = "LockOnDeath.LockUntil", pos=-1 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Player_Sleep, name = "LockOnDeath.Update", pos=1, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Player_Sleep, name = "LockOnDeath.Update", pos=1, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Exit, relative = -1 },

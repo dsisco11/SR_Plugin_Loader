@@ -28,8 +28,20 @@ namespace SR_PluginLoader
         #region Results
 
         private DialogResult result = DialogResult.NONE;
-        public DialogResult Result { get { return result; } set { result = value; Hide(); onResult?.Invoke(result); } }
-        public event Action<DialogResult> onResult;
+        public DialogResult Result { get { return result; }
+            set
+            {
+                result = value;
+                if(onResult==null) Hide();
+                else
+                {
+                    bool b = onResult.Invoke(result);
+                    if (b) Hide();
+                    else Show();
+                }
+            }
+        }
+        public Func<DialogResult, bool> onResult;
         #endregion
 
 

@@ -15,13 +15,9 @@ namespace SR_PluginLoader
 {
     public static class Loader
     {
-        /// <summary>
-        /// The version for the loader itself
-        /// </summary>
-        public static Plugin_Version VERSION = PluginLoader_Info.VERSION;
         
-        public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", Loader.VERSION); } }
-        public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", Loader.VERSION); } }
+        public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", PluginLoader_Info.VERSION); } }
+        public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", PluginLoader_Info.VERSION); } }
 
         private static GameObject root = null;
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
@@ -34,11 +30,9 @@ namespace SR_PluginLoader
         private static bool IN_LOADING_PHASE = false;
         private static WebClient web = new WebClient();
         private static string update_helper_file = null;
-        private static List<GitFile> available_updates= new List<GitFile>();// This isn't for plugin updates (yet)
         public static SettingsFile Config = null;
         
         private static Plugin_Update_Viewer plugin_updater = null;
-        internal static uiUpdatesAvailable updatesView = null;
         private static DevMenu dev_tools = null;
 
 
@@ -69,7 +63,6 @@ namespace SR_PluginLoader
                 IN_LOADING_PHASE = true;
                 Setup_Plugin_Dir();
                 
-                updatesView = uiControl.Create<uiUpdatesAvailable>();
                 Check_For_Updates();
 
                 Setup_Assembly_Resolver();
@@ -390,69 +383,7 @@ namespace SR_PluginLoader
 
         private static void Check_For_Updates()
         {
-            has_updates = Do_Update_Check();
-            if (has_updates == true)
-            {
-                updatesView.onResult += (DialogResult res) => { if (res == DialogResult.OK) { Loader.Auto_Update(); } };
-
-                SiscosHooks.Once(HOOK_ID.MainMenu_Loaded, (ref object sender, ref object[] args, ref object retn) => {
-                    updatesView.Show();
-                    return null;
-                });
-
-                //new GameObject().AddComponent<ActionDelayer>().SelfDestruct().onStart += () => { updatesView.Show(); };
-
-                /*
-                new UI_Notification()
-                {
-                    msg = "A new version of the plugin loader is available\nClick this box to update!",
-                    title = "Update Available",
-                    onClick = delegate () { Loader.Auto_Update(); }
-                };
-                */
-            }
-        }
-
-        public static void Auto_Update()
-        {
-            new GameObject().AddComponent<PluginLoader_AutoUpdater>().Files = available_updates;
-        }
-
-        /// <summary>
-        /// Checks GitHub to see if the currently installed version of the plugin loader is the most up to date.
-        /// </summary>
-        private static bool Do_Update_Check()
-        {
-            // We should automatically keep ALL files within the repositorys "installer" directory insync!
-            try
-            {
-                List<GitFile> list = Git_Updater.Get_Repo_Folder_Files("https://raw.github.com/dsisco11/SR_Plugin_Loader/master/", "/Installer/");
-                foreach(GitFile file in list)
-                {
-                    string FN = Path.GetFileName(file.FILE);
-                    string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                    if (String.Compare("SR_PluginLoader_Uninstaller.exe", FN) == 0) dir = Path.GetFullPath(String.Concat(dir, "/../../"));
-
-                    string local_path = Path.Combine(dir, FN);
-                    file.LOCAL_PATH = local_path;
-                    FILE_UPDATE_STATUS status = Git_Updater.instance.Get_Update_Status(file.FULLNAME, local_path);
-                    //status = FILE_UPDATE_STATUS.OUT_OF_DATE;// DEBUG
-
-                    //DebugHud.Log("{0}  |  LOCAL_PATH: {1}  |  REMOTE_PATH: {2}", file.FULLNAME, local_path, file.URL);
-                    if (status == FILE_UPDATE_STATUS.OUT_OF_DATE)
-                    {
-                        updatesView.Add_File(file.FILE);
-                        available_updates.Add(file);
-                    }
-                }
-                return (available_updates.Count > 0);
-            }
-            catch(Exception ex)
-            {
-                DebugHud.Log(ex);
-            }
-
-            return false;
+            new GameObject("Loader_AsyncUpdatesCheck").AddComponent<Loader_AsyncUpdatesCheck>();
         }
 
         public static void Restart_App()
