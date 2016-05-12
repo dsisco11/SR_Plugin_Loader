@@ -46,7 +46,7 @@ namespace SR_PluginLoader
                 }
                 
                 loadedTextures.Add(name, null);
-                Debug.LogError("Could not find texture: " + name);
+                SLog.Error("Could not find texture: " + name);
                 return null;
             }
         }
@@ -59,13 +59,13 @@ namespace SR_PluginLoader
             var all = Resources.FindObjectsOfTypeAll<Shader>();
             List<string> list = new List<string>();
 
-            DebugHud.Log("=== SHADERS ===");
+            SLog.Info("=== SHADERS ===");
             foreach(Shader shader in all)
             {
                 list.Add(shader.name);
-                DebugHud.Log("  - {0}", shader.name);
+                SLog.Info("  - {0}", shader.name);
             }
-            DebugHud.Log("===============");
+            SLog.Info("===============");
 
             System.IO.File.WriteAllLines("shader_list.txt", list.ToArray());
         }

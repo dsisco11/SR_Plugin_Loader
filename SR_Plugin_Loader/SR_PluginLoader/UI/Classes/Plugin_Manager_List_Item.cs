@@ -100,7 +100,7 @@ namespace SR_PluginLoader
         {
             if (p == null)
             {
-                DebugHud.Log(new Exception("Plugin is null!"));
+                SLog.Error(new Exception("Plugin is null!"));
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace SR_PluginLoader
                 plugin = p;
                 if (plugin.data == null)
                 {
-                    DebugHud.Log(new Exception("Plugin data is NULL!"));
+                    SLog.Error(new Exception("Plugin data is NULL!"));
                     return;
                 }
 
@@ -125,7 +125,7 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
         }
 

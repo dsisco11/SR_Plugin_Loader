@@ -78,7 +78,7 @@ namespace SR_PluginLoader
                         Create_Spawn_Panel(tab);
                         break;
                     default:
-                        DebugHud.Log("Unhandled Dev_Menu type: {0}", eStr);
+                        SLog.Warn("Unhandled Dev_Menu type: {0}", eStr);
                         break;
                 }
                 
@@ -101,7 +101,7 @@ namespace SR_PluginLoader
 
         private void Set_Active_Menu(Dev_Menu_Type newMenu)
         {
-            DebugHud.Log("Set_Active_Menu: {0}", Enum.GetName(typeof(Dev_Menu_Type), newMenu));
+            SLog.Info("Set_Active_Menu: {0}", Enum.GetName(typeof(Dev_Menu_Type), newMenu));
             activeMenu = newMenu;
             Dev_MenuTab menu = null;
             if (Menus.TryGetValue(newMenu, out menu)) menu.Tab.Select();
@@ -164,7 +164,7 @@ namespace SR_PluginLoader
                         break;
 
                     default:
-                        DebugHud.Log("Unhandled Spawn menu category: {0}", catStr);
+                        SLog.Info("Unhandled Spawn menu category: {0}", catStr);
                         break;
                 }
 
@@ -181,7 +181,7 @@ namespace SR_PluginLoader
             if (Game.atMainMenu)
             {
                 Sound.Play(SoundId.ERROR);
-                DebugHud.Log("Failed to spawn item: {0}, We are at the main menu.", ID);
+                SLog.Info("Failed to spawn item: {0}, We are at the main menu.", ID);
                 return;
             }
 
@@ -189,13 +189,13 @@ namespace SR_PluginLoader
             if (!ray.HasValue)
             {
                 Sound.Play(SoundId.ERROR);
-                DebugHud.Log("Failed to spawn item: {0}, Unable to perform raycast from player's view. Perhaps the ray distance is too far.", ID);
+                SLog.Info("Failed to spawn item: {0}, Unable to perform raycast from player's view. Perhaps the ray distance is too far.", ID);
             }
 
             if (Util.TrySpawn(ID, ray.Value) == null)
             {
                 Sound.Play(SoundId.ERROR);
-                DebugHud.Log("Failed to spawn item: {0}, An unknown error occured", ID);
+                SLog.Info("Failed to spawn item: {0}, An unknown error occured", ID);
             }
             else Sound.Play(SoundId.BTN_CLICK);
         }
@@ -225,7 +225,7 @@ namespace SR_PluginLoader
                 }
                 catch(Exception ex)
                 {
-                    DebugHud.LogSilent(ex);
+                    SLog.Debug(ex);
                 }
 
                 if (sprite == null) continue;// Exclude anything without an icon out of respect for the devs, we will just assume things without an icon aren't in the game just yet I suppose...

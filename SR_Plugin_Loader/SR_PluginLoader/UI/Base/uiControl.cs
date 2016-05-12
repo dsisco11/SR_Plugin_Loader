@@ -184,7 +184,7 @@ namespace SR_PluginLoader
             }
             set {
                 _visible = value;
-                //DebugHud.Log("{0}  _visible: {1}  isVisible: {2}", this, _visible, isVisible);
+                //PLog.Info("{0}  _visible: {1}  isVisible: {2}", this, _visible, isVisible);
                 if (isParent) {
                     ((uiPanel)this).handle_visibility_change();
                     if(_visible == true) set_layout_dirty();// If we are now visible then we should re-layout all of our children.
@@ -602,7 +602,7 @@ namespace SR_PluginLoader
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
         }
 
@@ -698,7 +698,7 @@ namespace SR_PluginLoader
             if (!force)
             {
                 //if (!isVisible) return false;// We don't update area stuff while invisible, we will do it once isVisible changes to TRUE
-                //if (CONFIRM_AREA) DebugHud.Log("{0}  Area {1} | last_area_value {2}", this.ToString(), _area, _last_area_value.Value);
+                //if (CONFIRM_AREA) PLog.Info("{0}  Area {1} | last_area_value {2}", this.ToString(), _area, _last_area_value.Value);
 
                 if (lock_area_update)
                 {
@@ -747,7 +747,7 @@ namespace SR_PluginLoader
                     area_updated = true;
                     Vector2 old_size = Vector2.zero;
                     if (_last_cached_area.HasValue) old_size = _last_cached_area.Value.size;
-                    if (CONFIRM_SIZE && _last_cached_area.HasValue && area.Value.size != old_size) DebugHud.Log("{0}  Confirm Size  |  Size Changed  |  new size: {1} | old size: {2}", this, area.Value.size, old_size);
+                    if (CONFIRM_SIZE && _last_cached_area.HasValue && area.Value.size != old_size) SLog.Info("{0}  Confirm Size  |  Size Changed  |  new size: {1} | old size: {2}", this, area.Value.size, old_size);
                 }
                 _last_area_value = set_area;
                                 
@@ -760,19 +760,19 @@ namespace SR_PluginLoader
                     area_updated = true;
                     Vector2 old_size = Vector2.zero;
                     if (_last_inner_area.HasValue) old_size = _last_inner_area.Value.size;
-                    if (CONFIRM_SIZE && _last_inner_area.HasValue && _inner_area.size != old_size) DebugHud.Log("{0}  Confirm Size  |  Inner Size Changed  |  new size(inner): {1} | old size(inner): {2}", this, _inner_area.size, old_size);
+                    if (CONFIRM_SIZE && _last_inner_area.HasValue && _inner_area.size != old_size) SLog.Info("{0}  Confirm Size  |  Inner Size Changed  |  new size(inner): {1} | old size(inner): {2}", this, _inner_area.size, old_size);
                 }
                 _last_inner_area = _inner_area;
 
-                if (CONFIRM_MARGIN) DebugHud.Log("{0}  Confirm Margins  |  Area without margins {1}  | Area with margins {2}", this, area.Value, border_area);
-                if (CONFIRM_BORDER) DebugHud.Log("{0}  Confirm Borders  |  Area without borders {1}  | Area with borders {2}", this, border_area, draw_area);
-                if (CONFIRM_PADDING) DebugHud.Log("{0}  Confirm Padding  |  Area without padding {1}  | Area with padding {2}", this, draw_area, _inner_area);
+                if (CONFIRM_MARGIN) SLog.Info("{0}  Confirm Margins  |  Area without margins {1}  | Area with margins {2}", this, area.Value, border_area);
+                if (CONFIRM_BORDER) SLog.Info("{0}  Confirm Borders  |  Area without borders {1}  | Area with borders {2}", this, border_area, draw_area);
+                if (CONFIRM_PADDING) SLog.Info("{0}  Confirm Padding  |  Area without padding {1}  | Area with padding {2}", this, draw_area, _inner_area);
 
                 if (CONFIRM_AREA)
                 {
-                    DebugHud.Log("{0}  Confirm Area Update  | _Area {1} | inner_area: {2} | border: {3} | draw: {4}", this, set_area, inner_area, border_area, draw_area);
-                    //DebugHud.Log("TRACE: {0}", new StackFrame(1).ToString());
-                    //DebugHud.Log("{0}", new StackTrace().ToString());
+                    SLog.Info("{0}  Confirm Area Update  | _Area {1} | inner_area: {2} | border: {3} | draw: {4}", this, set_area, inner_area, border_area, draw_area);
+                    //PLog.Info("TRACE: {0}", new StackFrame(1).ToString());
+                    //PLog.Info("{0}", new StackTrace().ToString());
                 }
                 
                 Apply_Positioners();// Only "Free Floating" controls can use auto-positioners because positioning a control based on another controls location would not give the intended results due to the update/layout order of controls within parent containers.
@@ -780,7 +780,7 @@ namespace SR_PluginLoader
 
                 if(area_updated)
                 {
-                    if (CONFIRM_LAYOUT) DebugHud.Log("{0}  Confirm Layout  |  Area changed, layout set to dirty.{1}", this, force?"(FORCED)":"");
+                    if (CONFIRM_LAYOUT) SLog.Info("{0}  Confirm Layout  |  Area changed, layout set to dirty.{1}", this, force?"(FORCED)":"");
 
                     set_layout_dirty();
                     if (isChild) parent.set_layout_dirty();//cause the parent to update due to this control altering it's position or size
@@ -991,7 +991,7 @@ namespace SR_PluginLoader
 
             update_area();
 
-            if(CONFIRM_SCROLL) DebugHud.Log("{0}  Parent Scrolled  | parentScroll: {1}  |  parent.ScrollPos: {2}  |  Area: {3}", this, parentScroll, (parent as IScrollableUI).Get_ScrollPos(), absArea);
+            if(CONFIRM_SCROLL) SLog.Info("{0}  Parent Scrolled  | parentScroll: {1}  |  parent.ScrollPos: {2}  |  Area: {3}", this, parentScroll, (parent as IScrollableUI).Get_ScrollPos(), absArea);
         }
 
         // One of the controls within this control's parent-chain changed.
@@ -1033,7 +1033,7 @@ namespace SR_PluginLoader
 
             if (!Util.floatEq(set_area.position.x, x) || !Util.floatEq(set_area.position.y, y))
             {
-                if (CONFIRM_POS) DebugHud.Log("{0}  Pos Changed | pos {1} | new_pos ({2}, {3})", this, set_area.position, x, y);
+                if (CONFIRM_POS) SLog.Info("{0}  Pos Changed | pos {1} | new_pos ({2}, {3})", this, set_area.position, x, y);
                 _alter_area(x, y, size);
                 //_alter_area(newpos, set_area.size);
                 //Area = new Rect(newpos, size);
@@ -1067,7 +1067,7 @@ namespace SR_PluginLoader
 
         public void print_positioners()
         {
-            DebugHud.Log("{0}  {1}", this.vertical_positioner, this.horizontal_positioner);
+            SLog.Info("{0}  {1}", this.vertical_positioner, this.horizontal_positioner);
         }
         
         public void Set_Pos(float x, float y)
@@ -1217,7 +1217,7 @@ namespace SR_PluginLoader
             float x = Area.x;
             float y = (val - size.y - yOff);
             clamp_pos(ref x, ref y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
-            if (CONFIRM_POSITIONER) DebugHud.Log("{0}  Confirm Positioner  |  align bottom  |  offset: {1}  |  val: {2}  |  area: {3}  |  size: {4}", this, new Vector2(x,y), val, Area, size);
+            if (CONFIRM_POSITIONER) SLog.Info("{0}  Confirm Positioner  |  align bottom  |  offset: {1}  |  val: {2}  |  area: {3}  |  size: {4}", this, new Vector2(x,y), val, Area, size);
 
             maybeUpdate_Pos(x, y);// we use 'area' instead of '_area' because we want to keep the control at the current position it is at.
 
@@ -1321,7 +1321,7 @@ namespace SR_PluginLoader
                         if (styleText.wordWrap)
                         {
                             float h = styleText.CalcHeight(content, csz.x - _padding.horizontal);
-                            //if (type == uiControlType.TextArea) DebugHud.Log("{0}  Autosize  |  Content Height: {1}  |  Height(unwrapped): {2}", this, h, csz.y);
+                            //if (type == uiControlType.TextArea) PLog.Info("{0}  Autosize  |  Content Height: {1}  |  Height(unwrapped): {2}", this, h, csz.y);
                             csz.y = h;
                         }
                     }
@@ -1375,11 +1375,11 @@ namespace SR_PluginLoader
                 {
                     Vector2 last_autosize = Vector2.zero;
                     if (_confirm_autosize_last.HasValue) last_autosize = _confirm_autosize_last.Value;
-                    DebugHud.Log("{0}  Confirm AutoSize Changed  |  new_autosize: {1}  |  last_autosize: {2}  |  starting_size: {3}", this, sz, last_autosize, ssz);
+                    SLog.Info("{0}  Confirm AutoSize Changed  |  new_autosize: {1}  |  last_autosize: {2}  |  starting_size: {3}", this, sz, last_autosize, ssz);
                 }
                 _confirm_autosize_last = sz;
-                //DebugHud.Log("TRACE: {0}", new StackFrame(1).ToString());
-                //DebugHud.Log("TRACE: {0}", new StackTrace().ToString());
+                //PLog.Info("TRACE: {0}", new StackFrame(1).ToString());
+                //PLog.Info("TRACE: {0}", new StackTrace().ToString());
             }
 
             return sz;
@@ -1393,7 +1393,7 @@ namespace SR_PluginLoader
             // Check if the size that was SET for the control matches the new size we WANT to set.
             if (!Util.floatEq(set_area.width, newsize.x) || !Util.floatEq(set_area.height, newsize.y))
             {
-                if (CONFIRM_SIZE) DebugHud.Log("{0}  Size Changed | size {1} | new_size {2}", this, set_area.size, newsize);
+                if (CONFIRM_SIZE) SLog.Info("{0}  Size Changed | size {1} | new_size {2}", this, set_area.size, newsize);
                 _alter_area(set_area.position.x, set_area.position.y, newsize);
                 //Area = new Rect(set_area.position, newsize);
                 return true;
@@ -1662,7 +1662,7 @@ namespace SR_PluginLoader
 
         protected void handleLayout()
         {
-            if (CONFIRM_LAYOUT) DebugHud.Log("{0}  Confirm Layout", this);
+            if (CONFIRM_LAYOUT) SLog.Info("{0}  Confirm Layout", this);
             doLayout();
             onLayout?.Invoke(this as uiPanel);// used by custom controls which cannot override the base function so they can position any child controls.
             doLayout_Post();
@@ -1714,7 +1714,7 @@ namespace SR_PluginLoader
             if (dirty_layout || et == EventType.Layout) handleLayout();
             
             //if(this.typename.Length>0 && evt.isMouse && et!= EventType.Repaint && et!= EventType.Used && et!= EventType.Ignore && et!= EventType.Layout)
-                //DebugHud.Log("[{0}] Event: {1}", this.typename, evt);
+                //PLog.Info("[{0}] Event: {1}", this.typename, evt);
 
             isMouseOver = absArea.Contains(evt.mousePosition);
             bool use_event = false;
@@ -1781,7 +1781,7 @@ namespace SR_PluginLoader
         public virtual void TryDisplay()
         {
             if (!isVisible) return;
-            if (CONFIRM_DRAW) { DebugHud.Log("{0}  Confirm Display  |  area: {1}", this, Area); }
+            if (CONFIRM_DRAW) { SLog.Info("{0}  Confirm Display  |  area: {1}", this, Area); }
 
             Color? prevClr = null;
             if(Tint.HasValue)
@@ -1842,9 +1842,9 @@ namespace SR_PluginLoader
         /// </summary>
         public virtual void handle_FirstFrame()
         {
-            //DebugHud.Log("{0}  Confirm FIRST FRAME: {1}  |  Area: {2}", this, _first_frame, area);
+            //PLog.Info("{0}  Confirm FIRST FRAME: {1}  |  Area: {2}", this, _first_frame, area);
             if (!_first_frame) return;// We already did this stuff, so skip it.
-            if (CONFIRM_AREA || CONFIRM_LAYOUT) DebugHud.Log("{0}  Confirm FIRST FRAME!", this);
+            if (CONFIRM_AREA || CONFIRM_LAYOUT) SLog.Info("{0}  Confirm FIRST FRAME!", this);
             
             lock_area_update = false;// Unlock area updates now.
 

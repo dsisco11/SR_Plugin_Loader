@@ -262,7 +262,7 @@ namespace SR_PluginLoader
             Plugin pl = Plugin.Get_Plugin(this.selected);
             if (pl == null)
             {
-                DebugHud.Log("Unable to find plugin via hash: {0}", this.selected);
+                SLog.Info("Unable to find plugin via hash: {0}", this.selected);
                 return;
             }
             /*
@@ -300,7 +300,7 @@ namespace SR_PluginLoader
                 }
                 catch (Exception ex)
                 {
-                    DebugHud.Log(ex);
+                    SLog.Error(ex);
                 }
             }
 

@@ -17,7 +17,7 @@ namespace SR_PluginLoader
 
         private IEnumerator Check_For_Updates()
         {
-            DebugHud.Log("[AutoUpdater] Checking for updates...");
+            SLog.Info("[AutoUpdater] Checking for updates...");
             List<UpdateFile> updates = new List<UpdateFile>();
 
             // We should automatically keep ALL files within the repositorys "installer" directory insync!
@@ -46,14 +46,14 @@ namespace SR_PluginLoader
                     FILE_UPDATE_STATUS status = (FILE_UPDATE_STATUS)it.Current;
                     //status = FILE_UPDATE_STATUS.OUT_OF_DATE;// DEBUG
 
-                    //DebugHud.Log("{0}  |  LOCAL_PATH: {1}  |  REMOTE_PATH: {2}", file.FULLNAME, local_path, file.URL);
+                    //PLog.Info("{0}  |  LOCAL_PATH: {1}  |  REMOTE_PATH: {2}", file.FULLNAME, local_path, file.URL);
                     if (status == FILE_UPDATE_STATUS.OUT_OF_DATE) { updates.Add(file); }
                 }
             }
 
             if (updates.Count > 0)
             {
-                DebugHud.Log("[AutoUpdater] {0} Updates Available.", updates);
+                SLog.Info("[AutoUpdater] {0} Updates Available.", updates);
                 var updatesView = uiControl.Create<uiUpdatesAvailable>();
                 updatesView.onResult += (DialogResult res) => {
                     if (res == DialogResult.OK)
@@ -70,7 +70,7 @@ namespace SR_PluginLoader
                 if (MainMenu.isReady) updatesView.Show();
                 else SiscosHooks.Once(HOOK_ID.MainMenu_Loaded, () => { updatesView.Show(); });
             }
-            else DebugHud.Log("[AutoUpdater] No updates.");
+            else SLog.Info("[AutoUpdater] No updates.");
 
             yield return null;
             yield break;

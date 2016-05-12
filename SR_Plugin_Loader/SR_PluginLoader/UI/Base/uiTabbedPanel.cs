@@ -94,7 +94,7 @@ namespace SR_PluginLoader
             if(last_tab >= 0) children[last_tab].isVisible = false;
             //foreach (uiScrollPanel tab in children) { tab.isVisible = false; }
             active_tab = idx;
-            //DebugHud.Log("{0}  Switched Tabs  | New: {1} | Old: {2}", this, idx, last_tab);
+            //PLog.Info("{0}  Switched Tabs  | New: {1} | Old: {2}", this, idx, last_tab);
             children[idx].isVisible = true;
             onChanged?.Invoke(this, (uiTab)children[idx]);
         }
@@ -104,12 +104,12 @@ namespace SR_PluginLoader
 
         public override uiControl Add(uiControl c) {
             if (CurrentTab == null) { throw new ArgumentNullException(this.ToString() + ": CurrentTab is NULL!"); }
-            //DebugHud.Log("{0} ADDING: {1}", this, c);
+            //PLog.Info("{0} ADDING: {1}", this, c);
             return CurrentTab.Add(c);
         }
         public override uiControl Add(string name, uiControl c) {
             if (CurrentTab == null) { throw new ArgumentNullException(this.ToString() + ": CurrentTab is NULL!"); }
-            //DebugHud.Log("{0} ADDING: ({2}){1}", this, c, name);
+            //PLog.Info("{0} ADDING: ({2}){1}", this, c, name);
             return CurrentTab.Add(name, c);
         }
 
@@ -125,16 +125,16 @@ namespace SR_PluginLoader
 
         protected override void Display()
         {
-            if (CONFIRM_DRAW) { DebugHud.Log("[{0}](" + Typename + ") Display confirm  | {1}", this, inner_area); }
+            if (CONFIRM_DRAW) { SLog.Info("[{0}](" + Typename + ") Display confirm  | {1}", this, inner_area); }
             Display_BG();// Draw Background
             GUI.BeginClip(inner_area);
 
             for (int i = 0; i < children.Count; i++)
             {
-                if (CONFIRM_DRAW) DebugHud.Log("  - Drawing child: {0} {1}", children[i], children[i].Get_Status_String());
+                if (CONFIRM_DRAW) SLog.Info("  - Drawing child: {0} {1}", children[i], children[i].Get_Status_String());
                 children[i].TryDisplay();
             }
-            if (CONFIRM_DRAW) DebugHud.Log(" - - - - - -");
+            if (CONFIRM_DRAW) SLog.Info(" - - - - - -");
 
             GUI.EndClip();
         }

@@ -88,12 +88,12 @@ namespace SR_PluginLoader
                 Plugin_Update_Item itm = list.Get_Children().First(o => ((Plugin_Update_Item)o).plugin_hash == plugin.Hash) as Plugin_Update_Item;
                 if(itm == null)
                 {
-                    DebugHud.Log("Unable to find plugin_update_item for plugin {0}({1})", plugin.data.NAME, plugin.Hash);
+                    SLog.Info("Unable to find plugin_update_item for plugin {0}({1})", plugin.data.NAME, plugin.Hash);
                     return;
                 }
                 else
                 {
-                    DebugHud.Log("Found plugin_update_item for plugin {0}({1})", plugin.data.NAME, plugin.Hash);
+                    SLog.Info("Found plugin_update_item for plugin {0}({1})", plugin.data.NAME, plugin.Hash);
                 }
 
                 uiProgressBar prog = null;
@@ -160,7 +160,7 @@ namespace SR_PluginLoader
 
         private IEnumerator CheckForUpdates()
         {
-            //DebugHud.Log("Checking for plugin updates...");
+            //PLog.Info("Checking for plugin updates...");
             int updates = 0;
             foreach (Plugin plugin in Loader.plugins.Values)
             {
@@ -168,11 +168,11 @@ namespace SR_PluginLoader
                 {
                     bool has_update = plugin.check_for_updates();
                     if (has_update) updates++;
-                    //DebugHud.Log("Plugin[{0}] has_update = {1}", plugin.data.NAME, (has_update ? "TRUE" : "FALSE"));
+                    //PLog.Info("Plugin[{0}] has_update = {1}", plugin.data.NAME, (has_update ? "TRUE" : "FALSE"));
                 }
                 catch(Exception ex)
                 {
-                    DebugHud.Log(ex);
+                    SLog.Error(ex);
                 }
             }
 

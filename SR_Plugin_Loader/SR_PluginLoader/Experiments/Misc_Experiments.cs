@@ -27,14 +27,14 @@ namespace SR_PluginLoader
 
                 GameObject.Destroy(inst);
             }
-            
-            DebugHud.Log("==== Results ====");
+
+            SLog.Info("==== Results ====");
             foreach(KeyValuePair<string, int> kvp in TALLY.OrderByDescending(o => o.Value))
             {
                 float pct = ((float)kvp.Value / ID_LIST.Count);
-                DebugHud.Log("{0}: {1:P1}", kvp.Key, pct);
+                SLog.Info("{0}: {1:P1}", kvp.Key, pct);
             }
-            DebugHud.Log("=================");
+            SLog.Info("=================");
 
         }
 

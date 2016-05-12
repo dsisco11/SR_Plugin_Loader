@@ -49,7 +49,7 @@ namespace SR_PluginLoader
             if(String.Compare("raw.", cname)==0) reg = new Regex(@"^/\w+/\w+/\w+/(.+)$");// EX:  https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer/SR_PluginLoader.dll
             else reg = new Regex(@"^/\w+/\w+/\w+/\w+/(.+)$");// EX:  https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Plugins/SiloEnhancer.dll
             Match match = reg.Match(uri.AbsolutePath);
-            //DebugHud.Log("match: success({0})  Group: {1}", (match.Success ? "TRUE" : "FALSE"), match.Groups[1].Value);
+            //PLog.Info("match: success({0})  Group: {1}", (match.Success ? "TRUE" : "FALSE"), match.Groups[1].Value);
 
             if (match.Success) return match.Groups[1].Value;
 
@@ -90,7 +90,7 @@ namespace SR_PluginLoader
             return result;
             */
             string result = String.Concat("https://raw.github.com/", uri.PathAndQuery);
-            //DebugHud.Log("Format_As_Raw_GitHub_Url:  {0}", result);
+            //PLog.Info("Format_As_Raw_GitHub_Url:  {0}", result);
             return result;
         }
 
@@ -118,7 +118,7 @@ namespace SR_PluginLoader
                 if (jsonStr == null || jsonStr.Length <= 0) return null;
 
                 remote_file_cache.Add(url, MEMENC.GetBytes(jsonStr));
-                DebugHud.LogSilent("Cached repository: {0}", url);
+                SLog.Debug("Cached repository: {0}", url);
             }
             else jsonStr = MEMENC.GetString(remote_file_cache[url]);
             
@@ -173,12 +173,12 @@ namespace SR_PluginLoader
                 if(!remote_file_cache.ContainsKey(url)) remote_file_cache.Add(url, MEMENC.GetBytes(jsonStr));
                 remote_file_cache[url] = MEMENC.GetBytes(jsonStr);
 
-                DebugHud.LogSilent("Cached repository: {0}", repo_url);
+                SLog.Debug("Cached repository: {0}", repo_url);
             }
             else
             {
                 jsonStr = MEMENC.GetString(remote_file_cache[url]);
-                //DebugHud.Log("CACHE: {0}", jsonStr);
+                //PLog.Info("CACHE: {0}", jsonStr);
                 //DebugHud.Log(remote_file_cache.ToLogString());
             }
 
@@ -216,7 +216,7 @@ namespace SR_PluginLoader
                 if (String.Compare("blob", file["type"].Value.ToLower()) != 0) continue;
                 if (String.Compare(dir, fldr) == 0)
                 {
-                    //DebugHud.Log("{0}  |  URL: {1}", path, url);
+                    //PLog.Info("{0}  |  URL: {1}", path, url);
                     list.Add(new UpdateFile(Path.Combine(repo_url, path), path, url, size));
                 }
             }
@@ -249,7 +249,7 @@ namespace SR_PluginLoader
                 if (String.Compare("blob", file["type"].Value.ToLower()) != 0) continue;
                 if (String.Compare(dir, fldr) == 0)
                 {
-                    //DebugHud.Log("{0}  |  URL: {1}", path, url);
+                    //PLog.Info("{0}  |  URL: {1}", path, url);
                     list.Add(new UpdateFile(Path.Combine(repo_url, path), path, url, size));
                 }
             }
@@ -283,7 +283,7 @@ namespace SR_PluginLoader
             JSONClass nr = new JSONClass();
             nr["sha"] = rSHA;
             Tracker[repo_url] = nr;
-            //DebugHud.LogSilent("Reset tracker for repo. SHA: {0} | URL: {1}", rSHA, repo_url);
+            //PLog.Debug("Reset tracker for repo. SHA: {0} | URL: {1}", rSHA, repo_url);
             Tracker.Save();
         }
 
@@ -367,14 +367,14 @@ namespace SR_PluginLoader
                 //if we DID cache the result from a past check against this file then return it here and don't waste time.
                 if (lastResult.HasValue)
                 {
-                    //DebugHud.LogSilent("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
+                    SLog.Debug("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
                     return lastResult.Value;
                 }
 
 
                 if (repo == null)
                 {
-                    DebugHud.Log("[AutoUpdater] Unable to cache git repository!");
+                    SLog.Info("[AutoUpdater] Unable to cache git repository!");
                     return FILE_UPDATE_STATUS.ERROR;
                 }
 
@@ -385,7 +385,7 @@ namespace SR_PluginLoader
                     {
                         // Compare the SHA1 hash for the dll on GitHub to the hash for the one currently installed
                         string nSHA = file["sha"];
-                        //DebugHud.Log("nSHA({0})  cSHA({1})  local_file: {2}", nSHA, cSHA, local_file);
+                        //PLog.Info("nSHA({0})  cSHA({1})  local_file: {2}", nSHA, cSHA, local_file);
 
                         if (String.Compare(nSHA, cSHA) != 0)
                         {
@@ -400,7 +400,7 @@ namespace SR_PluginLoader
                             try
                             {
                                 exist = Query_Remote_File_Exists(tmpurl);
-                                //DebugHud.Log("Query_Remote_File_Exists: {0}  = {1}", tmpurl, (exist ? "TRUE" : "FALSE"));
+                                //PLog.Info("Query_Remote_File_Exists: {0}  = {1}", tmpurl, (exist ? "TRUE" : "FALSE"));
                             }
                             catch (WebException wex)
                             {
@@ -419,12 +419,12 @@ namespace SR_PluginLoader
 
                             if (!exist)
                             {
-                                //DebugHud.Log("[Updater] Dev file: {0}", Path.GetFileName(local_file));
+                                //PLog.Info("[Updater] Dev file: {0}", Path.GetFileName(local_file));
                                 Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.DEV_FILE);
                                 return FILE_UPDATE_STATUS.DEV_FILE;
                             }
 
-                            //DebugHud.Log("[Updater] Outdated file: {0}", Path.GetFileName(local_file));
+                            //PLog.Info("[Updater] Outdated file: {0}", Path.GetFileName(local_file));
                             Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.OUT_OF_DATE);
                             return FILE_UPDATE_STATUS.OUT_OF_DATE;
                         }
@@ -441,10 +441,10 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
 
-            DebugHud.Log("[Git_Updater] Unable to find file in repository: {0}", remote_file);
+            SLog.Info("[Git_Updater] Unable to find file in repository: {0}", remote_file);
             return FILE_UPDATE_STATUS.NOT_FOUND;//no update
         }
 
@@ -469,7 +469,7 @@ namespace SR_PluginLoader
             //if we DID cache the result from a past check against this file then return it here and don't waste time.
             if (lastResult.HasValue)
             {
-                DebugHud.LogSilent("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
+                //SLog.Debug("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
                 yield return lastResult.Value;
                 yield break;// ensure we stop here
             }
@@ -477,7 +477,7 @@ namespace SR_PluginLoader
 
             if (repo == null)
             {
-                DebugHud.Log("[AutoUpdater] Unable to cache git repository!");
+                SLog.Info("[AutoUpdater] Unable to cache git repository!");
                 yield return FILE_UPDATE_STATUS.ERROR;
                 yield break;// ensure we stop here
             }
@@ -489,7 +489,7 @@ namespace SR_PluginLoader
                 {
                     // Compare the SHA1 hash for the dll on GitHub to the hash for the one currently installed
                     string nSHA = file["sha"];
-                    //DebugHud.Log("nSHA({0})  cSHA({1})  local_file: {2}", nSHA, cSHA, local_file);
+                    //PLog.Info("nSHA({0})  cSHA({1})  local_file: {2}", nSHA, cSHA, local_file);
 
                     if (String.Compare(nSHA, cSHA) != 0)
                     {
@@ -506,7 +506,7 @@ namespace SR_PluginLoader
                         do
                         {
                             yield return null;
-
+                            
                             try
                             {
                                 if (!it.MoveNext()) fail = true;//stop
@@ -530,13 +530,13 @@ namespace SR_PluginLoader
 
                         if (!exist)
                         {
-                            //DebugHud.Log("[Updater] Dev file: {0}", Path.GetFileName(local_file));
+                            //PLog.Info("[Updater] Dev file: {0}", Path.GetFileName(local_file));
                             Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.DEV_FILE);
                             yield return FILE_UPDATE_STATUS.DEV_FILE;
                             yield break;// ensure we stop here
                         }
 
-                        //DebugHud.Log("[Updater] Outdated file: {0}", Path.GetFileName(local_file));
+                        //PLog.Info("[Updater] Outdated file: {0}", Path.GetFileName(local_file));
                         Cache_Result(remote_path, local_file, FILE_UPDATE_STATUS.OUT_OF_DATE);
                         yield return FILE_UPDATE_STATUS.OUT_OF_DATE;
                         yield break;// ensure we stop here
@@ -550,7 +550,7 @@ namespace SR_PluginLoader
                 }
             }
 
-            DebugHud.Log("[Git_Updater] Unable to find file in repository: {0}", remote_file);
+            SLog.Warn("[Git_Updater] Unable to find file in repository: {0}", remote_file);
             yield return FILE_UPDATE_STATUS.NOT_FOUND;//no update
             yield break;// ensure we stop here
         }
@@ -561,7 +561,7 @@ namespace SR_PluginLoader
         /// </summary>
         /// <param name="url"></param>
         /// <returns>FileStream for the requested file.</returns>
-        public IEnumerator Cache_And_Open_File(string url)
+        public IEnumerator Cache_And_Open_File_Async(string url)
         {
             string repo_url = Extract_Repository_URL_From_Github_URL(url);
             var iter = Cache_Git_Repo_Async(repo_url);
@@ -569,12 +569,14 @@ namespace SR_PluginLoader
 
             JSONArray repo = iter.Current as JSONArray;
 
-            string local_file = String.Format("{0}\\{1}", UnityEngine.Application.dataPath, Path.GetFileName(url));
-            
-            var update_status = Get_Update_Status(url, local_file);
+            string local_file = String.Format("{0}\\{1}", UnityEngine.Application.dataPath, Path.GetFileName(url));            
+            var iter1 = Get_Update_Status_Async(url, local_file);
+            while (iter1.MoveNext()) yield return null;
+
+            var update_status = (FILE_UPDATE_STATUS)iter1.Current;
             if (update_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
             {
-                DebugHud.LogSilent("Git_Updater.Cache_And_Open_File(): Downloading: {0}  |  File: {1}", url, Path.GetFileName(local_file));
+                SLog.Debug("Git_Updater.Cache_And_Open_File(): Downloading: {0}  |  File: {1}", url, Path.GetFileName(local_file));
                 var it = Download(url, local_file);
                 while (it.MoveNext()) yield return null;
             }
@@ -595,7 +597,7 @@ namespace SR_PluginLoader
             var request = (HttpWebRequest)WebRequest.Create(url);
             if(request == null)
             {
-                DebugHud.Log("Unable to create an instance of HttpWebRequest!");
+                SLog.Info("Unable to create an instance of HttpWebRequest!");
                 return false;
             }
             request.UserAgent = USER_AGENT;
@@ -641,7 +643,7 @@ namespace SR_PluginLoader
             HttpWebRequest webRequest = WebRequest.Create(url) as HttpWebRequest;
             if (webRequest == null)
             {
-                DebugHud.Log("Unable to create an instance of HttpWebRequest!");
+                SLog.Info("Unable to create an instance of HttpWebRequest!");
                 yield return false;
             }
 
@@ -652,8 +654,8 @@ namespace SR_PluginLoader
             IEnumerator e = webAsync.GetResponse(webRequest);
             if (e == null)
             {
-                DebugHud.Log("Updater_Base.Get() Enumerator is NULL!");
-                yield return null;
+                SLog.Info("Updater_Base.Get() Enumerator is NULL!");
+                yield return false;
                 yield break;
             }
 

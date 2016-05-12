@@ -7,6 +7,8 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Security.Policy;
+using System.Security;
 
 namespace SR_PluginLoader
 {
@@ -24,8 +26,8 @@ namespace SR_PluginLoader
         public string Data_Hash {
             get
             {
-                if (!File.Exists(file)) return null;
-                if (_cached_data_hash == null) _cached_data_hash = Util.Git_File_Sha1_Hash(file);
+                if (!File.Exists(FilePath)) return null;
+                if (_cached_data_hash == null) _cached_data_hash = Util.Git_File_Sha1_Hash(FilePath);
 
                 return _cached_data_hash;
             }
@@ -37,6 +39,7 @@ namespace SR_PluginLoader
         private GameObject GM = null;
         private string Unique_GameObject_Name { get { return this.ToString(); } }
 
+        private bool first_load = true;
         private bool is_update_available = false;
         public bool Enabled = false;
         /// <summary>
@@ -45,10 +48,10 @@ namespace SR_PluginLoader
         public bool has_dependency_issues = false;
         public List<Plugin_Dependency> unmet_dependencys = new List<Plugin_Dependency>();
         
-        public string file = null;
+        public string FilePath = null;
         private DateTime? cached_file_time = null;
-        public DateTime file_time { get { if (!cached_file_time.HasValue) { cached_file_time = File.GetCreationTime(file); } return cached_file_time.Value; } }
-        public string dir = null;
+        public DateTime file_time { get { if (!cached_file_time.HasValue) { cached_file_time = File.GetCreationTime(FilePath); } return cached_file_time.Value; } }
+        public string FileDir = null;
         private string dll_name = null;
 
         public List<string> Errors = new List<string>();
@@ -66,11 +69,11 @@ namespace SR_PluginLoader
 
         public Plugin(string file, bool en = false)
         {
-            this.file = file;
-            this.dir = Path.GetDirectoryName(file);
-            this.dll_name = Path.GetFileName(file);
+            FilePath = file;
+            FileDir = Path.GetDirectoryName(file);
+            dll_name = Path.GetFileName(file);
 
-            this.Enabled = en;
+            Enabled = en;
         }
 
 
@@ -78,11 +81,11 @@ namespace SR_PluginLoader
         /// This is where we actually do all the loading, to prevent any exceptions from causing the plugin instance to not be put into our global plugins map.
         /// This way we can ensure any errors that we DO get while loading can be properly displayed at the plugins menu!
         /// </summary>
-        public void load()
+        public void Setup()
         {
-            this.Load_DLL();
-            this.Load_Plugin_Info();
-            this.Load_Assets();
+            Load_DLL();
+            Load_Plugin_Info();
+            Load_Assets();
         }
         
         private void Load_Assets()
@@ -123,15 +126,15 @@ namespace SR_PluginLoader
         {
             try
             {
-                var field = this.pluginClass.GetField("PLUGIN_INFO", BindingFlags.Public | BindingFlags.Static);
+                var field = pluginClass.GetField("PLUGIN_INFO", BindingFlags.Public | BindingFlags.Static);
                 if (field == null) return;
 
-                this.data = (Plugin_Data)field.GetValue(null);
-                this.data.DESCRIPTION = this.data.DESCRIPTION.Trim(new char[] {'\n', '\r' });
+                data = (Plugin_Data)field.GetValue(null);
+                data.DESCRIPTION = data.DESCRIPTION.Trim(new char[] {'\n', '\r' });
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
         }
         
@@ -140,7 +143,7 @@ namespace SR_PluginLoader
         {
             string str = DebugHud.Format_Log(format, 1, args);
             Errors.Add(str);
-            DebugHud.Log("[ <b>{0}</b> ] {1}", this.dll_name, str);
+            SLog.Info("[ <b>{0}</b> ] {1}", this.dll_name, str);
             onError?.Invoke();
         }
 
@@ -148,7 +151,7 @@ namespace SR_PluginLoader
         {
             string str = DebugHud.Format_Exception_Log(ex, 1);
             Errors.Add(str);
-            DebugHud.Log("[ <b>{0}</b> ] {1}", this.dll_name, str);
+            SLog.Info("[ <b>{0}</b> ] {1}", this.dll_name, str);
             onError?.Invoke();
         }
 
@@ -156,7 +159,7 @@ namespace SR_PluginLoader
         {
             try
             {
-                this.dll = this.load_assembly(this.dll != null);
+                dll = load_assembly(dll != null);
 
                 //find the static SR_Plugin class amongst however many namespaces this library has.
                 foreach (Type ty in dll.GetExportedTypes())
@@ -186,51 +189,60 @@ namespace SR_PluginLoader
 
                 if (this.load_funct == null || this.unload_funct == null)
                 {
-                    DebugHud.Log("Unable to locate load/unload functions.");
+                    SLog.Info("Unable to locate load/unload functions.");
                     return false;
                 }
 
-                //DebugHud.Log("[{0}] Plugin loaded!", this.dll_name);
+                //PLog.Info("[{0}] Plugin loaded!", this.dll_name);
                 return true;
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
                 return false;
             }
         }
+        
 
         private Assembly load_assembly(bool reload=false)
         {
             try
             {
+                string FN_NoExt = Path.GetFileNameWithoutExtension(FilePath);
+                string pdb_file = String.Concat(FileDir, "\\", FN_NoExt, ".pdb");
+
                 if (reload == true)
                 {
-                    Assembly asm = Assembly.LoadFile(this.file);//  https://msdn.microsoft.com/en-us/library/b61s44e8(v=vs.110).aspx
-                    return asm;
                 }
-                else
-                {
-                    //DebugHud.LogSilent("Loading: {0}", this.dll_name);
-                    string pdb_file = String.Format("{0}\\{1}.pdb", this.dir, Path.GetFileNameWithoutExtension(this.file));
+                
 
-                    byte[] dll_buf = this.Load_Bytes(this.file);
-                    byte[] pdb_buf = null;
-                    if(File.Exists(pdb_file)) this.Load_Bytes(pdb_file);
+                //PLog.Debug("Loading: {0}", this.dll_name);
 
-                    if (dll_buf == null) return null;
+                byte[] dll_buf = Load_Bytes(FilePath);
+                byte[] pdb_buf = null;
+                if(File.Exists(pdb_file)) Load_Bytes(pdb_file);
 
-                    Assembly asm;
-                    if (pdb_buf != null) asm = Assembly.Load(dll_buf, pdb_buf);
-                    else asm = Assembly.Load(dll_buf);
+                if (dll_buf == null) return null;
 
-                    //DebugHud.LogSilent("LOADED: {0}", this.dll_name);
-                    return asm;
-                }
+                Assembly asm;
+                /*
+                if (pdb_buf != null) asm = Assembly.Load(dll_buf, pdb_buf);
+                else asm = Assembly.Load(dll_buf);
+                */
+                /*
+                if (pdb_buf != null) asm = Domain.Load(dll_buf, pdb_buf);
+                else asm = Domain.Load(dll_buf);
+                */
+
+                if (pdb_buf != null) asm = AppDomain.CurrentDomain.Load(dll_buf, pdb_buf);
+                else asm = AppDomain.CurrentDomain.Load(dll_buf);
+
+                //PLog.Debug("LOADED: {0}", this.dll_name);
+                return asm;
             }
             catch(Exception ex)
             {
-                this.Add_Error(ex);
+                Add_Error(ex);
             }
 
             return null;
@@ -300,16 +312,18 @@ namespace SR_PluginLoader
         public bool Enable()
         {
             Enabled = false;//default it and if we successfully load THEN we can make it true.
-            if (this.has_dependency_issues == true)
+            if (has_dependency_issues == true)
             {
                 Enabled = false;
                 return false;
             }
 
-            if ( this.Load() )
+            if ( Load() )
             {
                 Enabled = true;
-                Loader.Plugin_Status_Change(this, Enabled);
+                bool was_first = first_load;
+                first_load = false;
+                if (!was_first) Loader.Plugin_Status_Change(this, Enabled);
             }
 
             return Enabled;
@@ -321,7 +335,7 @@ namespace SR_PluginLoader
             if (dupe != null)
             {
                 GameObject.DestroyImmediate(dupe);
-                DebugHud.Log("Destroyed pre-existing plugin manager GameObject instance!");
+                SLog.Info("Destroyed pre-existing plugin manager GameObject instance!");
             }
 
             GameObject gmObj = new GameObject(this.Unique_GameObject_Name);
@@ -371,7 +385,7 @@ namespace SR_PluginLoader
         {
             try
             {
-                if (this.unload_funct != null)
+                if (unload_funct != null)
                 {
                     object[] args = new object[unload_funct.GetParameters().Length];
                     var paramz = unload_funct.GetParameters();
@@ -421,11 +435,11 @@ namespace SR_PluginLoader
 
         public void Uninstall()
         {
-            this.Disable();
+            Disable();
 
-            string name = Path.GetFileNameWithoutExtension(file);
+            string name = Path.GetFileNameWithoutExtension(FilePath);
             Loader.plugins.Remove(name);
-            File.Delete(this.file);
+            File.Delete(FilePath);
         }
         
         public byte[] Load_Resource(string name)
@@ -462,7 +476,7 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
                 return null;
             }
         }
@@ -476,20 +490,20 @@ namespace SR_PluginLoader
 
             if(data==null)
             {
-                DebugHud.Log("{0} Plugin has no DATA structure!", this);
+                SLog.Info("{0} Plugin has no DATA structure!", this);
                 return false;
             }
 
             if (data.UPDATE_METHOD == null || data.UPDATE_METHOD.METHOD == UPDATER_TYPE.NONE)
             {
-                DebugHud.Log("{0} Plugin has no UPDATE_METHOD specified!", this);
+                SLog.Info("{0} Plugin has no UPDATE_METHOD specified!", this);
                 return false;
             }
 
-            var status = Updater.Get_Update_Status(data.UPDATE_METHOD.URL, file);
+            var status = Updater.Get_Update_Status(data.UPDATE_METHOD.URL, FilePath);
             is_update_available = (status == FILE_UPDATE_STATUS.OUT_OF_DATE);
 
-            //DebugHud.Log("{0}  update_status: {1}", this, Enum.GetName(typeof(FILE_UPDATE_STATUS), status));
+            //PLog.Info("{0}  update_status: {1}", this, Enum.GetName(typeof(FILE_UPDATE_STATUS), status));
             return is_update_available;
         }
 
@@ -503,7 +517,7 @@ namespace SR_PluginLoader
         {
             if (!this.check_for_updates())
             {
-                DebugHud.Log("{0} Plugin.download_update():  Already up to date!", this);
+                SLog.Info("{0} Plugin.download_update():  Already up to date!", this);
                 yield break;
             }
 
@@ -520,7 +534,7 @@ namespace SR_PluginLoader
         {
             if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException(String.Format("{0} Plugin has no UPDATE_METHOD specified!", this));
             
-            IEnumerator iter = this.Updater.Download(this.data.UPDATE_METHOD.URL, this.file, null,
+            IEnumerator iter = this.Updater.Download(this.data.UPDATE_METHOD.URL, this.FilePath, null,
                (float current, float total) =>
                {//Download progress
                     float f = (float)current / (float)total;

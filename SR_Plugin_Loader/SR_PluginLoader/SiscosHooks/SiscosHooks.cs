@@ -78,7 +78,7 @@ namespace SR_PluginLoader
             try
             {
 #if DEBUG
-                if (HOOKS_TO_ANNOUNCE.Contains(hook)) DebugHud.Log("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
+                if (HOOKS_TO_ANNOUNCE.Contains(hook)) SLog.Info("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
 #endif
 
                 _hook_result result = new _hook_result(args);
@@ -457,18 +457,18 @@ namespace SR_PluginLoader
         private const string LOG_TAG = "<b>SiscosHooks</b>  ";
         private static void Log(HOOK_ID hook, string format, params object[] args)
         {
-            DebugHud.Log(String.Format("{0}<{1}> {2}", LOG_TAG, hook.ToString(), format), args);
+            SLog.Info(String.Format("{0}<{1}> {2}", LOG_TAG, hook.ToString(), format), args);
         }
 
         private static void Log(string format, params object[] args)
         {
-            DebugHud.Log(String.Format("{0} {1}", LOG_TAG, format), args);
+            SLog.Info(String.Format("{0} {1}", LOG_TAG, format), args);
         }
 
         private static void Log(Exception ex)
         {
-            string str = DebugHud.Format_Exception_Log(ex, 1);
-            DebugHud.Log("{0}(Exception) {1}", LOG_TAG, str);
+            string str = Logging.Logger.Format_Exception(ex);
+            SLog.Error("{0}(Exception) {1}", LOG_TAG, str);
         }
 
 #endregion

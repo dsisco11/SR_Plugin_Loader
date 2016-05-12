@@ -41,7 +41,7 @@ namespace SR_PluginLoader
         {
             if (json[key] == null)
             {
-                DebugHud.Log(new ArgumentNullException(String.Format("\"{0}\" is null!", key)));
+                SLog.Error(new ArgumentNullException(String.Format("\"{0}\" is null!", key)));
                 return null;
             }
 

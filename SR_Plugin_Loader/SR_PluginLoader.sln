@@ -7,7 +7,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SR_PluginLoader", "SR_Plugi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Restart_Helper", "Restart_Helper\Restart_Helper.csproj", "{D17964E2-E3A5-476D-8420-8991E08E3FC8}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Logging", "Logging\Logging.shproj", "{7449B8F1-DB5F-4C04-9735-68BFA9C4C1C6}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Logging\Logging.projitems*{fd444148-f22d-438e-b48d-924292c8c32d}*SharedItemsImports = 4
+		Logging\Logging.projitems*{7449b8f1-db5f-4c04-9735-68bfa9c4c1c6}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86

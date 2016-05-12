@@ -292,7 +292,7 @@ namespace SR_PluginLoader
                 // draw the debug console text
                 console_scroll = GUI.BeginScrollView(console_area, console_scroll, console_inner_area, false, false);
                     console_text_style.Draw(console_inner_text_area, console_lines, id);
-                //DebugHud.Log("{0} {1} {2}", console_inner_area.height, console_inner_text_area.height, console_scrollbar_area.height);
+                //PLog.Info("{0} {1} {2}", console_inner_area.height, console_inner_text_area.height, console_scrollbar_area.height);
                 GUI.EndScrollView(true);
 
                 GUI.depth = prev_depth;

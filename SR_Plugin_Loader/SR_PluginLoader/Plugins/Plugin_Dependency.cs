@@ -12,6 +12,7 @@ namespace SR_PluginLoader
         VERSION_TOO_LOW,
         VERSION_TOO_HIGH
     }
+
     public class Plugin_Dependency
     {
         /// <summary>

@@ -212,7 +212,7 @@ namespace SR_PluginLoader
                     GL.Begin(GL.LINES);
                     if (hits.Count > 0)
                     {
-                        //DebugHud.Log("Drawing: {0} {{{1}}}", hits.Count, String.Join(", ", hits.Select(h => String.Format("{0}({1})[p:{2}]", h.gameObject.name, h.gameObject.GetType().Name, h.gameObject.transform.parent.gameObject.name)).ToArray()));
+                        //PLog.Info("Drawing: {0} {{{1}}}", hits.Count, String.Join(", ", hits.Select(h => String.Format("{0}({1})[p:{2}]", h.gameObject.name, h.gameObject.GetType().Name, h.gameObject.transform.parent.gameObject.name)).ToArray()));
                         foreach (RaycastResult res in hits)
                         {
                             DebugUI.Draw_GameObj_Bounds(res.gameObject);
@@ -258,7 +258,7 @@ namespace SR_PluginLoader
             {
                 Vector2 mousePos = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
                 IEnumerable<uiControl> list = uiControl.ALL.Select(o => o.Value).Where(o => !o.isChild).Where(o => o!=DebugUI.ROOT);// It's for debug functionality screw it, we don't NEED to optimize it.
-                //DebugHud.Log("{0}", String.Join(", ", list.Select(o => o.Name).ToArray()));
+                //PLog.Info("{0}", String.Join(", ", list.Select(o => o.Name).ToArray()));
                 const int MAX_LOOP = 999;// Limit for safety
                 int loop = 0;
 

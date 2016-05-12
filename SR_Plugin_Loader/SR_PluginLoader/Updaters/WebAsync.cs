@@ -134,7 +134,7 @@ namespace SR_PluginLoader
                 if (requestState.errorMessage != null)
                 {
                     // this is not an ERROR because there are at least 2 error messages that are expected: 404 and NameResolutionFailure - as can be seen on CheckForMissingURL
-                    Debug.Log("[WebAsync] Error message while getting response from request '" + webRequest.RequestUri.ToString() + "': " + requestState.errorMessage);
+                    Debug.Log("[WebAsync] Error message while getting response from request '" + webRequest.RequestUri.ToString() + "': " + requestState.errorMessage + "\n" + StackTraceUtility.ExtractStackTrace());
                 }
             }
 

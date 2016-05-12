@@ -50,7 +50,7 @@ namespace SR_PluginLoader
             if ((int)sz.x <= 0 || (int)sz.y <= 0) return;
             if (!color.HasValue) return;
             texture = new Texture2D((int)sz.x, (int)sz.y);
-            //DebugHud.Log("Preparing texture ({0}, {1}), {2}", texture.width, texture.height, color);
+            //PLog.Info("Preparing texture ({0}, {1}), {2}", texture.width, texture.height, color);
 
             int stpl_sz = 0;
             if (stipple_size.HasValue) stpl_sz = stipple_size.Value;

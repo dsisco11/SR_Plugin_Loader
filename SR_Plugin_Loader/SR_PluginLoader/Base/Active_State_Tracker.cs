@@ -20,7 +20,7 @@ namespace SR_PluginLoader
         private void Log(string format, params object[] args)
         {
             string msg = String.Format(format, args);
-            DebugHud.Log("["+nameof(Active_State_Tracker)+"]({0}) {1}", Name, msg);
+            SLog.Info("["+nameof(Active_State_Tracker)+"]({0}) {1}", Name, msg);
         }
 
         public Active_State_Tracker(string name, bool allow_negative_values=false) { Name = name; AllowNegative = allow_negative_values; }

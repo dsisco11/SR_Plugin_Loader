@@ -232,7 +232,7 @@ namespace SR_PluginLoader
             string url = this.plugins[hash].URL;
             if(url == null || url.Length <= 0)
             {
-                DebugHud.Log("Cannot download plugin, Invalid URL: {0}", url);
+                SLog.Info("Cannot download plugin, Invalid URL: {0}", url);
                 return;
             }
             
@@ -310,11 +310,11 @@ namespace SR_PluginLoader
             IEnumerator iter = null;
             try
             {
-                iter = Git_Updater.instance.Cache_And_Open_File(PLUGINS_LIST_URL);
+                iter = Git_Updater.instance.Cache_And_Open_File_Async(PLUGINS_LIST_URL);
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
                 fail = true;
             }
             //while (iter.MoveNext()) yield return null;
@@ -322,11 +322,16 @@ namespace SR_PluginLoader
             {
                 try
                 {
+                    if (iter == null)
+                    {
+                        fail = true;
+                        break;
+                    }
                     b = iter.MoveNext();
                 }
                 catch (Exception ex)
                 {
-                    DebugHud.Log(ex);
+                    SLog.Error(ex);
                     fail = true;
                 }
 
@@ -354,14 +359,14 @@ namespace SR_PluginLoader
                             plugins[dat.Hash] = dat;
                         }
 
-                        lbl_pl_count.Value = this.plugins.Count.ToString();
+                        lbl_pl_count.Value = plugins.Count.ToString();
                         pending_rebuild = true;
                         plugins_tab.Select();
                     }
                     catch (Exception ex)
                     {
-                        DebugHud.Log("Error while updating plugins list.");
-                        DebugHud.Log(ex);
+                        SLog.Info("Error while updating plugins list.");
+                        SLog.Error(ex);
                         fail = true;
                     }
                 }
@@ -456,7 +461,7 @@ namespace SR_PluginLoader
 
             if(plData.Updater == null)
             {
-                DebugHud.Log("The plugin \"{0}\" has an invalid updater instance, it's update method might not have been specified by the author!", pl_title);
+                SLog.Info("The plugin \"{0}\" has an invalid updater instance, it's update method might not have been specified by the author!", pl_title);
                 return;
             }
 
@@ -472,7 +477,7 @@ namespace SR_PluginLoader
                (list[hash] as Plugin_StoreItem).progress_text.Text = "Downloading:";
                if (ContentType.StartsWith("application/")) return true;//yea it's binary file data
 
-               DebugHud.Log("The download url for the plugin \"{0}\" returns content of type \"{1}\" rather than the plugin file itself.\nThis may indicate that the url for this plugin leads to a download PAGE as opposed to giving the actual file, the plugin creator should supply a valid url leading DIRECTLY to the file.", pl_title, ContentType);
+               SLog.Info("The download url for the plugin \"{0}\" returns content of type \"{1}\" rather than the plugin file itself.\nThis may indicate that the url for this plugin leads to a download PAGE as opposed to giving the actual file, the plugin creator should supply a valid url leading DIRECTLY to the file.", pl_title, ContentType);
                return false;//This file is not ok to download.
            },
            (float read, float total) =>

@@ -10,6 +10,8 @@ using SimpleJSON;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Logging;
 
 namespace SR_PluginLoader
 {
@@ -34,11 +36,37 @@ namespace SR_PluginLoader
         
         private static Plugin_Update_Viewer plugin_updater = null;
         private static DevMenu dev_tools = null;
-
+        private static bool loaded_symbols = false;
+        
 
         public static void init(string hash)
         {
             if (Loader.Config != null) return;
+            Application.stackTraceLogType = StackTraceLogType.Full;
+            Logger.Begin(Path.Combine(Application.dataPath, "plugins.log"));
+
+#if DEBUG
+            /*
+            if (!loaded_symbols)
+            {
+                loaded_symbols = true;
+                StackFrame sf = new StackFrame(true);
+                if (String.IsNullOrEmpty(sf.GetFileName()))
+                {
+                    string dll_path = Assembly.GetExecutingAssembly().Location;
+                    Log.Info("DLL_PATH: {0}", dll_path);
+                    string pdb_path = String.Concat(Path.GetDirectoryName(dll_path), "\\", Path.GetFileNameWithoutExtension(dll_path), ".pdb");
+                    Log.Info("PDB_PATH: {0}", pdb_path);
+                    Log.Info("");
+                    byte[] dll_buf = File.ReadAllBytes(dll_path);
+                    byte[] pdb_buf = File.ReadAllBytes(pdb_path);
+                    AppDomain.CurrentDomain.Load(dll_buf, pdb_buf);
+                }
+            }
+            */
+            //throw null;// Debug
+#endif
+
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
@@ -49,6 +77,7 @@ namespace SR_PluginLoader
                 Loader.root = new GameObject();
                 UnityEngine.Object.DontDestroyOnLoad(Loader.root);
 
+                
                 DebugHud.Init();
                 TextureHelper.Load_Common();
                 SiscosHooks.Setup();
@@ -84,13 +113,13 @@ namespace SR_PluginLoader
             }
             catch(Exception ex)
             {
-                DebugHud.Log("Exception during PluginLoader initialization!");
-                DebugHud.Log(ex);
+                SLog.Error("Exception during PluginLoader initialization!");
+                SLog.Error(ex);
             }
             finally
             {
                 timer.Stop();
-                DebugHud.LogSilent("Plugin Loader initialized! Took: {0}ms", timer.ElapsedMilliseconds);
+                SLog.Debug("Plugin Loader initialized! Took: {0}ms", timer.ElapsedMilliseconds);
             }
         }
 
@@ -174,10 +203,10 @@ namespace SR_PluginLoader
                             }
                         }
 
-                        if (trash == null) DebugHud.Log("Found multiple instances of the same plugin and cannot determine which plugin file to ignore! Plugin: ", plug);
+                        if (trash == null) SLog.Info("Found multiple instances of the same plugin and cannot determine which plugin file to ignore! Plugin: ", plug);
                         else
                         {
-                            DebugHud.Log("Multiple instances of the same plugin have been found, uninstalling file: {0}", trash.FilePath);
+                            SLog.Info("Multiple instances of the same plugin have been found, uninstalling file: {0}", trash.FilePath);
                             trash.Uninstall();
                             return false;
                         }
@@ -186,7 +215,7 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
                 return false;
             }
 
@@ -204,7 +233,7 @@ namespace SR_PluginLoader
         {
             string dataDir = Path.GetDirectoryName(UnityEngine.Application.dataPath);
             pluginDir = Path.GetFullPath(String.Format("{0}/plugins/", dataDir));
-            //DebugHud.Log("Setup_Plugin_Dir: {0}", pluginDir);
+            //PLog.Info("Setup_Plugin_Dir: {0}", pluginDir);
 
             if (!Directory.Exists(pluginDir))
             {
@@ -234,7 +263,7 @@ namespace SR_PluginLoader
                     }
                     catch(Exception ex)
                     {
-                        DebugHud.Log(ex);
+                        SLog.Error(ex);
                     }
                 }
             }
@@ -290,7 +319,7 @@ namespace SR_PluginLoader
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
         }
         
@@ -309,7 +338,7 @@ namespace SR_PluginLoader
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
                 return false;
             }
         }
@@ -322,7 +351,7 @@ namespace SR_PluginLoader
             {
                 if(plugins == null)
                 {
-                    DebugHud.Log("CRITICAL ERROR: Active plugins list is null!");
+                    SLog.Warn("CRITICAL ERROR: Active plugins list is null!");
                     return;
                 }
                 
@@ -334,14 +363,14 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
         }
 
         public static void Plugin_Status_Change(Plugin p, bool enabled)
         {
             if (IN_LOADING_PHASE) return;
-            DebugHud.LogSilent("Plugin_Status_Change: Saving config...");
+            SLog.Debug("Plugin_Status_Change: Saving config...");
             Loader.Save_Config();
         }
 
@@ -372,10 +401,17 @@ namespace SR_PluginLoader
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             string assemblyPath = Find_Assembly_In_Include_Dirs(args.Name);
-
             if (File.Exists(assemblyPath) == false) return null;
+            string pdb_path = String.Concat(Path.GetDirectoryName(assemblyPath)+"\\", Path.GetFileNameWithoutExtension(assemblyPath), ".pdb");
 
-            Assembly assembly = Assembly.LoadFrom(assemblyPath);
+            Assembly assembly = null;
+            byte[] dll_buf = File.ReadAllBytes(assemblyPath);
+            byte[] pdb_buf = null;
+            if(File.Exists(pdb_path)) pdb_buf = File.ReadAllBytes(pdb_path);
+            //Assembly.LoadFrom(assemblyPath);
+            if (pdb_buf != null) assembly = Assembly.Load(dll_buf, pdb_buf);
+            else assembly = Assembly.Load(dll_buf);
+
             return assembly;
         }
 
@@ -399,12 +435,12 @@ namespace SR_PluginLoader
                 }
                 else
                 {
-                    DebugHud.Log("Failed to unpack the auto update helper!");
+                    SLog.Warn("Failed to unpack the auto update helper!");
                 }
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
         }
         #endregion

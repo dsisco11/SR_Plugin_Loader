@@ -34,6 +34,9 @@ namespace SR_PluginLoader
                 UnityEngine.Object.DontDestroyOnLoad(DebugHud.hud);
             }
 
+            Logging.Logger.onLog += Logger_onLog;
+
+            
             string[] tags = new string[] { "b", "size", "color" };
             List<string> tmp = new List<string>();
 
@@ -46,24 +49,48 @@ namespace SR_PluginLoader
             html_tags = tmp.ToArray();
         }
 
+        private static void Logger_onLog(Logging.LogLevel level, string module, string msg)
+        {
+            if (DebugHud.hud == null)
+            {
+                DebugHud.lines.Add(msg);
+            }
+            else
+            {
+                if (DebugHud.lines.Count > 0)
+                {
+                    foreach (string s in DebugHud.lines)
+                    {
+                        DebugHud.hud.Add_Line(s);
+                    }
+                    DebugHud.lines.Clear();
+                }
+                DebugHud.hud.Add_Line(msg);
+            }
+        }
+
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
         public static void Log(string format)
         {
             string str = DebugHud.Tag_String(format, 1);
             DebugHud.Add_Line(str);
         }
 
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
         public static void Log(string format, params object[] args)
         {
             string str = DebugHud.Tag_String(String.Format(format, args), 1);
             DebugHud.Add_Line(str);
         }
 
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
         public static void Log(Exception ex)
         {
             string str = DebugHud.Format_Exception_Log(ex, 1);
             DebugHud.Add_Line(str, true);
         }
 
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
         public static void Log(GameObject obj)
         {
             Log("GameObject<{0}>  {1}", obj.GetInstanceID(), GameObject_Components_ToString(obj));
@@ -71,17 +98,20 @@ namespace SR_PluginLoader
 
 
 
+        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!")]
         public static void LogSilent(string format, params object[] args)
         {
             string str = DebugHud.Format_Log(format, 1, args);
             DebugHud.write_log(str);
         }
 
+        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!")]
         public static void LogSilent(string str)
         {
             DebugHud.write_log(str);
         }
 
+        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!")]
         public static void LogSilent(Exception ex)
         {
             string str = DebugHud.Format_Exception_Log(ex, 0);
@@ -99,10 +129,12 @@ namespace SR_PluginLoader
         
         private static void open_log_stream()
         {
+            /*
             if (DebugHud.log_file != null) DebugHud.log_file.Close();
 
             string logPath = String.Format("{0}/Plugins.log", UnityEngine.Application.dataPath);
             DebugHud.log_file = new FileStream(logPath, FileMode.Create);
+            */
         }
 
         private static void write_log(string str, bool write_to_unity=false)
@@ -113,11 +145,11 @@ namespace SR_PluginLoader
             str = DebugHud.strip_html_tags(str);
             if(write_to_unity) UnityEngine.Debug.Log(str);
 
-            byte[] bytes = new byte[str.Length * sizeof(char)];
-            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            /*
 
             DebugHud.log_file.Write(bytes, 0, bytes.Length);
             DebugHud.log_file.Flush();
+            */
         }
 
         private static void write_log(string format, params object[] args)
@@ -214,16 +246,7 @@ namespace SR_PluginLoader
             foreach (var c in comps) str = String.Format("{0}, {1}", str, c.GetType());
             return str;
         }
-
-        /// <summary>
-        /// Asserts that a condition is true, if it is not then outputs a specified log message and returns <c>FALSE</c>
-        /// </summary>
-        public static bool Assert(bool b, string failure_msg, params object[] args)
-        {
-            if(!b) Log(new Exception(String.Format(failure_msg, args)));
-
-            return b;
-        }
+        
 
         public static void Reset()
         {
