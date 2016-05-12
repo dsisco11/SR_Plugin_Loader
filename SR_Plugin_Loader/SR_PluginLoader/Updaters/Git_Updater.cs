@@ -367,7 +367,7 @@ namespace SR_PluginLoader
                 //if we DID cache the result from a past check against this file then return it here and don't waste time.
                 if (lastResult.HasValue)
                 {
-                    DebugHud.LogSilent("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
+                    //DebugHud.LogSilent("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
                     return lastResult.Value;
                 }
 

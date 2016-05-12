@@ -120,7 +120,6 @@ namespace SR_PluginLoader
 
                 Transform Status = Instance.transform.FindChild("Status");
                 RectTransform statusTrans = (Status as RectTransform);
-                DebugHud.Log("StatusTrans.anchoredPos: {0}", statusTrans.anchoredPosition);
 
                 VerticalLayoutGroup layout = MenuPanel.GetComponent<VerticalLayoutGroup>();
                 if (!DebugHud.Assert(layout != null, "Cannot find VerticalLayoutGroup component in MenuPanel")) return;

@@ -51,3 +51,6 @@ Temporary Items
 SR_Plugin_Loader/SR_PluginLoader/bin/Release/Assembly-CSharp.dll
 *.log
 *.log
+SR_Plugin_Loader/SR_PluginLoader/obj/Release/SR_PluginLoader.dll
+SR_Plugin_Loader/SR_PluginLoader/bin/Release/SR_PluginLoader.dll
+*.pdb

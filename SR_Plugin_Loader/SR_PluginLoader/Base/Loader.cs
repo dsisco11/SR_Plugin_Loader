@@ -155,7 +155,7 @@ namespace SR_PluginLoader
 
             try
             {
-                plug.load();
+                plug.Setup();
                 foreach(KeyValuePair<string, Plugin> kv in plugins)
                 {
                     if (String.Compare(name, kv.Key) == 0) continue;
@@ -177,7 +177,7 @@ namespace SR_PluginLoader
                         if (trash == null) DebugHud.Log("Found multiple instances of the same plugin and cannot determine which plugin file to ignore! Plugin: ", plug);
                         else
                         {
-                            DebugHud.Log("Multiple instances of the same plugin have been found, uninstalling file: {0}", trash.file);
+                            DebugHud.Log("Multiple instances of the same plugin have been found, uninstalling file: {0}", trash.FilePath);
                             trash.Uninstall();
                             return false;
                         }
