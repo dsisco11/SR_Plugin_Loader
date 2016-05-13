@@ -12,24 +12,28 @@ namespace SR_PluginLoader
     /// </summary>
     public static class SLog
     {
-        private static LogModule log = new LogModule(() => 
-        {
-            // This handly little doodad will figure our which plugin DLL the log message is coming from, it might be a little slow (not really) but I mean these are debug logs guys...
-            int idx = 0;
-            string class_name = null;
-            StackFrame frame = null;
-
-            // Search upwards through the callstack to find the first classname that isnt DebugHud. USUALLY this will only loop once and cost us no more time then the old method I used to use. 
-            // But this one will catch those odd cases where this function gets called from a big hierarchy of DebugHud functions and STILL give us the plugin name we so want!
-            while (class_name == null || String.Compare("DebugHud", class_name) == 0)
+        private static string originName {
+            get
             {
-                frame = new StackFrame(++idx, false);// pre incrementing makes idx = 1 on the first loop
-                class_name = frame.GetMethod().DeclaringType.Name;
-            }
+                // This handly little doodad will figure our which plugin DLL the log message is coming from, it might be a little slow (not really) but I mean these are debug logs guys...
+                int idx = 0;
+                string class_name = null;
+                StackFrame frame = null;
 
-            string plugin_name = frame.GetMethod().Module.ScopeName;
-            return String.Concat("<b>", plugin_name, "</b>");
-        });
+                // Search upwards through the callstack to find the first classname that isnt DebugHud. USUALLY this will only loop once and cost us no more time then the old method I used to use. 
+                // But this one will catch those odd cases where this function gets called from a big hierarchy of DebugHud functions and STILL give us the plugin name we so want!
+                while (class_name == null || String.Compare("DebugHud", class_name) == 0)
+                {
+                    frame = new StackFrame(++idx, false);// pre incrementing makes idx = 1 on the first loop
+                    class_name = frame.GetMethod().DeclaringType.Name;
+                }
+
+                string plugin_name = frame.GetMethod().Module.ScopeName;
+                return String.Concat("<b>", plugin_name, "</b>");
+            }
+        }
+
+        private static LogModule log = new LogModule(originName);
         #region Logging Functions
 
         // This outputs a log entry of the level info.
@@ -74,6 +78,19 @@ namespace SR_PluginLoader
         // is required.
         public static void Interface(params object[] args) { log.Interface(args); }
         #endregion
+
+
+        /// <summary>
+        /// Checks for a condition; if the condition is <c>false</c>, outputs a specified message and displays a message box that shows the call stack.
+        /// This method is equivalent to System.Diagnostics.Debug.Assert, however, it was modified to also write to the Logger output.
+        /// </summary>
+        /// <param name="condition">The conditional expression to evaluate. If the condition is <c>true</c>, the specified message is not sent and the message box is not displayed.</param>
+        /// <param name="module">The category of the message.</param>
+        /// <param name="message">The message to display if the assertion fails.</param>
+        public static void Assert(bool condition, string message)
+        {
+            Logger.Assert(condition, originName, message);
+        }
     }
 
 }
