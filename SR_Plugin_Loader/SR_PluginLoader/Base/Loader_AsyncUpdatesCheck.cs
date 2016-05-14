@@ -61,9 +61,9 @@ namespace SR_PluginLoader
                         var updater = (new GameObject().AddComponent<PluginLoader_AutoUpdater>());
                         updater.Files = updatesView.Files;
                         updater.updatesView = updatesView;
-                        return false;
+                        return true;
                     }
-                    return true;
+                    return false;
                 };
                 foreach (var f in updates) updatesView.Add_File(f);
 

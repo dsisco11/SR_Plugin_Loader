@@ -25,6 +25,8 @@ namespace SR_PluginLoader
         protected uiWrapperPanel btnPanel = null;
         #endregion
 
+        public override string Text { get { return message.Text; } set { message.Text = value; } }
+
         #region Results
 
         private DialogResult result = DialogResult.NONE;
@@ -36,12 +38,17 @@ namespace SR_PluginLoader
                 else
                 {
                     bool b = onResult.Invoke(result);
-                    if (b) Hide();
-                    else Show();
+                    if (!b) Hide();
                 }
             }
         }
-        public Func<DialogResult, bool> onResult;
+
+        /// <summary>
+        /// A callback to fire which handles user input for the dialog control.
+        /// Return <c>TRUE</c> to leave the dialog control visible.
+        /// </summary>
+        public DialogResultDelegate onResult;
+        public delegate bool DialogResultDelegate(DialogResult result);
         #endregion
 
 
@@ -53,7 +60,7 @@ namespace SR_PluginLoader
             message = Create<uiTextArea>("msg", this);
             message.Autosize_Method = AutosizeMethod.BLOCK;
             message.Autosize = true;
-            message.Text = "Lorum Ipsum Lorum Ipsum Lorum Ipsum Lorum Ipsum";
+            message.Text = "Lorum Ipsum Lorum Ipsum\nLorum Ipsum Lorum Ipsum";
             message.TextColor = new Color(0.6f, 0.6f, 0.6f, 1f);
 
             contentPanel = Create<uiScrollPanel>("content", this);

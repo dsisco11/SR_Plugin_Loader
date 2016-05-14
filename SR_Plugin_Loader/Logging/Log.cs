@@ -5,8 +5,7 @@ using Logging;
 using System.Diagnostics;
 
 namespace SR_PluginLoader
-{
-    
+{    
     /// <summary>
     /// Provides static access to the SR_PluginLoader's logging system.
     /// </summary>

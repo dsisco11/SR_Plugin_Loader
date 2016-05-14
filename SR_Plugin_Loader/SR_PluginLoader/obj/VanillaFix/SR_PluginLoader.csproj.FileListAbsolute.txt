@@ -1,0 +1,7 @@
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\VanillaFix\SR_PluginLoader.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\bin\VanillaFix\SR_PluginLoader.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\VanillaFix\SR_PluginLoader.Properties.Resources.resources
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\VanillaFix\SR_PluginLoader.csproj.GenerateResource.Cache
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\VanillaFix\SR_PluginLoader.dll
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\VanillaFix\SR_PluginLoader.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\SR_PluginLoader\obj\VanillaFix\SR_PluginLoader.csprojResolveAssemblyReference.cache

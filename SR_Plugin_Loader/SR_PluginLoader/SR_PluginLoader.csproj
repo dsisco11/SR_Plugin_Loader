@@ -33,6 +33,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <BaseAddress>4194304</BaseAddress>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'VanillaFix|AnyCPU'">
+    <OutputPath>bin\VanillaFix\</OutputPath>
+    <DefineConstants>TRACE;SR_VANILLA</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -69,6 +79,7 @@
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
     <Compile Include="SiscosHooks\HOOK_SHAS.cs" />
+    <Compile Include="UI\Base\uiMessageBox.cs" />
     <Compile Include="UI\Enums\SizeConstraint.cs" />
     <Compile Include="UI\Base\uiEmpty.cs" />
     <Compile Include="UI\Base\uiList_ItemProgress.cs" />
@@ -190,10 +201,9 @@
     <Compile Include="UI\Enums\uiSkinPreset.cs" />
     <Compile Include="Updaters\Git_Updater.cs" />
     <Compile Include="Helpers\Unity Scripts\Singleton.cs" />
-    <Compile Include="UI\Legacy\Notice_Manager.cs" />
     <Compile Include="SiscosHooks\HOOKS.cs" />
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
-    <Compile Include="Loader.cs" />
+    <Compile Include="Base\Loader.cs" />
     <Compile Include="Helpers\MainMenu.cs" />
     <Compile Include="Plugins\Plugin.cs" />
     <Compile Include="Plugins\Plugin_Dependency.cs" />
@@ -211,7 +221,6 @@
     <Compile Include="SiscosHooks\Siscos_Return.cs" />
     <Compile Include="SiscosHooks\Sisco_Hook_Ref.cs" />
     <Compile Include="UI\Classes\ToggleSwitch.cs" />
-    <Compile Include="UI\Legacy\UI_Notification.cs" />
     <Compile Include="Updaters\Updater_Base.cs" />
     <Compile Include="Helpers\Util.cs" />
     <Compile Include="SiscosHooks\_hook_result.cs" />
@@ -240,6 +249,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TestBed\" />
+    <Folder Include="UI\Legacy\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
@@ -262,13 +272,13 @@
   <Import Project="..\Logging\Logging.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug (
-COPY "$(TargetDir)/$(TargetName).pdb" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetName).pdb" /Y
+    <PostBuildEvent>CD "$(TargetDir)/../../../"
+"./tools/pdb2mdb/pdb2mdb.exe" "$(TargetDir)/$(TargetFileName)"
+COPY "$(TargetDir)/" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/" /Y
+COPY "$(TargetDir)" "$(TargetDir)/../../../../Installer/" /Y
+if $(ConfigurationName) == Release (
+"./tools/7za.exe" a "./../Installer.zip" -w "./../Installer/"
 )
-COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetFileName)" /Y
-COPY "$(TargetPath)" "$(TargetDir)/../../../../Installer/$(TargetFileName)" /Y
-CD "$(TargetDir)/../../../"
-7za.exe a "./../Installer.zip" -w "./../Installer/"
 CD "./../Installer/"
 START SR_PluginLoader_Installer.exe -fast</PostBuildEvent>
   </PropertyGroup>

@@ -9,15 +9,19 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Security.Policy;
 using System.Security;
+using System.Runtime.InteropServices;
 
 namespace SR_PluginLoader
 {
-    public partial class Plugin 
+    public partial class Plugin
     {
+        #region Variables
+
         public Plugin_Data data = null;
         public string Hash { get { if (data==null) { throw new ArgumentNullException("Plugin DATA is NULL!"); } return data.Hash; } }
         protected Updater_Base Updater { get { return Updater_Base.Get_Instance(data.UPDATE_METHOD.METHOD); } }
         public override string ToString() { return String.Format("Plugin[{0}.{1}]", data.NAME, data.AUTHOR); }
+
 
         /// <summary>
         /// Gets the SHA1 hash for the currently installed version of the plugin so it can be compared to other plugin dll's
@@ -65,6 +69,7 @@ namespace SR_PluginLoader
         private Type pluginClass = null;
         private MethodInfo load_funct = null;
         private MethodInfo unload_funct = null;
+        #endregion
 
 
         public Plugin(string file, bool en = false)
@@ -164,30 +169,30 @@ namespace SR_PluginLoader
                 //find the static SR_Plugin class amongst however many namespaces this library has.
                 foreach (Type ty in dll.GetExportedTypes())
                 {
-                    if (ty.Name == "SR_Plugin")
+                    if (String.Compare(ty.Name, "SR_Plugin")==0)
                     {
                         if (ty.IsPublic == false) continue;
-                        this.pluginClass = ty;
+                        pluginClass = ty;
                         break;
                     }
                 }
 
-                if (this.pluginClass == null)
+                if (pluginClass == null)
                 {
-                    this.Add_Error("Unable to locate a static 'SR_Plugin' class in the loaded library.");
+                    Add_Error("Unable to locate a static 'SR_Plugin' class in the loaded library.");
                     return false;
                 }
 
 
-                this.load_funct = this.pluginClass.GetMethod("Load", BindingFlags.Static | BindingFlags.Public);
-                this.unload_funct = this.pluginClass.GetMethod("Unload", BindingFlags.Static | BindingFlags.Public);
+                load_funct = pluginClass.GetMethod("Load", BindingFlags.Static | BindingFlags.Public);
+                unload_funct = pluginClass.GetMethod("Unload", BindingFlags.Static | BindingFlags.Public);
 
-                if (this.load_funct == null) this.Add_Error("Unable to find Load function!");
-                if (this.unload_funct == null) this.Add_Error("Unable to find Unload function!");
+                if (load_funct == null) Add_Error("Unable to find Load function!");
+                if (unload_funct == null) Add_Error("Unable to find Unload function!");
 
 
 
-                if (this.load_funct == null || this.unload_funct == null)
+                if (load_funct == null || unload_funct == null)
                 {
                     SLog.Info("Unable to locate load/unload functions.");
                     return false;
@@ -215,8 +220,7 @@ namespace SR_PluginLoader
                 {
                 }
                 
-
-                //PLog.Debug("Loading: {0}", this.dll_name);
+                
 
                 byte[] dll_buf = Load_Bytes(FilePath);
                 byte[] pdb_buf = null;
@@ -229,15 +233,10 @@ namespace SR_PluginLoader
                 if (pdb_buf != null) asm = Assembly.Load(dll_buf, pdb_buf);
                 else asm = Assembly.Load(dll_buf);
                 */
-                /*
-                if (pdb_buf != null) asm = Domain.Load(dll_buf, pdb_buf);
-                else asm = Domain.Load(dll_buf);
-                */
 
                 if (pdb_buf != null) asm = AppDomain.CurrentDomain.Load(dll_buf, pdb_buf);
                 else asm = AppDomain.CurrentDomain.Load(dll_buf);
 
-                //PLog.Debug("LOADED: {0}", this.dll_name);
                 return asm;
             }
             catch(Exception ex)

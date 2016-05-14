@@ -16,12 +16,16 @@ namespace SR_PluginLoader
         /// See: 
         /// </summary>
         public UPDATER_TYPE METHOD = UPDATER_TYPE.NONE;
+        /// <summary>
+        /// Returns <c>TRUE</c> if this instance has both a valid METHOD and a non-null non-empty URL.
+        /// </summary>
+        public bool Valid { get { return (METHOD != UPDATER_TYPE.NONE && !String.IsNullOrEmpty(URL)); } }
 
 
         public Update_Method(string url=null, UPDATER_TYPE method = UPDATER_TYPE.NONE)
         {
-            this.URL = url;
-            this.METHOD = method;
+            URL = url;
+            METHOD = method;
         }
     }
 }

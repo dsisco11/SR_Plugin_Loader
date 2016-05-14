@@ -174,8 +174,8 @@ namespace SR_PluginLoader
 
         #region REGISTRATION LOGIC
         
-        [Obsolete("Use register(Hook_ID, Callback, Registrar) or register(Hook_ID, Callback) instead!", true)]
-        public static bool register(object registrar, HOOK_ID hook, Sisco_Hook_Delegate cb) { return (register(hook, cb, null) != null); }
+        //[Obsolete("Use register(Hook_ID, Callback, Registrar) or register(Hook_ID, Callback) instead!", true)]
+        //public static bool register(object registrar, HOOK_ID hook, Sisco_Hook_Delegate cb) { return (register(hook, cb, null) != null); }
         
         /// <summary>
         /// Register your own function to be called whenever a specified event triggers.
