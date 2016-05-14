@@ -19,6 +19,8 @@ Global
 		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
+		VanillaFix|Any CPU = VanillaFix|Any CPU
+		VanillaFix|x86 = VanillaFix|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FD444148-F22D-438E-B48D-924292C8C32D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{FD444148-F22D-438E-B48D-924292C8C32D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FD444148-F22D-438E-B48D-924292C8C32D}.Release|x86.ActiveCfg = Release|Any CPU
 		{FD444148-F22D-438E-B48D-924292C8C32D}.Release|x86.Build.0 = Release|Any CPU
+		{FD444148-F22D-438E-B48D-924292C8C32D}.VanillaFix|Any CPU.ActiveCfg = VanillaFix|Any CPU
+		{FD444148-F22D-438E-B48D-924292C8C32D}.VanillaFix|Any CPU.Build.0 = VanillaFix|Any CPU
+		{FD444148-F22D-438E-B48D-924292C8C32D}.VanillaFix|x86.ActiveCfg = VanillaFix|Any CPU
+		{FD444148-F22D-438E-B48D-924292C8C32D}.VanillaFix|x86.Build.0 = VanillaFix|Any CPU
 		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -37,6 +43,10 @@ Global
 		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.Release|x86.ActiveCfg = Release|Any CPU
 		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.Release|x86.Build.0 = Release|Any CPU
+		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.VanillaFix|Any CPU.ActiveCfg = VanillaFix|Any CPU
+		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.VanillaFix|Any CPU.Build.0 = VanillaFix|Any CPU
+		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.VanillaFix|x86.ActiveCfg = VanillaFix|Any CPU
+		{D17964E2-E3A5-476D-8420-8991E08E3FC8}.VanillaFix|x86.Build.0 = VanillaFix|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

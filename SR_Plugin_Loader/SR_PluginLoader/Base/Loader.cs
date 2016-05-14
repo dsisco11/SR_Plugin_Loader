@@ -135,21 +135,22 @@ namespace SR_PluginLoader
 
             if(!ok)
             {
-                new UI_Notification()
-                {
-                    msg = "The current loader's hash does not match the hash of the one that was installed, click here to install this version.",
-                    title = "Version Mismatch",
-                    icon = TextureHelper.icon_alert,
-                    onClick = () =>
-                    {
+                //throw null;
+                uiMessageBox.New("The current loader's hash does not match the hash of the one that was installed, click here to install this version.", 
+                    "Version Mismatch", 
+                    (DialogResult res) => {
+                        if (res != DialogResult.OK) return true;
                         Restart_App();
-                    }
-                };
+                        return true;
+                    }).Show();
             }
 
             return ok;
         }
 
+        /// <summary>
+        /// This function sets our <see cref="update_helper_file"/> variable and deletes the designated file if it exists as it's only needed under specific circumstances.
+        /// </summary>
         private static void Setup_Update_Helper()
         {
             string dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);

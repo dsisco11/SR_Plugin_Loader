@@ -18,17 +18,13 @@ namespace SR_PluginLoader
         private Action<string> onCreateFile;
         private string FILE = null;
         private JSONClass json = null;
-        /// <summary>
-        /// if TRUE then all values will be resaved to disk on the next update pass.
-        /// </summary>
-        private bool dirty = false;
 
         /// <summary>
         /// Please note that with the <see cref="SimpleJSON"/> system key-value associations are actually instances of <see cref="JSONClass"/>.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public JSONNode this[string key] { get { if (json == null) { throw new Exception("JSONClass is not ready!"); } if (!json.ContainsKey(key)) { return null; } return json[key]; } set { json[key] = value; set_dirty(); } }
+        public JSONNode this[string key] { get { if (json == null) { throw new Exception("JSONClass is not ready!"); } if (!json.ContainsKey(key)) { return null; } return json[key]; } set { json[key] = value; } }
 
 
         /// <summary>
@@ -69,9 +65,6 @@ namespace SR_PluginLoader
 
         public void Save()
         {
-            dirty = false;
-            //File.WriteAllText(FILE, json.ToString(), Encoding.UTF8);
-
             string FILE_TMP = String.Concat(FILE, ".tmp");
             FileStream strm = File.Open(FILE_TMP, FileMode.OpenOrCreate);
             byte[] buf = Encoding.UTF8.GetBytes(json.ToString());
@@ -83,7 +76,6 @@ namespace SR_PluginLoader
             }, null);
         }
 
-        private void set_dirty() { dirty = true; }
         #endregion
 
         #region Setters

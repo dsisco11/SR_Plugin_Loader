@@ -14,6 +14,19 @@ namespace SR_PluginLoader
         /// <summary>
         /// Returns the name of the currently loaded save file or NULL if no file is loaded.
         /// </summary>
-        public static string SaveFileName { get { if (atMainMenu) { return null; }  if (Directors.autosaveDirector.current==null) { return null; } return Directors.autosaveDirector.current.gameName; } }
+        public static string SaveFileName
+        {
+            get
+            {
+#if SR_VANILLA
+                return null;
+#else
+                if (atMainMenu) { return null; }
+                if (Directors.autosaveDirector.current==null) { return null; } return Directors.autosaveDirector.current.gameName;
+#endif
+            }
+        }
+
+
     }
 }

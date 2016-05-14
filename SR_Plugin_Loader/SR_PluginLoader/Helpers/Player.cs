@@ -1,5 +1,4 @@
-﻿//#define USING_VANILLA // This turns off any references to methods that arent available when using a "vanilla" assembly-csharp file, eg: one that hasnt had the installer run on it.
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -57,13 +56,13 @@ namespace SR_PluginLoader
         /// </summary>
         public static Vector3 Pos { get { return pObj.transform.position; } set { pObj.transform.position.Set(value.x, value.y, value.z); } }
 
-#if !USING_VANILLA
+#if !SR_VANILLA
         public static int MaxHealth { get { return player.maxHealth; } set { player.maxHealth = value; Health = Health; } }
         public static int MaxEnergy { get { return player.maxEnergy; } set { player.maxEnergy = value; Energy = Energy; } }
         public static int MaxRads { get { return player.maxRads; } set { player.maxRads = value; Rads = Rads; } }
         public static int MaxAmmo { get { return player.maxAmmo; } set { player.maxAmmo = value; } }
 #else
-        public static int MaxHealth, MaxEnergy, MaxRads, MaxAmmo;
+        public static int MaxHealth, MaxEnergy, MaxRads, MaxAmmo;// When compiling for a vanilla assembly without the extra variable addons we cant actually manipulate any of these values, but we cant leave them out of the build either, so we just make them ints because we will be recompiling in Release mode immediately after this build is done anyway...
 #endif
         #endregion
 
@@ -74,7 +73,7 @@ namespace SR_PluginLoader
         /// <returns></returns>
         public static int Get_Inv_Item_Count(Identifiable.Id id)
         {
-#if !USING_VANILLA
+#if !SR_VANILLA
             for (int s = 0; s< player.Ammo.slotCount; s++)
             {
                 Identifiable.Id sid = player.Ammo.GetSlotName(s);
@@ -96,7 +95,7 @@ namespace SR_PluginLoader
         public static List<Identifiable> Get_Captive_Items()
         {
             List<Identifiable> ret = new List<Identifiable>();
-#if !USING_VANILLA
+#if !SR_VANILLA
             foreach (Joint joint in Player.Weapon.Get_Joints())
             {
                 if (joint == null || joint.connectedBody == null) continue;

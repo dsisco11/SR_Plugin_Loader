@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 
@@ -13,7 +14,8 @@ namespace SR_PluginLoader
     [DebuggerDisplay("Hook = {name}")]
     public class HOOK_ID
     {
-#region BLAH BLAH
+        #region BLAH BLAH
+
         protected int id = -1;
         private static int _idx = 0;
         private string name = null;
@@ -21,18 +23,18 @@ namespace SR_PluginLoader
         
         private HOOK_ID()
         {
-            this.id = ++_idx;
+            id = ++_idx;
         }
-
+        
         private HOOK_ID(int i)
         {
-            this.id = i;
+            id = i;
             if (i >= _idx) _idx = (i + 1);
         }
 
         private HOOK_ID(HOOK_ID i)
         {
-            this.id = i.id;
+            id = i.id;
             if (id >= _idx) _idx = (id + 1);
         }
 
@@ -60,26 +62,23 @@ namespace SR_PluginLoader
         // Update: not so awful now that it caches the name...
         public override string ToString()
         {
-            if (this.name != null) return this.name;
-            
+            if (name != null) return name;
+
             Type type = typeof(HOOK_ID);
-            //PropertyInfo[] properties = type.GetProperties(BindingFlags.Static | BindingFlags.Public);
             FieldInfo[] fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
             
             foreach (FieldInfo field in fields)
             {
                 if (field.FieldType != typeof(HOOK_ID)) continue;
-                HOOK_ID obj = (HOOK_ID)field.GetValue(this);
-
-                HOOK_ID hk = (HOOK_ID)obj;
-                if (hk.id != this.id) continue;
-                this.name = field.Name;
+                HOOK_ID hk = (HOOK_ID)field.GetValue(this);
+                if (hk.id != id) continue;
+                name = field.Name;
                 break;
             }
 
-            return this.name;
+            return name;
         }
-#endregion
+        #endregion
 
         public static readonly HOOK_ID NONE = new HOOK_ID(0);
 
@@ -137,20 +136,13 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Get_Available_Saves = new HOOK_ID();
         public static readonly HOOK_ID Get_Save_Directory = new HOOK_ID();
 
-        public static readonly HOOK_ID Ext_Game_Saved = new HOOK_ID();
         public static readonly HOOK_ID Game_Saved = new HOOK_ID();
-
         public static readonly HOOK_ID Pre_Game_Loaded = new HOOK_ID();
-        public static readonly HOOK_ID Ext_Pre_Game_Loaded = new HOOK_ID();
-
         public static readonly HOOK_ID Post_Game_Loaded = new HOOK_ID();
-        public static readonly HOOK_ID Ext_Post_Game_Loaded = new HOOK_ID();
 
 
         public static readonly HOOK_ID Plot_Load_Upgrades = new HOOK_ID();
         public static readonly HOOK_ID Spawn_Plot_Upgrades_UI = new HOOK_ID();
-        public static readonly HOOK_ID Ext_Spawn_Plot_Upgrades_UI = new HOOK_ID();
-
         public static readonly HOOK_ID Spawn_Player_Upgrades_UI = new HOOK_ID();
         
         #region Silo Events
@@ -177,6 +169,22 @@ namespace SR_PluginLoader
         // Which is to say that they aren't fired via code injected into the game itself but rather from custom MonoBehaviour scripts created by the loader at runtime.
         public static readonly HOOK_ID Level_Loaded = new HOOK_ID();
         public static readonly HOOK_ID MainMenu_Loaded = new HOOK_ID();
+        #endregion
+
+        #region Extenders
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Game_Saved = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Pre_Game_Loaded = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Post_Game_Loaded = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Spawn_Plot_Upgrades_UI = new HOOK_ID();
+        
         #endregion
 
     }

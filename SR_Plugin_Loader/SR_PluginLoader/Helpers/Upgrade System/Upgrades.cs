@@ -163,6 +163,7 @@ namespace SR_PluginLoader
 
         public static bool TryPurchase(LandPlotUI kiosk, PlotUpgrade upgrade)
         {
+#if !SR_VANILLA
             LandPlot plot = kiosk.Get_LandPlot();
             PlotUpgradeTracker tracker = plot.GetComponent<PlotUpgradeTracker>();
 
@@ -183,6 +184,7 @@ namespace SR_PluginLoader
                 Sound.Play(SoundId.ERROR);
                 kiosk.Error("e.insuf_coins");
             }
+#endif
             return false;
         }
 #endregion
@@ -306,7 +308,7 @@ namespace SR_PluginLoader
         private static Sisco_Return onSpawn_PlotUpgrades_Kiosk(ref object sender, ref object[] args, ref object return_value)
         {
             LandPlot.Id kind = (LandPlot.Id)args[0];
-
+#if !SR_VANILLA
             LandPlotUI kiosk = sender as LandPlotUI;
             LandPlot plot = kiosk.Get_LandPlot();
             PlotUpgradeTracker tracker = plot.GetComponent<PlotUpgradeTracker>();
@@ -322,6 +324,7 @@ namespace SR_PluginLoader
                 bool can_buy = up.CanBuy(tracker);
                 ui.AddButton(new PurchaseUI.Purchasable(up.Name, up.Sprite, up.PreviewSprite, up.Description, up.Cost, new PediaDirector.Id?(), new UnityAction(() => { up.Purchase(kiosk.gameObject); }), can_buy));
             }
+#endif
             return null;
         }
 #endregion
