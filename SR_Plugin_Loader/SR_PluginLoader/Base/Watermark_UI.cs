@@ -46,7 +46,7 @@ namespace SR_PluginLoader
 
             icon = Create<uiIcon>(this);
             icon.local_style.normal.background = null;
-            icon.image = TextureHelper.icon_logo;
+            icon.Image = TextureHelper.icon_logo;
             icon.Tint = new Color(1f,1f,1f, 0.6f);
             icon.Set_Size(36, 36);
         }

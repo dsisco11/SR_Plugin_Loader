@@ -69,28 +69,28 @@ namespace SR_PluginLoader
             }
         }
 
-        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!", true)]
         public static void Log(string format)
         {
             string str = DebugHud.Tag_String(format, 1);
             DebugHud.Add_Line(str);
         }
 
-        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!", true)]
         public static void Log(string format, params object[] args)
         {
             string str = DebugHud.Tag_String(String.Format(format, args), 1);
             DebugHud.Add_Line(str);
         }
 
-        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!", true)]
         public static void Log(Exception ex)
         {
             string str = DebugHud.Format_Exception_Log(ex, 1);
             DebugHud.Add_Line(str, true);
         }
 
-        [Obsolete("The DebugHud class is obsolete, use the Log class instead!")]
+        [Obsolete("The DebugHud class is obsolete, use the Log class instead!", true)]
         public static void Log(GameObject obj)
         {
             Log("GameObject<{0}>  {1}", obj.GetInstanceID(), GameObject_Components_ToString(obj));
@@ -98,20 +98,20 @@ namespace SR_PluginLoader
 
 
 
-        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!")]
+        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!", true)]
         public static void LogSilent(string format, params object[] args)
         {
             string str = DebugHud.Format_Log(format, 1, args);
             DebugHud.write_log(str);
         }
 
-        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!")]
+        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!", true)]
         public static void LogSilent(string str)
         {
             DebugHud.write_log(str);
         }
 
-        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!")]
+        [Obsolete("The DebugHud class is obsolete, use the Log.Debug() to silently log messages!", true)]
         public static void LogSilent(Exception ex)
         {
             string str = DebugHud.Format_Exception_Log(ex, 0);
@@ -218,6 +218,7 @@ namespace SR_PluginLoader
 
         private static void Add_Line(string str, bool write_to_unity=false)
         {
+            /*
             str = DebugHud.AppendTimeStamp(str);
             DebugHud.write_log(str, write_to_unity);
 
@@ -237,6 +238,7 @@ namespace SR_PluginLoader
                 }
                 DebugHud.hud.Add_Line(str);
             }
+            */
         }
 
         public static string GameObject_Components_ToString(GameObject obj)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 
@@ -19,8 +20,9 @@ namespace SR_PluginLoader
         private uiButton btn_copy_json = null;
         private uiToggle pl_toggle = null;
         private uiTextArea ins_title = null, ins_text = null, ins_no_plugins_text = null;
+        private uiIcon btn_donate = null;
         private uiIconButton btn_store = null;
-        private uiWrapperPanel nop_wrapper = null;
+        private uiWrapperPanel nop_wrapper = null, top_wrapper;
         private uiTab pl_tab = null, tab_need_plugins = null, tab_ins = null;
         private uiCollapser control_panel = null, pl_errors=null;
 
@@ -42,14 +44,28 @@ namespace SR_PluginLoader
             list.Set_Margin(2, 0, 2, 2);
 
 
-            btn_store = Create<uiIconButton>(this);
+            top_wrapper = Create<uiWrapperPanel>(this);
+            top_wrapper.Autosize_Method = AutosizeMethod.BLOCK;
+            top_wrapper.Set_Margin(0, 0, 0, 2);
+            top_wrapper.Set_Padding(2);
+            top_wrapper.onLayout += Top_wrapper_onLayout;
+
+
+            btn_store = Create<uiIconButton>(top_wrapper);
             btn_store.Text = "Plugin Store";
             btn_store.Icon = TextureHelper.icon_arrow_left;
             btn_store.Border.type = uiBorderType.NONE;
-            //btn_store.Skin = uiSkinPreset.FLAT;
             btn_store.Border.normal.color = Color.white;
             btn_store.Border.normal.size = new RectOffset(1, 1, 1, 1);
             btn_store.onClicked += btn_store_onClicked;
+
+
+            btn_donate = Create<uiIcon>(top_wrapper);
+            btn_donate.Text = null;
+            btn_donate.Image = (Texture2D)TextureHelper.Load_From_Resource("donate_btn.png", "SR_PluginLoader", (TextureOpFlags.NO_MIPMAPPING & TextureOpFlags.NO_WRAPPING));
+            btn_donate.Image_MouseOver = Util.Tint_Texture( (Texture2D)TextureHelper.Load_From_Resource("donate_btn.png", "SR_PluginLoader", (TextureOpFlags.NO_MIPMAPPING & TextureOpFlags.NO_WRAPPING)), new Color(0.7f,0.7f,0.7f));
+            btn_donate.Border.type = uiBorderType.NONE;
+            btn_donate.onClicked += (uiControl c) => { Process.Start("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DYGPA5XA4MWC2"); };
 
 
             //CONTROL PANEL
@@ -89,7 +105,7 @@ namespace SR_PluginLoader
             pl_errors.Collapse();
 
             var err_ico = Create<uiIcon>("err_ico", pl_errors);
-            err_ico.image = TextureHelper.icon_alert;
+            err_ico.Image = TextureHelper.icon_alert;
             err_ico.Set_Height(26);
 
             var err_lbl = Create<uiText>("err_lbl", pl_errors);
@@ -149,6 +165,13 @@ namespace SR_PluginLoader
             ins_no_plugins_text.Autosize = true;
         }
 
+        private void Top_wrapper_onLayout(uiPanel c)
+        {
+            btn_store.alignLeftSide();
+            btn_donate.alignRightSide();
+            btn_donate.Set_Height(btn_store.Get_Height());// eh, match the store buttons height...
+        }
+
         private void Clps_errors_onLayout(uiPanel c)
         {
             var err_ico = c["err_ico"];
@@ -160,23 +183,12 @@ namespace SR_PluginLoader
 
         private void PluginManager_onLayout(uiPanel c)
         {
-            /*
-        }
-        
-        public override void doLayout()
-        {
-            base.doLayout();
-            */
-
-            btn_store.alignTop(2);
-            btn_store.alignLeftSide(2);
-
             list.alignLeftSide();
 
-            control_panel.alignTop();
+            control_panel.moveBelow(top_wrapper);
             control_panel.moveRightOf(list);
 
-            list.moveBelow((control_panel.isCollapsed ? btn_store as uiControl : control_panel as uiControl));
+            list.moveBelow(top_wrapper);
             list.FloodY();
 
             tabPanel.moveBelow(control_panel);
@@ -359,7 +371,7 @@ namespace SR_PluginLoader
                 //this.pl_desc.isDisabled = true;
 
                 this.pl_vers.Text = "";
-                this.pl_thumb.image = null;
+                this.pl_thumb.Image = null;
                 this.pl_toggle.isVisible = false;
                 this.pl_toggle.isChecked = false;
                 this.pl_errors.Collapse();
@@ -372,14 +384,14 @@ namespace SR_PluginLoader
                 //this.pl_desc.isDisabled = false;
 
                 this.pl_vers.Text = p.data.VERSION.ToString();
-                this.pl_thumb.image = p.thumbnail;
+                this.pl_thumb.Image = p.thumbnail;
                 this.pl_toggle.isVisible = true;
                 this.pl_toggle.isChecked = p.Enabled;
                 this.pl_errors.Set_Collapsed(!p.HasErrors);
             }
 
-            if (this.pl_thumb.image == null) thumb_sz = 0f;
-            else thumb_aspect = ((float)this.pl_thumb.image.height / (float)this.pl_thumb.image.width);
+            if (this.pl_thumb.Image == null) thumb_sz = 0f;
+            else thumb_aspect = ((float)this.pl_thumb.Image.height / (float)this.pl_thumb.Image.width);
 
             float thumb_height = (thumb_sz * thumb_aspect);
             pl_thumb.Set_Size(thumb_sz, thumb_height);

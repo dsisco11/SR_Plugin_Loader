@@ -256,6 +256,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\logo_sad.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\donate_btn.png" />
+  </ItemGroup>
   <Import Project="..\Logging\Logging.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

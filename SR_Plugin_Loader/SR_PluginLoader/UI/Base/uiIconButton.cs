@@ -15,7 +15,7 @@ namespace SR_PluginLoader
         private uiText text = null;
         private uiIcon icon = null;
 
-        public Texture2D Icon { get { return icon.image; } set { icon.image = value; icon.Autosize_Method = (value==null ? AutosizeMethod.NONE : AutosizeMethod.ICON_FILL); set_layout_dirty(); } }// We don't update the area after this because if we just did that then the text would never shift over to make room or anything.
+        public Texture2D Icon { get { return icon.Image; } set { icon.Image = value; icon.Autosize_Method = (value==null ? AutosizeMethod.NONE : AutosizeMethod.ICON_FILL); set_layout_dirty(); } }// We don't update the area after this because if we just did that then the text would never shift over to make room or anything.
         public override string Text { get { return text.Text; } set { text.Text = value; set_area_dirty(); } }
 
 

@@ -117,9 +117,9 @@ namespace SR_PluginLoader
                 pl_version.Text = plugin.data.VERSION.ToString();
                 Plugin_State_Changed();
 
-                if (plugin.icon != null) pl_icon.image = plugin.icon;
-                else if (TextureHelper.icon_unknown != null) pl_icon.image = TextureHelper.icon_unknown;
-                else pl_icon.image = null;
+                if (plugin.icon != null) pl_icon.Image = plugin.icon;
+                else if (TextureHelper.icon_unknown != null) pl_icon.Image = TextureHelper.icon_unknown;
+                else pl_icon.Image = null;
 
                 plugin_state_init = false;
             }

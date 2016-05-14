@@ -17,7 +17,7 @@ namespace SR_PluginLoader
 
         public string Title { get { return title.Text; } set { title.Text = value; } }
         public string Description { get { return description.Text; } set { description.Text = value; } }
-        public Texture2D Icon { get { return icon.image; } set { icon.image = value; } }
+        public Texture2D Icon { get { return icon.Image; } set { icon.Image = value; } }
 
 
 

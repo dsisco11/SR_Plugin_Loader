@@ -233,6 +233,20 @@ namespace SR_PluginLoader
                 return (_local_style != null ? _local_style : get_skin_style_for_type(Kind));
             }
         }
+
+        /// <summary>
+        /// Returns the current <c>GUIStyleState</c> the control should be using.
+        /// </summary>
+        public GUIStyleState StyleState {
+            get
+            {
+                if (isHovered) return Style.hover;
+                else if (isActive) return Style.active;
+                else if (isFocused) return Style.focused;
+                return Style.normal;
+            }
+        }
+
         public GUIStyle defaultStyle { get { return get_skin_style_for_type(Kind); } }
         public GUIStyle local_style { get { if (_local_style == null) { _local_style = new GUIStyle(Style); update_area(); } set_style_dirty(); return _local_style; } set { _local_style = value; _style_text = null; _style_combo = null; } }
         public GUIStyle styleText { get { if (_style_text == null) { styleText = null; } return _style_text; }
@@ -304,6 +318,11 @@ namespace SR_PluginLoader
         #endregion
 
         #region Text Settings
+
+        /// <summary>
+        /// The tooltip text for this control.
+        /// </summary>
+        public string Tooltip = null;
 
         public virtual string Text { get { return _content.text; } set { _content.text = value; update_area(); update_style(); } }
         public virtual int TextSize { get { return Style.fontSize; } set { local_style.fontSize = value; update_area(); update_style(); } }
@@ -382,6 +401,10 @@ namespace SR_PluginLoader
         public event controlEvent<uiControl> onClicked;
         public event controlEvent<uiControl> onSelected;
         public event parentEvent onLayout;// Fired by parent controls so child controls can do their positioning logic.
+        /// <summary>
+        /// Fires each frame, used to process custom logic for controls.
+        /// </summary>
+        public event Action onThink;
         #endregion
 
         #region Area
@@ -1812,6 +1835,8 @@ namespace SR_PluginLoader
         {
             if(!disableBG) Style.Draw(draw_area, GUIContent.none, isHovered, isActive, false, isFocused);
             draw_border();
+
+            if (isMouseOver && Tooltip != null) GUI.tooltip = Tooltip;
         }
 
         protected virtual void Display_Text()
@@ -1860,7 +1885,7 @@ namespace SR_PluginLoader
             _first_frame = false;
         }
         #endregion
-
+        
         private void OnGUI()
         {
             bool was_visible = _was_visible;
@@ -1903,6 +1928,10 @@ namespace SR_PluginLoader
             GUI.skin = prevSkin;
         }
 
+        private void Update()
+        {
+            onThink?.Invoke();
+        }
     }
 
 }
