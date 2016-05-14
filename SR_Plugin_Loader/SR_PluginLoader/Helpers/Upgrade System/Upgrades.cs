@@ -69,7 +69,7 @@ namespace SR_PluginLoader
             var old = ALL[upgrade.Type].FirstOrDefault(o => String.Compare(o.ID, upgrade.ID) == 0);
             if (old != null) ALL[upgrade.Type].Remove(old);
 
-            //DebugHud.Log("[Upgrades] registered: {0}", upgrade.ID);
+            //PLog.Info("[Upgrades] registered: {0}", upgrade.ID);
             ALL[upgrade.Type].Add(upgrade);
         }
 
@@ -99,7 +99,7 @@ namespace SR_PluginLoader
             if (!Plot_Upgrade_Data[pid][upgradeName].ContainsKey(key)) Plot_Upgrade_Data[pid][upgradeName].Add(key, value);
             else Plot_Upgrade_Data[pid][upgradeName][key] = value;
             
-            //DebugHud.Log("SET => [{0}][{1}] [{2}]: ({3}){4}", pid, upgradeName, key, value.Length, Util.FormatByteArray(value));
+            //PLog.Info("SET => [{0}][{1}] [{2}]: ({3}){4}", pid, upgradeName, key, value.Length, Util.FormatByteArray(value));
         }
 
         public static byte[] Read_Upgrade_Data_Value(PlotID pid, string upgradeName, string key)
@@ -207,7 +207,7 @@ namespace SR_PluginLoader
                     if (upgrade == null)
                     {
                         Player_Upgrades_Missing.Add(id);
-                        DebugHud.Log("[Upgrades] Unable to find Upgrade, ID: {0}", id);
+                        SLog.Info("[Upgrades] Unable to find Upgrade, ID: {0}", id);
                     }
                     else
                     {
@@ -232,8 +232,8 @@ namespace SR_PluginLoader
             string plyUpgradesFile = String.Concat(gameName, ".pug");
             string plotUpgradesFile = String.Concat(gameName, ".plu");
 
-            DebugHud.LogSilent("Writing: {0}", plyUpgradesFile);
-            DebugHud.LogSilent("Writing: {0}", plotUpgradesFile);
+            SLog.Debug("Writing: {0}", plyUpgradesFile);
+            SLog.Debug("Writing: {0}", plotUpgradesFile);
 
             // SAVE PLAYER UPGRADES
             // Always write to a temp file first when saving data
@@ -277,7 +277,7 @@ namespace SR_PluginLoader
                 System.Threading.Timer timer = null;
                 timer = new System.Threading.Timer((object o) =>
                 {
-                    DebugHud.Log("Flushing custom upgrades...");
+                    SLog.Info("Flushing custom upgrades...");
                     Upgrades.setup = false;
                     Upgrades.Setup();
 
@@ -363,7 +363,7 @@ namespace SR_PluginLoader
                             int blen = br.ReadInt32();
                             byte[] value = br.ReadBytes(blen);
 
-                            //DebugHud.Log("[{0}][{1}] [{2}]: ({3}){4}", pid, upgrade, key, blen, Util.FormatByteArray(value));
+                            //PLog.Info("[{0}][{1}] [{2}]: ({3}){4}", pid, upgrade, key, blen, Util.FormatByteArray(value));
 
                             if (!Plot_Upgrade_Data[pid][upgrade].ContainsKey(key)) Plot_Upgrade_Data[pid][upgrade].Add(key, value);
                             else Plot_Upgrade_Data[pid][upgrade][key] = value;
@@ -497,7 +497,7 @@ namespace SR_PluginLoader
 
         public static void Serialize(BinaryWriter bw, PlotID id, List<string> list)
         {
-            //DebugHud.Log("PlotUpgrades: {0} | Writing {1} plot upgrades", id, list.Count);
+            //PLog.Info("PlotUpgrades: {0} | Writing {1} plot upgrades", id, list.Count);
             id.Serialize(bw);
             bw.Write((int)list.Count);
             foreach(string str in list)

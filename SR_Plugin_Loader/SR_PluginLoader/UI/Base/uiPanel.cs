@@ -95,7 +95,7 @@ namespace SR_PluginLoader
             uiControl tmp;
             if (child_map.TryGetValue(name, out tmp))
             {
-                if (tmp != c) DebugHud.Log("[Plugin UI] Warning: assigning new control to a name that is already taken: {0}", name);
+                if (tmp != c) SLog.Info("[Plugin UI] Warning: assigning new control to a name that is already taken: {0}", name);
             }
 
             child_map[name] = c;
@@ -161,7 +161,7 @@ namespace SR_PluginLoader
             // And if so, scale back the requested size so it fits within our limits.
             if (isSizeConstrained) max.x = Get_Content_Area().width;
 
-            if (CONFIRM_SIZE) DebugHud.Log("{0}  Confirm Child Size Constraint  |  Available Area: {1}  |  Requested Size: {2}  ", this, max, requested_size);
+            if (CONFIRM_SIZE) SLog.Info("{0}  Confirm Child Size Constraint  |  Available Area: {1}  |  Requested Size: {2}  ", this, max, requested_size);
 
             if ((requested_size.x + c.Pos.x) > max.x) requested_size.x = (max.x - c.Pos.x);
             if ((requested_size.y + c.Pos.y) > max.y) requested_size.y = (max.y - c.Pos.y);
@@ -203,7 +203,7 @@ namespace SR_PluginLoader
 
                 float cmX = child.Area.xMax;
                 float cmY = child.Area.yMax;
-                //if (CONFIRM_LAYOUT && cmY > _content_area.yMax) DebugHud.Log("{0}  Child Y OOB  |  yMax: {1}  |  area: {2}  |  child.yMax: {3}", this, _content_area.yMax, area, cmY);
+                //if (CONFIRM_LAYOUT && cmY > _content_area.yMax) PLog.Info("{0}  Child Y OOB  |  yMax: {1}  |  area: {2}  |  child.yMax: {3}", this, _content_area.yMax, area, cmY);
                 xMax = Math.Max(xMax, cmX);
                 yMax = Math.Max(yMax, cmY);
             }
@@ -213,11 +213,11 @@ namespace SR_PluginLoader
             _content_area = new Rect(0f, 0f, xMax, yMax);
 
 
-            if (CONFIRM_LAYOUT) DebugHud.Log("{0}  Confirmed Layout", this);
+            if (CONFIRM_LAYOUT) SLog.Info("{0}  Confirmed Layout", this);
             if (!last.Compare(_content_area) || hasScrollbar != hadScrollbar)
             {
                 set_area_dirty();
-                if (CONFIRM_LAYOUT) DebugHud.Log("{0}  Confirmed Layout Changed Area  |  new_content_area: {1}  |  last_content_area: {2}", this, _content_area, last);
+                if (CONFIRM_LAYOUT) SLog.Info("{0}  Confirmed Layout Changed Area  |  new_content_area: {1}  |  last_content_area: {2}", this, _content_area, last);
             }
         }
 
@@ -262,7 +262,7 @@ namespace SR_PluginLoader
         
         protected override void Display()
         {
-            if (CONFIRM_DRAW) { DebugHud.Log("[{0}](" + Typename + ") Display confirm  | {1}", this, inner_area); }
+            if (CONFIRM_DRAW) { SLog.Info("[{0}](" + Typename + ") Display confirm  | {1}", this, inner_area); }
             Display_BG();// Draw Background
             // Draw children within scrollable area
             Vector2 pre_scroll = _scroll_pos;//track what the scroll pos was before this frame
@@ -275,17 +275,17 @@ namespace SR_PluginLoader
 
             for (int i = 0; i < children.Count; i++)
             {
-                if (CONFIRM_DRAW) DebugHud.Log("  - Drawing child: {0} {1}", children[i], children[i].Get_Status_String());
+                if (CONFIRM_DRAW) SLog.Info("  - Drawing child: {0} {1}", children[i], children[i].Get_Status_String());
                 children[i].TryDisplay();
             }
-            if (CONFIRM_DRAW) DebugHud.Log(" - - - - - -");
+            if (CONFIRM_DRAW) SLog.Info(" - - - - - -");
 
             if (Scrollable)
             {
                 GUI.EndScrollView(true);
                 if (!Util.floatEq(_scroll_pos.x, pre_scroll.x) || !Util.floatEq(_scroll_pos.y, pre_scroll.y))
                 {
-                    if (CONFIRM_SCROLL) DebugHud.Log("{0}  Confirm Scroll  |  Scroll: {1}  |  pre_scroll: {2}", this, _scroll_pos, pre_scroll);
+                    if (CONFIRM_SCROLL) SLog.Info("{0}  Confirm Scroll  |  Scroll: {1}  |  pre_scroll: {2}", this, _scroll_pos, pre_scroll);
                     foreach (var child in children)
                     {
                         child.parent_scroll_updated();

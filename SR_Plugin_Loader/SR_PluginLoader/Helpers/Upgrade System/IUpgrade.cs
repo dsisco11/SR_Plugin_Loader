@@ -230,7 +230,7 @@ namespace SR_PluginLoader
             Upgrades.Clear_Upgrade_Data(pID, this.ID);
             // Remove the upgrade from this plot's tracker.
             PlotUpgradeTracker tracker = plot.GetComponent<PlotUpgradeTracker>();
-            if (tracker == null) DebugHud.Log("Failed to remove upgrade from plot {0}. Cannot find PlotUpgradeTracker!", pID);
+            if (tracker == null) SLog.Info("Failed to remove upgrade from plot {0}. Cannot find PlotUpgradeTracker!", pID);
             else tracker.Remove_Upgrade(this);
             // Call the upgrades cleanup logic.
             if(removal_function != null) removal_function(plot);

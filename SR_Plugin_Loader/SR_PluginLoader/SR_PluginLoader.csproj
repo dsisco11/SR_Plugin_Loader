@@ -168,8 +168,8 @@
     <Compile Include="UI\Classes\Plugin_Update_Item.cs" />
     <Compile Include="UI\Base\uiCheckbox.cs" />
     <Compile Include="UI\Base\uiTextArea.cs" />
-    <Compile Include="UI\Menus\Plugin_Update_Viewer.cs" />
-    <Compile Include="UI\Menus\Plugin_Manager.cs" />
+    <Compile Include="UI\UI Windows\Plugin_Update_Viewer.cs" />
+    <Compile Include="UI\UI Windows\Plugin_Manager.cs" />
     <Compile Include="UI\Classes\Plugin_Manager_List_Item.cs" />
     <Compile Include="UI\Base\uiScrollPanel.cs" />
     <Compile Include="UI\Base\uiToggle.cs" />
@@ -180,7 +180,7 @@
     <Compile Include="Plugins\Plugin_Update_Method.cs" />
     <Compile Include="UI\Base\uiTextbox.cs" />
     <Compile Include="UI\Classes\Plugin_StoreItem.cs" />
-    <Compile Include="UI\Menus\Plugin_Store.cs" />
+    <Compile Include="UI\UI Windows\Plugin_Store.cs" />
     <Compile Include="UI\Base\uiButton.cs" />
     <Compile Include="UI\Base\uiList_View.cs" />
     <Compile Include="UI\Base\uiControl.cs" />
@@ -193,7 +193,7 @@
     <Compile Include="UI\Legacy\Notice_Manager.cs" />
     <Compile Include="SiscosHooks\HOOKS.cs" />
     <Compile Include="SiscosHooks\HOOK_DATA.cs" />
-    <Compile Include="Base\Loader.cs" />
+    <Compile Include="Loader.cs" />
     <Compile Include="Helpers\MainMenu.cs" />
     <Compile Include="Plugins\Plugin.cs" />
     <Compile Include="Plugins\Plugin_Dependency.cs" />
@@ -256,9 +256,16 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\logo_sad.png" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\donate_btn.png" />
+  </ItemGroup>
+  <Import Project="..\Logging\Logging.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetFileName)" /Y
+    <PostBuildEvent>if $(ConfigurationName) == Debug (
+COPY "$(TargetDir)/$(TargetName).pdb" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetName).pdb" /Y
+)
+COPY "$(TargetPath)" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/$(TargetFileName)" /Y
 COPY "$(TargetPath)" "$(TargetDir)/../../../../Installer/$(TargetFileName)" /Y
 CD "$(TargetDir)/../../../"
 7za.exe a "./../Installer.zip" -w "./../Installer/"

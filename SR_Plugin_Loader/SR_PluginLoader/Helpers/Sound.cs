@@ -31,7 +31,7 @@ namespace SR_PluginLoader
 
         public static void Play(SoundId snd, Vector3 pos)
         {
-            //DebugHud.Log("[Sound] Playing: SoundId.{0}", snd.ToString());
+            //PLog.Info("[Sound] Playing: SoundId.{0}", snd.ToString());
             Func<SECTR_AudioCue> cue;
             if (SOUND_MAP.TryGetValue(snd, out cue))
             {
@@ -39,7 +39,7 @@ namespace SR_PluginLoader
             }
             else
             {
-                DebugHud.Log("[Sound] No sound listed for SoundId.{0}", snd.ToString());
+                SLog.Warn("[Sound] No sound listed for SoundId.{0}", snd.ToString());
             }
         }
 

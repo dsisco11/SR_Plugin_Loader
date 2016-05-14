@@ -28,7 +28,7 @@ namespace SR_PluginLoader
 
         protected override void Display()
         {
-            if (CONFIRM_DRAW) { DebugHud.Log("[{0}]({1})  Confirm Display  |  draw_area: {2}", this, Typename, draw_area); }
+            if (CONFIRM_DRAW) { SLog.Info("[{0}]({1})  Confirm Display  |  draw_area: {2}", this, Typename, draw_area); }
             Display_BG();// Draw BG
             Display_Text();// Draw our text
             /*

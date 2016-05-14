@@ -100,14 +100,14 @@ namespace SR_PluginLoader
                     if (!match.Success) continue;
                     if (match.Groups.Count <= 1) continue;
 
-                    //for (int i = 0; i < match.Groups.Count; i++) DebugHud.Log("  - {0}", match.Groups[i].Value);
+                    //for (int i = 0; i < match.Groups.Count; i++) PLog.Info("  - {0}", match.Groups[i].Value);
 
                     Name = match.Groups[1].Value.TrimStart(new char[] { '_' });
                     gType = kvp.Value;
                     break;
                 }
 
-                //DebugHud.Log("- Group: \"{0}\" Type: {1}", gName, Enum.GetName(typeof(MdlGroupType), gType));
+                //PLog.Info("- Group: \"{0}\" Type: {1}", gName, Enum.GetName(typeof(MdlGroupType), gType));
                 
                 GameObject gObj = new GameObject(group.Name);
                 MeshBuilder builder = new MeshBuilder(mdl);
@@ -134,7 +134,7 @@ namespace SR_PluginLoader
                     {
                         if (mesh.Material != null)
                         {
-                            //DebugHud.Log("-   Material: {0}", mesh.Material.Name);
+                            //PLog.Info("-   Material: {0}", mesh.Material.Name);
                             materials.Add(matBuilder.Create(mesh.Material));
                         }
                     }
@@ -163,7 +163,7 @@ namespace SR_PluginLoader
                     }
                     else
                     {
-                        //DebugHud.Log("Creating material for: {0}", group.Material.Name);
+                        //PLog.Info("Creating material for: {0}", group.Material.Name);
                         renderer.enabled = true;
                         renderer.materials = materials.ToArray();
                     }
@@ -218,13 +218,13 @@ namespace SR_PluginLoader
 
             mesh.vertices = verts.ToArray();
             if (normals.Count == verts.Count) mesh.normals = normals.ToArray();
-            //else if (normals.Count > 0) DebugHud.Log("Number of normals doesn't match the number of verticies!");
+            //else if (normals.Count > 0) PLog.Info("Number of normals doesn't match the number of verticies!");
 
             if (uvw.Count == verts.Count) mesh.uv = uvw.ToArray();
-            //else if (uvw.Count > 0) DebugHud.Log("Number of texture coords doesn't match the number of verticies!");
+            //else if (uvw.Count > 0) PLog.Info("Number of texture coords doesn't match the number of verticies!");
 
             if (colors.Count == verts.Count) mesh.colors = colors.ToArray();
-            //else if (colors.Count > 0) DebugHud.Log("Number of vertex colors doesn't match the number of verticies!");
+            //else if (colors.Count > 0) PLog.Info("Number of vertex colors doesn't match the number of verticies!");
 
             mesh.subMeshCount = tri_list.Count;
             for(int i=0; i<tri_list.Count; i++)
@@ -263,7 +263,7 @@ namespace SR_PluginLoader
             int vIdx = face.VertexIndex-1;
             int nIdx = face.NormalIndex-1;
             int tIdx = face.TextureIndex-1;
-            //DebugHud.Log("vIdx<{0}>  nIdx<{1}>  tIdx<{2}>", vIdx, nIdx, tIdx);
+            //PLog.Info("vIdx<{0}>  nIdx<{1}>  tIdx<{2}>", vIdx, nIdx, tIdx);
             Vector3 scaleVec = Vector3.one;
 
             if (Model.Vertices.Count > vIdx && vIdx > -1)
@@ -495,9 +495,9 @@ namespace SR_PluginLoader
         {
             if (resolver == null) throw new ArgumentNullException(String.Format("Material resolver callback is null, Cannot locate texture: {0}", file));
 
-            //DebugHud.LogSilent("[MaterialBuilder] Resolving file: {0}", file);
+            //PLog.Debug("[MaterialBuilder] Resolving file: {0}", file);
             var stream = resolver(file);
-            if (stream == null) DebugHud.Log("Cannot resolve file: {0}", file);
+            if (stream == null) SLog.Info("Cannot resolve file: {0}", file);
 
             return stream;
         }

@@ -59,7 +59,7 @@ namespace SR_PluginLoader
             using (Stream stream = Assembly.GetCallingAssembly().GetManifestResourceStream(asset_name))
             {
                 byte[] data = Util.Read_Stream(stream);
-                if (data == null) DebugHud.Log("UNABLE TO LOAD SPECIFIED RESOURCE: {0}", name);
+                if (data == null) SLog.Info("UNABLE TO LOAD SPECIFIED RESOURCE: {0}", name);
                 return Load(data, name);
             }
         }
@@ -77,7 +77,7 @@ namespace SR_PluginLoader
             using (Stream stream = Assembly.GetCallingAssembly().GetManifestResourceStream(asset_name))
             {
                 byte[] data = Util.Read_Stream(stream);
-                if (data == null) DebugHud.Log("UNABLE TO LOAD SPECIFIED RESOURCE: {0}", name);
+                if (data == null) SLog.Info("UNABLE TO LOAD SPECIFIED RESOURCE: {0}", name);
                 return Load(data, flags, name);
             }
         }
@@ -220,7 +220,7 @@ namespace SR_PluginLoader
 
             DDS_HEADER header = Util.BytesToStructure<DDS_HEADER>(ddsBytes);
             uint fourCC = header.pixelFormat.dwFourCC;
-            //DebugHud.Log("DDPF_FOURCC: {0}", fourCC);
+            //PLog.Info("DDPF_FOURCC: {0}", fourCC);
 
             TextureFormat textureFormat = TextureFormat.DXT1;
             if (fourCC == DXT.MAKEFOURCC('D', 'X', 'T', '1')) textureFormat = TextureFormat.DXT1;
@@ -251,7 +251,7 @@ namespace SR_PluginLoader
         {
             if (magic == null || data == null || magic.Length <= 0 || (data.Length - offset) <= 0 || magic.Length > (data.Length - offset))
             {
-                DebugHud.Log("Bad arguments.");
+                SLog.Info("Bad arguments.");
                 return false;
             }
 

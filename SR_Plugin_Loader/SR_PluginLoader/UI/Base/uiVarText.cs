@@ -16,7 +16,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// The unchanging text to print at the left of the value
         /// </summary>
-        public string Text { get { return _text.Text; } set { _text.Text = String.Format("<b>{0}</b> ", value); update_area(); } }
+        public override string Text { get { return _text.Text; } set { _text.Text = String.Format("<b>{0}</b> ", value); update_area(); } }
         /// <summary>
         /// The value string to print at the right of the text
         /// </summary>

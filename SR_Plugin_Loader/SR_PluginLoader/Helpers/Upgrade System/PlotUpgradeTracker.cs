@@ -94,7 +94,7 @@ namespace SR_PluginLoader
         public void Remove_Upgrade(PlotUpgrade upgrade)
         {
             bool b = upgrades.Remove(upgrade);
-            if (!b) DebugHud.Log("Failed to remove custom plot upgrade from tracker. Upgrade: {0}", upgrade);
+            if (!b) SLog.Warn("Failed to remove custom plot upgrade from tracker. Upgrade: {0}", upgrade);
         }
 
         #region Serialization / Deserialization

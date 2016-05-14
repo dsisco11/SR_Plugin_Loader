@@ -72,15 +72,15 @@ namespace SR_PluginLoader
                 var child = base.gameObject.transform.Find(fullName);
                 if(child == null)
                 {
-                    DebugHud.Log("Unable to find child named: \"{0}\"", fullName);
+                    SLog.Info("Unable to find child named: \"{0}\"", fullName);
                     continue;
                 }
                 GameObject gObj = child.gameObject;
 
                 if (!dict.ContainsKey(name)) dict.Add(name, gObj);
-                else DebugHud.Log("Duplicate entry for child named: \"{0}\"", name);
+                else SLog.Info("Duplicate entry for child named: \"{0}\"", name);
             }
-            //DebugHud.Log("Dictionary<> {0} entrys. {1}", dict.Keys.Count, String.Join(", ", dict.Keys.ToArray()));
+            //PLog.Info("Dictionary<> {0} entrys. {1}", dict.Keys.Count, String.Join(", ", dict.Keys.ToArray()));
         }
 
         private void TryCreateLineMat()
@@ -171,7 +171,7 @@ namespace SR_PluginLoader
             if (MESHES == null) throw new Exception("MESHES Dictionary not ready!");
             if (!MESHES.ContainsKey(keyStr))
             {
-                DebugHud.Log("No MESH group named \"{0}\" could be found!", keyStr);
+                SLog.Info("No MESH group named \"{0}\" could be found!", keyStr);
                 return null;
             }
 
@@ -189,7 +189,7 @@ namespace SR_PluginLoader
             if (ATTACHMENT_POINTS == null) throw new Exception("ATTACHMENT_POINTS Dictionary not ready!");
             if (!ATTACHMENT_POINTS.ContainsKey(keyStr))
             {
-                DebugHud.Log("No ATTACHMENT_POINTS group named \"{0}\" could be found!", keyStr);
+                SLog.Info("No ATTACHMENT_POINTS group named \"{0}\" could be found!", keyStr);
                 return null;
             }
 
@@ -227,12 +227,12 @@ namespace SR_PluginLoader
                     GameObject point = kvp.Value;
                     if (point == null)
                     {
-                        DebugHud.Log("attachment point is null!");
+                        SLog.Info("attachment point is null!");
                         continue;
                     }
                     if(point.transform == null)
                     {
-                        DebugHud.Log("attachment point transform is null!");
+                        SLog.Info("attachment point transform is null!");
                         continue;
                     }
                     // Draw a triangle centered on this point

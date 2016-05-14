@@ -100,7 +100,7 @@ namespace SR_PluginLoader
         {
             if (p == null)
             {
-                DebugHud.Log(new Exception("Plugin is null!"));
+                SLog.Error(new Exception("Plugin is null!"));
                 return;
             }
 
@@ -109,7 +109,7 @@ namespace SR_PluginLoader
                 plugin = p;
                 if (plugin.data == null)
                 {
-                    DebugHud.Log(new Exception("Plugin data is NULL!"));
+                    SLog.Error(new Exception("Plugin data is NULL!"));
                     return;
                 }
 
@@ -117,15 +117,15 @@ namespace SR_PluginLoader
                 pl_version.Text = plugin.data.VERSION.ToString();
                 Plugin_State_Changed();
 
-                if (plugin.icon != null) pl_icon.image = plugin.icon;
-                else if (TextureHelper.icon_unknown != null) pl_icon.image = TextureHelper.icon_unknown;
-                else pl_icon.image = null;
+                if (plugin.icon != null) pl_icon.Image = plugin.icon;
+                else if (TextureHelper.icon_unknown != null) pl_icon.Image = TextureHelper.icon_unknown;
+                else pl_icon.Image = null;
 
                 plugin_state_init = false;
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
         }
 

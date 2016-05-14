@@ -26,7 +26,7 @@ namespace SR_PluginLoader
         {
             foreach (KeyValuePair<string, Plugin> kv in Loader.plugins)
             {
-                if (kv.Value == null || kv.Value.data == null) { DebugHud.Log("[ERROR] @ Loader.Is_Plugin_Installed(): Value for KeyValuePair @ Key {0} is not a valid/loaded plugin!", kv.Key); }
+                if (kv.Value == null || kv.Value.data == null) { SLog.Error("@ Loader.Is_Plugin_Installed(): Value for KeyValuePair @ Key {0} is not a valid/loaded plugin!", kv.Key); }
                 else if (String.Compare(kv.Value.Hash, hash) == 0) return true;
             }
             return false;

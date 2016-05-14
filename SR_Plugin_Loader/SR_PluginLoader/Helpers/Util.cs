@@ -157,7 +157,7 @@ namespace SR_PluginLoader
             StringBuilder dat = new StringBuilder();
             dat.Append(head);
             dat.Append(Encoding.ASCII.GetString(buf));
-            //DebugHud.Log("HEAD: size({0}) content: '{1}'", dat.Length, dat.ToString());
+            //PLog.Info("HEAD: size({0}) content: '{1}'", dat.Length, dat.ToString());
             byte[] blob_buf = Encoding.ASCII.GetBytes(dat.ToString());
             */
 
@@ -172,7 +172,7 @@ namespace SR_PluginLoader
 
             string hash_foobar = "323fae03f4606ea9991df8befbb2fca795e648fa";// Correct GIT hash for a file containing only "foobar\n"
             bool match = (String.Compare(sb.ToString(), hash_foobar)==0);
-            //DebugHud.Log("[SHA1 HASH TEST] Match<{0}>  Hash: {1}  HEAD: '{2}'", (match?"TRUE":"FALSE"), sb.ToString(), head);
+            //PLog.Info("[SHA1 HASH TEST] Match<{0}>  Hash: {1}  HEAD: '{2}'", (match?"TRUE":"FALSE"), sb.ToString(), head);
 
             return sb.ToString();
         }
@@ -185,7 +185,7 @@ namespace SR_PluginLoader
 
             foreach(var res in resources)
             {
-                DebugHud.Log(res);
+                SLog.Info(res);
             }
         }
 
@@ -222,7 +222,7 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
                 return null;
             }
         }

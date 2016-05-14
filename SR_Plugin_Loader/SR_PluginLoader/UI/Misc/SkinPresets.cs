@@ -79,7 +79,7 @@ namespace SR_PluginLoader
             }
             catch(Exception ex)
             {
-                DebugHud.Log(ex);
+                SLog.Error(ex);
             }
 
             return skin;

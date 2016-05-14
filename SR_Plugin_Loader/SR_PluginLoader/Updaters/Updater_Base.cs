@@ -81,7 +81,7 @@ namespace SR_PluginLoader
         // So for the JSON updater this method needs to be overriden and made to download that JSON info and treat the DOWNLOAD url contained therein as if IT was passed as the 'remote_file'
         public virtual IEnumerator Download(string remote_file, string local_file, Updater_File_Type_Confirm confirm = null, Updater_File_Download_Progress prog_callback = null, Updater_File_Download_Completed download_completed = null)
         {
-            DebugHud.LogSilent("Downloading: {0}", remote_file);
+            SLog.Debug("Downloading: {0}", remote_file);
             if (local_file == null) local_file = String.Format("{0}\\{1}", UnityEngine.Application.dataPath, Path.GetFileName(remote_file));
 
             WebResponse resp = null;
@@ -128,7 +128,7 @@ namespace SR_PluginLoader
                     }
                     catch (Exception ex)
                     {
-                        DebugHud.Log(ex);
+                        SLog.Error(ex);
                     }
                 }
                 yield return 0;// yield execution until next frame
@@ -164,7 +164,7 @@ namespace SR_PluginLoader
             IEnumerator e = webAsync.GetResponse(webRequest);
             if (e == null)
             {
-                DebugHud.Log("Updater_Base.Get() Enumerator is NULL!");
+                SLog.Info("Updater_Base.Get() Enumerator is NULL!");
                 yield return null;
                 yield break;
             }
@@ -205,7 +205,7 @@ namespace SR_PluginLoader
                     }
                     catch (Exception ex)
                     {
-                        DebugHud.Log(ex);
+                        SLog.Error(ex);
                     }
                 }
                 yield return null;// yield execution until next frame

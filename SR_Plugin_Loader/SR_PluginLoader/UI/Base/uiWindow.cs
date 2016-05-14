@@ -9,7 +9,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Tracks all uiWindow instances by their ID.
         /// </summary>
-        private static List<int> ALL = new List<int>();
+        private static new List<int> ALL = new List<int>();
         private static Texture2D title_bar_texture = null;
 
         #region Components
@@ -261,7 +261,7 @@ namespace SR_PluginLoader
         {
             if (!isVisible || isDisabled)
             {
-                DebugHud.Log("[{0}] Window handling events while INVISIBLE!", this);
+                SLog.Info("[{0}] Window handling events while INVISIBLE!", this);
                 return;
             }
 
@@ -310,7 +310,7 @@ namespace SR_PluginLoader
 
             for (int i = 0; i < children.Count; i++)
             {
-                if(CONFIRM_DRAW) DebugHud.Log("  - Drawing child: {0}", this.children[i]);
+                if(CONFIRM_DRAW) SLog.Info("  - Drawing child: {0}", children[i]);
                 children[i].TryDisplay();
             }
 

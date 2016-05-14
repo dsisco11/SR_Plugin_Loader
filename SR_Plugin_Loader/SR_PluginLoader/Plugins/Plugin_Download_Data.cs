@@ -28,20 +28,20 @@ namespace SR_PluginLoader
         {
             json = info;
             
-            this.Author = TryGet("author");
-            this.Name = TryGet("name");
-            this.Description = TryGet("description");
-            this.URL = TryGet("url");
+            Author = TryGet("author");
+            Name = TryGet("name");
+            Description = TryGet("description");
+            URL = TryGet("url");
 
             string method = TryGet("update_method");
-            if(method != null) this.Updater = Updater_Base.Get_Instance((UPDATER_TYPE)Enum.Parse(typeof(UPDATER_TYPE), method, true));
+            if(method != null) Updater = Updater_Base.Get_Instance((UPDATER_TYPE)Enum.Parse(typeof(UPDATER_TYPE), method, true));
         }
 
         string TryGet(string key)
         {
             if (json[key] == null)
             {
-                DebugHud.Log(new ArgumentNullException(String.Format("\"{0}\" is null!", key)));
+                SLog.Error(new ArgumentNullException(String.Format("\"{0}\" is null!", key)));
                 return null;
             }
 
