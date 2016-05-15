@@ -135,7 +135,6 @@ namespace SR_PluginLoader
 
             if(!ok)
             {
-                //throw null;
                 uiMessageBox.New("The current loader's hash does not match the hash of the one that was installed, click here to install this version.", 
                     "Version Mismatch", 
                     (DialogResult res) => {
