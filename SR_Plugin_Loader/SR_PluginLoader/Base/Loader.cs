@@ -17,7 +17,7 @@ namespace SR_PluginLoader
 {
     public static class Loader
     {
-        
+        private static Plugin_Version VERSION = PluginLoader_Info.VERSION;
         public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", PluginLoader_Info.VERSION); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", PluginLoader_Info.VERSION); } }
 
@@ -444,51 +444,5 @@ namespace SR_PluginLoader
             }
         }
         #endregion
-                
-        private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
-        {
-            //Return true if the server certificate is ok
-            if (sslPolicyErrors == SslPolicyErrors.None)
-                return true;
-
-            bool acceptCertificate = true;
-
-            //The server did not present a certificate
-            if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateNotAvailable) == SslPolicyErrors.RemoteCertificateNotAvailable)
-            {
-                acceptCertificate = false;
-            }
-            else
-            {
-                //The certificate does not match the server name
-                if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateNameMismatch) == SslPolicyErrors.RemoteCertificateNameMismatch)
-                {
-                    acceptCertificate = false;
-                }
-
-                //There is some other problem with the certificate
-                if ((sslPolicyErrors & SslPolicyErrors.RemoteCertificateChainErrors) == SslPolicyErrors.RemoteCertificateChainErrors)
-                {
-                    foreach (X509ChainStatus item in chain.ChainStatus)
-                    {
-                        if (item.Status != X509ChainStatusFlags.RevocationStatusUnknown && item.Status != X509ChainStatusFlags.OfflineRevocation)
-                            break;
-
-                        if (item.Status != X509ChainStatusFlags.NoError)
-                        {
-                            acceptCertificate = false;
-                        }
-                    }
-                }
-            }
-
-            //If Validation failed
-            if (acceptCertificate == false)
-            {
-                acceptCertificate = true;
-            }
-
-            return acceptCertificate;
-        }
     }
 }

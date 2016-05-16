@@ -1,33 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace SR_PluginLoader
 {
     public class Plugin_Version
     {
-        public int major;
-        public int minor;
-        public int patch;
+        public int Major;
+        public int Minor;
+        public int Build;
 
         public Plugin_Version(int _major, int _minor = 0)
         {
-            this.major = _major;
-            this.minor = _minor;
-            this.patch = 0;
+            Major = _major;
+            Minor = _minor;
+            Build = ComputeBuildNo(Assembly.GetCallingAssembly());
         }
-
+        
         public Plugin_Version(int _major, int _minor, int _patch)
         {
-            this.major = _major;
-            this.minor = _minor;
-            this.patch = _patch;
+            Major = _major;
+            Minor = _minor;
+            Build = _patch;
+        }
+
+        private int ComputeBuildNo(Assembly asy)
+        {
+            Version v = asy.GetName().Version;
+            return ((v.Build << 16) + v.Revision);
         }
 
         public override string ToString()
         {
-            return String.Format("v{0}.{1}.{2}", this.major, this.minor, this.patch);
+            return String.Format("v{0}.{1}.{2}", Major, Minor, Build);
         }
 
         public static bool operator ==(Plugin_Version v1, Plugin_Version v2)
@@ -62,7 +69,7 @@ namespace SR_PluginLoader
 
         protected long toInt()
         {
-            return ((this.major << 32) + (this.minor << 16) + this.patch);
+            return ((Major << 32) + (Minor << 16) + Build);
         }
 
         public int Compare(Plugin_Version other)
@@ -78,7 +85,7 @@ namespace SR_PluginLoader
         public override bool Equals(object obj)
         {
             Plugin_Version vers = obj as Plugin_Version;
-            return Compare(vers)==0;
+            return 0==Compare(vers);
         }
     }
 }

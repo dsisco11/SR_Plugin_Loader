@@ -153,8 +153,14 @@ namespace SR_PluginLoader
         /// <param name="window">The window to switch to.</param>
         public static void Switch(uiWindow window)
         {
-            window.Show();
-            foreach (int wid in uiWindow.ALL) { if (wid != window.ID) (uiControl.ALL[wid] as uiWindow).Hide(); }
+            try
+            {
+                foreach (int wid in uiWindow.ALL) { if (wid != window.ID) (uiControl.ALL[wid] as uiWindow).Hide(); }
+            }
+            finally
+            {
+                window.Show();
+            }
         }
 
         public void Close()
