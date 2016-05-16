@@ -56,3 +56,4 @@ SR_Plugin_Loader/SR_PluginLoader/bin/Release/SR_PluginLoader.dll
 *.pdb
 Installer/ildump.cs
 Installer/_ildump.bat
+ildump.cs
