@@ -154,9 +154,9 @@ namespace SR_PluginLoader
 
         private void Add_Error(Exception ex)
         {
-            string str = DebugHud.Format_Exception_Log(ex, 1);
+            string str = Logging.Logger.Format_Exception(ex);
             Errors.Add(str);
-            SLog.Info("[ <b>{0}</b> ] {1}", this.dll_name, str);
+            SLog.Error("[ <b>{0}</b> ] {1}", dll_name, str);
             onError?.Invoke();
         }
 
@@ -337,12 +337,12 @@ namespace SR_PluginLoader
                 SLog.Info("Destroyed pre-existing plugin manager GameObject instance!");
             }
 
-            GameObject gmObj = new GameObject(this.Unique_GameObject_Name);
+            GameObject gmObj = new GameObject(Unique_GameObject_Name);
             UnityEngine.GameObject.DontDestroyOnLoad(gmObj);
 
             try
             {
-                if (this.load_funct != null)
+                if (load_funct != null)
                 {
                     object[] args = new object[load_funct.GetParameters().Length];
                     var paramz = load_funct.GetParameters();
@@ -354,7 +354,7 @@ namespace SR_PluginLoader
 
                     }
 
-                    this.load_funct.Invoke(null, args);
+                    load_funct.Invoke(null, args);
                 }
                 else return false;
 
@@ -362,16 +362,9 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
+                SLog.Error(ex);
                 Add_Error(ex);
                 Unload();
-                //let's try and unload the things it might have loaded
-                /*
-                if (this.unload_funct != null)
-                {
-                    this.unload_funct.Invoke(null, new object[] { gmObj });
-                }
-                UnityEngine.GameObject.Destroy(gmObj);
-                */
                 return false;
             }
             return true;
@@ -393,7 +386,6 @@ namespace SR_PluginLoader
                         ParameterInfo param = paramz[i];
                         if (typeof(GameObject) == param.ParameterType) args[i] = GM;
                         else if (typeof(Plugin) == param.ParameterType) args[i] = this;
-
                     }
 
                     this.unload_funct.Invoke(null, args);
@@ -401,6 +393,7 @@ namespace SR_PluginLoader
             }
             catch (Exception ex)
             {
+                SLog.Error(ex);
                 Add_Error(ex);
             }
             finally

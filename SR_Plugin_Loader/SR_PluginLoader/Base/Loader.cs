@@ -21,7 +21,6 @@ namespace SR_PluginLoader
         public static string TITLE { get { return String.Format("Sisco++'s Plugin Loader {0}", PluginLoader_Info.VERSION); } }
         public static string NAME { get { return String.Format("[Plugin Loader] {0} by Sisco++", PluginLoader_Info.VERSION); } }
 
-        private static GameObject root = null;
         public static Dictionary<string, Plugin> plugins = new Dictionary<string, Plugin>();
         private static string pluginDir = null;
 
@@ -44,40 +43,14 @@ namespace SR_PluginLoader
             if (Loader.Config != null) return;
             Application.stackTraceLogType = StackTraceLogType.Full;
             Logger.Begin(Path.Combine(Application.dataPath, "plugins.log"));
-
-#if DEBUG
-            /*
-            if (!loaded_symbols)
-            {
-                loaded_symbols = true;
-                StackFrame sf = new StackFrame(true);
-                if (String.IsNullOrEmpty(sf.GetFileName()))
-                {
-                    string dll_path = Assembly.GetExecutingAssembly().Location;
-                    Log.Info("DLL_PATH: {0}", dll_path);
-                    string pdb_path = String.Concat(Path.GetDirectoryName(dll_path), "\\", Path.GetFileNameWithoutExtension(dll_path), ".pdb");
-                    Log.Info("PDB_PATH: {0}", pdb_path);
-                    Log.Info("");
-                    byte[] dll_buf = File.ReadAllBytes(dll_path);
-                    byte[] pdb_buf = File.ReadAllBytes(pdb_path);
-                    AppDomain.CurrentDomain.Load(dll_buf, pdb_buf);
-                }
-            }
-            */
-            //throw null;// Debug
-#endif
-
+            
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
             if (!Loader.Load_Config_Stream()) return;
 
             try
-            {
-                Loader.root = new GameObject();
-                UnityEngine.Object.DontDestroyOnLoad(Loader.root);
-
-                
+            {                
                 DebugHud.Init();
                 TextureHelper.Load_Common();
                 SiscosHooks.Setup();
