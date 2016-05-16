@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading;
 using System.Collections;
 using UnityEngine;
+using System.Net.Security;
 
 /*
 http://wiki.unity3d.com/index.php/WebAsync
@@ -62,6 +63,8 @@ namespace SR_PluginLoader
             isURLmissing = false;
 
             Uri httpSite = new Uri(url);
+
+            ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
             WebRequest webRequest = WebRequest.Create(httpSite);
 
             // We need no more than HTTP's head

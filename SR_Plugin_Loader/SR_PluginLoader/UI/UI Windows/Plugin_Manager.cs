@@ -57,7 +57,7 @@ namespace SR_PluginLoader
             btn_store.Border.type = uiBorderType.NONE;
             btn_store.Border.normal.color = Color.white;
             btn_store.Border.normal.size = new RectOffset(1, 1, 1, 1);
-            btn_store.onClicked += btn_store_onClicked;
+            btn_store.onClicked += (uiControl c) => { uiWindow.Switch(PluginStore.Instance); };
 
 
             btn_donate = Create<uiIcon>(top_wrapper);
@@ -206,14 +206,7 @@ namespace SR_PluginLoader
             pl_toggle.alignLeftSide();
             btn_copy_json.moveRightOf(pl_toggle, 3);
         }
-
-        private void btn_store_onClicked(uiControl c)
-        {
-            //PluginManager.Instance.Hide();
-            //PluginStore.Instance.Show();
-            uiWindow.Switch(PluginStore.Instance);
-        }
-
+        
         private void Nop_Wrapper_onLayout(uiControl c)
         {
             ins_no_plugins_text.Set_Pos(0, 0);
@@ -277,10 +270,6 @@ namespace SR_PluginLoader
                 SLog.Info("Unable to find plugin via hash: {0}", this.selected);
                 return;
             }
-            /*
-            string json_str = String.Format("\"{0}.{1}\": {{\n\t\t \"name\": \"{0}\",\n\t\t\t \"author\": \"{1}\",\n\t\t\t \"description\": \"{2}\",\n\t\t\t \"update_method\": \"{3}\",\n\t\t\t \"url\": \"{4}\"\n\t\t }}", pl.data.NAME, pl.data.AUTHOR, Util.JSON_Escape_String(pl.data.DESCRIPTION), Enum.GetName(typeof(UPDATER_TYPE), pl.data.UPDATE_METHOD.METHOD), pl.data.UPDATE_METHOD.URL);
-            GUIUtility.systemCopyBuffer = json_str;//copy this text to the clipboard
-            */
             GUIUtility.systemCopyBuffer = pl.data.ToJSON();
         }
         
