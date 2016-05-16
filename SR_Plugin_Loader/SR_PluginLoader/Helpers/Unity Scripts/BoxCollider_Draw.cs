@@ -10,7 +10,7 @@ namespace SR_PluginLoader
     /// Will render the bounds of an objects BoxCollider if it has one
     /// Except it doesn't work right now, the OpenGL matricies aren't right somehow.
     /// </summary>
-    public class BoxCollider_Draw : MonoBehaviour
+    public class Debug_Object_Visualizer : MonoBehaviour
     {
         public Color color = Color.green;
 
