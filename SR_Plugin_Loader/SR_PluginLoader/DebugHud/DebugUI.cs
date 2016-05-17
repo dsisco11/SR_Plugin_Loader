@@ -112,7 +112,6 @@ namespace SR_PluginLoader
         public static void Draw_Point(Vector2 pos)
         {
             const float Z = 0f;
-            const float o = 0f;// 1f;
             float rx = (float)Math.Round(pos.x) + 0.5f;// center of the pixel
             float ry = (float)Math.Round(pos.y) + 0.5f;// center of the pixel
             float rw = (float)Math.Round(6f) - 1;
