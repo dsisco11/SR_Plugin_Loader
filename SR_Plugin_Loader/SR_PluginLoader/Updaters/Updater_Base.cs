@@ -48,6 +48,21 @@ namespace SR_PluginLoader
 
     public abstract class Updater_Base
     {
+        protected static Encoding ENCODING = Encoding.UTF8;
+        protected const int CHUNK_SIZE = 2048;
+
+        public static HttpWebRequest CreateRequest(string url)
+        {
+            //ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
+            ServicePointManager.ServerCertificateValidationCallback += (o, certificate, chain, errors) => true;
+            System.Security.Cryptography.AesCryptoServiceProvider b = new System.Security.Cryptography.AesCryptoServiceProvider();
+
+            Uri uri = new Uri(url);
+            HttpWebRequest webRequest = WebRequest.Create(uri) as HttpWebRequest;
+            webRequest.UserAgent = USER_AGENT;
+            return webRequest;
+        }
+
         public static Updater_Base Get_Instance(UPDATER_TYPE ty)
         {
             switch (ty)
@@ -75,11 +90,43 @@ namespace SR_PluginLoader
         }
 
 
+        public static byte[] Get(string url)
+        {
+            HttpWebRequest webRequest = CreateRequest(url);
+            WebResponse webResponse = webRequest.GetResponse();
+            Stream stream = webResponse.GetResponseStream();
+
+            int total = (int)webResponse.ContentLength;
+            byte[] buf = new byte[total];
+
+            int read = 0;//how many bytes we have read so far (offset within the stream)
+            int remain = total;//how many bytes are left to read
+            int r = 0;
+
+            while (remain > 0)
+            {
+                r = stream.Read(buf, read, Math.Min(remain, CHUNK_SIZE));
+                read += r;
+                remain -= r;
+            }
+
+            return buf;
+        }
+
+        public static string GetString(string url)
+        {
+            byte[] buf = Get(url);
+            if (buf == null) return null;
+            if (buf.Length <= 0) return "";
+
+            return ENCODING.GetString(buf);
+        }
+
         // Remember: when this function is used by plugins they will pass their given updater_method URL for 'remote_file'
         // In the case of things like the Git updater this is fine as that url will BE a link to the most current version of the plugin DLL
         // However in the case of the JSON updater that url will instead be a link to the JSON file containing the HASH and DOWNLOAD URL for said plugin.
         // So for the JSON updater this method needs to be overriden and made to download that JSON info and treat the DOWNLOAD url contained therein as if IT was passed as the 'remote_file'
-        public virtual IEnumerator Download(string remote_file, string local_file, Updater_File_Type_Confirm confirm = null, Updater_File_Download_Progress prog_callback = null, Updater_File_Download_Completed download_completed = null)
+        public virtual IEnumerator DownloadAsync(string remote_file, string local_file, Updater_File_Type_Confirm confirm = null, Updater_File_Download_Progress prog_callback = null, Updater_File_Download_Completed download_completed = null)
         {
             SLog.Debug("Downloading: {0}", remote_file);
             if (local_file == null) local_file = String.Format("{0}\\{1}", UnityEngine.Application.dataPath, Path.GetFileName(remote_file));
@@ -87,8 +134,7 @@ namespace SR_PluginLoader
             WebResponse resp = null;
             Stream stream = null;
 
-            HttpWebRequest webRequest = WebRequest.Create(remote_file) as HttpWebRequest;
-            webRequest.UserAgent = USER_AGENT;
+            HttpWebRequest webRequest = CreateRequest(remote_file);
 
             WebAsync webAsync = new WebAsync();
             IEnumerator e = webAsync.GetResponse(webRequest);
@@ -109,7 +155,6 @@ namespace SR_PluginLoader
             stream = resp.GetResponseStream();
             int total = (int)resp.ContentLength;
             byte[] buf = new byte[total];
-            const int CHUNK_SIZE = 2048;
 
             int read = 0;//how many bytes we have read so far (offset within the stream)
             int remain = total;//how many bytes are left to read
@@ -143,10 +188,11 @@ namespace SR_PluginLoader
             download_completed?.Invoke(local_file);
             yield break;//exit routine
         }
+
         /// <summary>
         /// Performs a coroutine Http GET request and returns a byte array with the result via both a callback and the current value of the IEnumerator object.
         /// </summary>
-        public static IEnumerator Get(string url, Updater_File_Type_Confirm confirm = null, Updater_File_Download_Progress prog_callback = null, Updater_Get_Result callback = null)
+        public static IEnumerator GetAsync(string url, Updater_File_Type_Confirm confirm = null, Updater_File_Download_Progress prog_callback = null, Updater_Get_Result callback = null)
         {
             if (remote_file_cache.ContainsKey(url))
             {
@@ -157,8 +203,7 @@ namespace SR_PluginLoader
             WebResponse resp = null;
             Stream stream = null;
 
-            HttpWebRequest webRequest = WebRequest.Create(url) as HttpWebRequest;
-            webRequest.UserAgent = USER_AGENT;
+            HttpWebRequest webRequest = CreateRequest(url);
             
             WebAsync webAsync = new WebAsync();
             IEnumerator e = webAsync.GetResponse(webRequest);
@@ -186,7 +231,6 @@ namespace SR_PluginLoader
             stream = resp.GetResponseStream();
             int total = (int)resp.ContentLength;
             byte[] buf = new byte[total];
-            const int CHUNK_SIZE = 2048;
 
             int read = 0;//how many bytes we have read so far (offset within the stream)
             int remain = total;//how many bytes are left to read

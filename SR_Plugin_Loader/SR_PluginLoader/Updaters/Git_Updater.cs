@@ -12,7 +12,6 @@ namespace SR_PluginLoader
 {
     public class Git_Updater : Updater_Base
     {
-        private static Encoding MEMENC = Encoding.UTF8;
         private static readonly Git_Updater _instance = new Git_Updater();
         public static Git_Updater instance { get { return _instance; } }
         public static readonly UPDATER_TYPE type = UPDATER_TYPE.GIT;
@@ -20,8 +19,8 @@ namespace SR_PluginLoader
 
         public delegate void Git_Updater_Repo_Result(JSONArray arr);
 
-        private static WebClient _webClient = null;
-        private static WebClient webClient { get { if (_webClient == null) { _webClient = GetClient(); } return _webClient; }  }
+        //private static WebClient _webClient = null;
+        //private static WebClient webClient { get { if (_webClient == null) { _webClient = GetClient(); } return _webClient; }  }
 
         private static string get_cname(string host)
         {
@@ -67,13 +66,6 @@ namespace SR_PluginLoader
 
             string result = url;
             result = String.Concat("https://api.github.com/repos/", repo_url);
-            /*
-            var reg = new Regex(@"^(/\w+/\w+)/.+$");
-            Match match = reg.Match(uri.AbsolutePath);
-
-            string result = url;
-            if (match.Success) { result = String.Concat("https://api.github.com/repos", match.Groups[1].Value); }
-            */
             return result;
         }
 
@@ -93,7 +85,7 @@ namespace SR_PluginLoader
             //PLog.Info("Format_As_Raw_GitHub_Url:  {0}", result);
             return result;
         }
-
+        /*
         private static WebClient GetClient()
         {
             // Add a handler for SSL certs because mono doesnt have any trusted ones by default
@@ -104,6 +96,7 @@ namespace SR_PluginLoader
 
             return client;
         }
+        */
 
         private static JSONArray Cache_Git_Repo(string repo_url)
         {
@@ -114,13 +107,14 @@ namespace SR_PluginLoader
             if (!remote_file_cache.ContainsKey(url))
             {
                 // Fetch repo information
-                jsonStr = webClient.DownloadString(url);
+                //jsonStr = webClient.DownloadString(url);
+                jsonStr = GetString(url);
                 if (jsonStr == null || jsonStr.Length <= 0) return null;
 
-                remote_file_cache.Add(url, MEMENC.GetBytes(jsonStr));
+                remote_file_cache.Add(url, ENCODING.GetBytes(jsonStr));
                 SLog.Debug("Cached repository: {0}", url);
             }
-            else jsonStr = MEMENC.GetString(remote_file_cache[url]);
+            else jsonStr = ENCODING.GetString(remote_file_cache[url]);
             
             // Parse the json response from GitHub
             var git = SimpleJSON.JSON.Parse(jsonStr);
@@ -146,7 +140,7 @@ namespace SR_PluginLoader
             {
                 // Fetch repo information
                 //jsonStr = webClient.DownloadString(url);
-                IEnumerator iter = Updater_Base.Get(url);
+                IEnumerator iter = GetAsync(url);
                 while (iter.MoveNext()) yield return null;
 
                 if(iter.Current == null)
@@ -162,7 +156,7 @@ namespace SR_PluginLoader
                     yield break;
                 }
 
-                jsonStr = MEMENC.GetString(buf);
+                jsonStr = ENCODING.GetString(buf);
                 if (jsonStr == null || jsonStr.Length <= 0)
                 {
                     yield return null;
@@ -170,14 +164,14 @@ namespace SR_PluginLoader
                 }
 
                 //Check again just to make sure, because async methods could screw us up here.
-                if(!remote_file_cache.ContainsKey(url)) remote_file_cache.Add(url, MEMENC.GetBytes(jsonStr));
-                remote_file_cache[url] = MEMENC.GetBytes(jsonStr);
+                if(!remote_file_cache.ContainsKey(url)) remote_file_cache.Add(url, ENCODING.GetBytes(jsonStr));
+                remote_file_cache[url] = ENCODING.GetBytes(jsonStr);
 
                 SLog.Debug("Cached repository: {0}", repo_url);
             }
             else
             {
-                jsonStr = MEMENC.GetString(remote_file_cache[url]);
+                jsonStr = ENCODING.GetString(remote_file_cache[url]);
                 //PLog.Info("CACHE: {0}", jsonStr);
                 //DebugHud.Log(remote_file_cache.ToLogString());
             }
@@ -268,7 +262,7 @@ namespace SR_PluginLoader
                 Cache_Git_Repo(repo_url);
             }
 
-            string jsonStr = MEMENC.GetString(remote_file_cache[url]);
+            string jsonStr = ENCODING.GetString(remote_file_cache[url]);
             // Parse the cached json response from GitHub
             var git = SimpleJSON.JSON.Parse(jsonStr);
 
@@ -577,7 +571,7 @@ namespace SR_PluginLoader
             if (update_status == FILE_UPDATE_STATUS.OUT_OF_DATE)
             {
                 SLog.Debug("Git_Updater.Cache_And_Open_File(): Downloading: {0}  |  File: {1}", url, Path.GetFileName(local_file));
-                var it = Download(url, local_file);
+                var it = DownloadAsync(url, local_file);
                 while (it.MoveNext()) yield return null;
             }
             
