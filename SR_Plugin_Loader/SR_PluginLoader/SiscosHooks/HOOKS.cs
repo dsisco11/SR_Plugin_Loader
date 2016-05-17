@@ -125,7 +125,7 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Player_MoneyChanged = new HOOK_ID();
         public static readonly HOOK_ID Player_AddRads = new HOOK_ID();
         public static readonly HOOK_ID Player_Death = new HOOK_ID();
-        public static readonly HOOK_ID Player_Respawn = new HOOK_ID();
+        public static readonly HOOK_ID Player_Spawn = new HOOK_ID();
 
         public static readonly HOOK_ID Player_Sleep_Begin = new HOOK_ID();
         public static readonly HOOK_ID Player_Sleep_End = new HOOK_ID();

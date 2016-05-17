@@ -554,7 +554,7 @@ namespace SR_PluginLoader
             if (is_player_dead)
             {
                 is_player_dead = false;
-                return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Respawn, sender, ref return_value, new object[] {}));
+                return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Spawn, sender, ref return_value, new object[] {}));
             }
             else
             {

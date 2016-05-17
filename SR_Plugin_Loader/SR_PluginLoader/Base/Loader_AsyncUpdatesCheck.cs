@@ -51,13 +51,15 @@ namespace SR_PluginLoader
                 }
             }
 
+            // If we have updates prompt the user to accept them.
             if (updates.Count > 0)
             {
-                SLog.Info("[AutoUpdater] {0} Updates Available.", updates);
+                SLog.Info("[AutoUpdater] {0} Updates Available.", updates.Count);
                 var updatesView = uiControl.Create<uiUpdatesAvailable>();
                 updatesView.onResult += (DialogResult res) => {
                     if (res == DialogResult.OK)
                     {
+                        // The user said OK so let's start downloading
                         var updater = (new GameObject().AddComponent<PluginLoader_AutoUpdater>());
                         updater.Files = updatesView.Files;
                         updater.updatesView = updatesView;

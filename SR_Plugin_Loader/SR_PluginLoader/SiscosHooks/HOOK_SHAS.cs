@@ -33,6 +33,7 @@ namespace SR_PluginLoader
             { "PlayerState.AddCurrency", "7c0454e3ce6959f852a22d046734fb8c6d867f31" },
             { "PlayerState.AddRads", "e58780edc19bc4763ca0bc83f144942578cc5a1b" },
             { "PlayerState.ApplyUpgrade", "1056d6ca685277cfe3c1d16e20a5f84f5e7438eb" },
+            { "PlayerState.Awake", "41b340791d86fa3545a93e4c2d04ac8e8ac50bd5" },
             { "PlayerState.CanGetUpgrade", "bab916084658dc735f1362ab3dd2a9bc720928b7" },
             { "PlayerState.Damage", "e1548891d4c58bcd0c021335fd0d7a1cf421c2f9" },
             { "PlayerState.SetEnergy", "8b67962e618ce4a8b4713227abac534e093d2075" },
