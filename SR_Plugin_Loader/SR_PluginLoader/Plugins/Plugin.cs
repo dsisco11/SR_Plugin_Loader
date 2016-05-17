@@ -526,7 +526,7 @@ namespace SR_PluginLoader
         {
             if (this.data.UPDATE_METHOD == null) throw new ArgumentNullException(String.Format("{0} Plugin has no UPDATE_METHOD specified!", this));
             
-            IEnumerator iter = this.Updater.Download(this.data.UPDATE_METHOD.URL, this.FilePath, null,
+            IEnumerator iter = this.Updater.DownloadAsync(this.data.UPDATE_METHOD.URL, this.FilePath, null,
                (float current, float total) =>
                {//Download progress
                     float f = (float)current / (float)total;

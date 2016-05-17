@@ -62,10 +62,10 @@ namespace SR_PluginLoader
             isURLcheckingCompleted = false;
             isURLmissing = false;
 
-            Uri httpSite = new Uri(url);
+            //Uri httpSite = new Uri(url);
 
-            ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
-            WebRequest webRequest = WebRequest.Create(httpSite);
+            WebRequest webRequest = Updater_Base.CreateRequest(url);
+            //WebRequest webRequest = WebRequest.Create(httpSite);
 
             // We need no more than HTTP's head
             webRequest.Method = "HEAD";

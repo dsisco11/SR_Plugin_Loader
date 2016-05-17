@@ -23,7 +23,7 @@ namespace SR_PluginLoader
             foreach (UpdateFile file in Files)
             {
                 byte[] buf = null;
-                IEnumerator iter = Updater_Base.Get(file.URL, null, (float read, float total) => {
+                IEnumerator iter = Updater_Base.GetAsync(file.URL, null, (float read, float total) => {
                     if (updatesView != null)
                     {
                         var prog = (updatesView[file.FILE] as uiListItem_Progress);

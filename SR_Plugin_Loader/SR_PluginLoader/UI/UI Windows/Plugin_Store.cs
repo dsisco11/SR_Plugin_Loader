@@ -472,7 +472,7 @@ namespace SR_PluginLoader
             plugin.progress_text.Value = "0%";
             
             string local_file = String.Format("{0}\\..\\plugins\\{1}", UnityEngine.Application.dataPath, plData.Filename);
-            StartCoroutine(plData.Updater.Download(url, local_file, (string ContentType) =>
+            StartCoroutine(plData.Updater.DownloadAsync(url, local_file, (string ContentType) =>
            {
                (list[hash] as Plugin_StoreItem).progress_text.Text = "Downloading:";
                if (ContentType.StartsWith("application/")) return true;//yea it's binary file data

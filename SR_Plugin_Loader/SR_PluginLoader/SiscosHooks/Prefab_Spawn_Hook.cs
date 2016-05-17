@@ -79,7 +79,7 @@ namespace SR_PluginLoader
             LandPlot.Id ID = plot ? plot.id : LandPlot.Id.NONE;
 
             object return_value = new object();
-            SiscosHooks.call(HOOK_ID.Spawned_Land_Plot, base.gameObject, ref return_value, new object[] { ID });
+            SiscosHooks.call(HOOK_ID.Spawned_Land_Plot, plot, ref return_value, new object[] { ID });
         }
 
         private void Handle_Garden_Patch()
