@@ -120,7 +120,11 @@ namespace Logging
             string formattedString = String.Concat(timeStr, moduleStr, logLevelStr, lineStr);
             string fileFormattedString = strip_html_tags(Logger.stripXTERM ? XTERM.Strip(formattedString) : formattedString);
 
-            if (level >= FileLogLevel) _FileStream.WriteLine(fileFormattedString);
+            if (level >= FileLogLevel)
+            {
+                _FileStream.WriteLine(fileFormattedString);
+                UnityEngine.Debug.Log(fileFormattedString);
+            }
             if (level >= OutputLevel)
             {
                 XTERM.WriteLine(formattedString);

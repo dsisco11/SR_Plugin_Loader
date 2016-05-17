@@ -62,6 +62,15 @@ namespace SR_PluginLoader
         public bool HasErrors { get { return (Errors.Count > 0); } }
         public Action onError;
 
+        /// <summary>
+        /// Returns True/False whether or not this plugin has the ability to auto update.
+        /// </summary>
+        public bool CanAutoUpdate { get { return (data!=null && data.UPDATE_METHOD != null && data.UPDATE_METHOD.Valid); } }
+
+        private FILE_UPDATE_STATUS _update_status = FILE_UPDATE_STATUS.UP_TO_DATE;//Assume up to date by default to avoid glitches if this plugin CANT update or something.
+        public FILE_UPDATE_STATUS UpdateStatus { get { return _update_status; } }
+
+
         public Texture2D icon = null;
         public Texture2D thumbnail = null;
         
@@ -482,18 +491,15 @@ namespace SR_PluginLoader
 
             if(data==null)
             {
-                SLog.Info("{0} Plugin has no DATA structure!", this);
+                SLog.Warn("{0} Plugin has no DATA structure!", this);
                 return false;
             }
 
-            if (data.UPDATE_METHOD == null || data.UPDATE_METHOD.METHOD == UPDATER_TYPE.NONE)
-            {
-                SLog.Info("{0} Plugin has no UPDATE_METHOD specified!", this);
+            if (data.UPDATE_METHOD == null || !data.UPDATE_METHOD.Valid)
                 return false;
-            }
 
-            var status = Updater.Get_Update_Status(data.UPDATE_METHOD.URL, FilePath);
-            is_update_available = (status == FILE_UPDATE_STATUS.OUT_OF_DATE);
+            _update_status = Updater.Get_Update_Status(data.UPDATE_METHOD.URL, FilePath);
+            is_update_available = (_update_status == FILE_UPDATE_STATUS.OUT_OF_DATE);
 
             //PLog.Info("{0}  update_status: {1}", this, Enum.GetName(typeof(FILE_UPDATE_STATUS), status));
             return is_update_available;
