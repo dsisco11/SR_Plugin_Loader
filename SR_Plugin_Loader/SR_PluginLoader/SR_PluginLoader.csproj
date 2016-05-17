@@ -67,6 +67,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Dev_Menu\Dev_Hierarchy_Browser.cs" />
+    <Compile Include="Dev_Menu\Dev_SpawnMenu.cs" />
     <Compile Include="Helpers\Unity Scripts\ActionDelayer.cs" />
     <Compile Include="Base\SafeEnum.cs" />
     <Compile Include="Base\DDS_HEADER.cs" />
@@ -79,6 +81,8 @@
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
     <Compile Include="SiscosHooks\HOOK_SHAS.cs" />
+    <Compile Include="UI\Base\uiList_TreeNode.cs" />
+    <Compile Include="UI\Base\uiDockingPanel.cs" />
     <Compile Include="UI\Base\uiMessageBox.cs" />
     <Compile Include="UI\Enums\SizeConstraint.cs" />
     <Compile Include="UI\Base\uiEmpty.cs" />
@@ -268,6 +272,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\donate_btn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\node_arrow.png" />
   </ItemGroup>
   <Import Project="..\Logging\Logging.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -22,10 +22,6 @@ namespace Logging
         /// </summary>
         public static bool showTimestamps = true;
         /// <summary>
-        /// Should colors be stripped from log lines before they are output to file?
-        /// </summary>
-        public static bool stripXTERM = true;
-        /// <summary>
         /// If <c>TRUE</c> then every log line output will show it's LogLevel at the start of the line.
         /// Meaning that debug lines start with "DEBUG: " and error lines start with "ERROR: " etc.
         /// </summary>

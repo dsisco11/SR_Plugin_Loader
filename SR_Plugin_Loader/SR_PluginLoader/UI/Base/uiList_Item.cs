@@ -12,8 +12,17 @@ namespace SR_PluginLoader
     /// </summary>
     public class uiListItem : uiPanel
     {
-        protected uiText title = null, description = null;
+        protected uiText title = null;
         protected uiIcon icon = null;
+        protected uiTextArea description = null;
+
+        /*
+        public override int TextSize { get { return title.TextSize; } set { title.TextSize = value; } }
+        public override Color TextColor { get { return title.TextColor; } set { title.TextColor = value; } }
+        public override FontStyle TextStyle { get { return title.TextStyle; } set { title.TextStyle = value; } }
+        public override TextAnchor TextAlign { get { return title.TextAlign; } set { title.TextAlign = value; } }
+        public override Color TextColor_Hover { get { return title.TextColor_Hover; } set { title.TextColor_Hover = value; } }
+        */
 
         public string Title { get { return title.Text; } set { title.Text = value; } }
         public string Description { get { return description.Text; } set { description.Text = value; } }
@@ -27,14 +36,15 @@ namespace SR_PluginLoader
 
         private void init()
         {
+            TextStyle = FontStyle.Bold;
             Clickable = true;
             Selectable = true;
             onClicked += (uiControl c) => { if (_selectable) { Selected = !Selected; } };
             Autosize = true;
             //Autosize_Method = AutosizeMethod.BLOCK;
 
-            Set_Padding(2, 2, 2, 2);
-            Set_Margin(2, 2, 2, 2);
+            Set_Padding(2);
+            Set_Margin(2);
 
             Util.Set_BG_Color(local_style.normal, new Color32(32, 32, 32, 150));
             Util.Set_BG_Color(local_style.hover, new Color32(36, 36, 36, 255));
@@ -45,14 +55,15 @@ namespace SR_PluginLoader
 
             icon = uiControl.Create<uiIcon>("icon", this);
             icon.SizeConstraint = uiSizeConstraint.WIDTH_MATCHES_HEIGHT;
-            icon.Set_Padding(2, 2, 2, 2);
+            icon.Set_Padding(2);
             icon.Autosize = true;
 
             title = uiControl.Create<uiText>("title", this);
-            title.TextSize = 16;
-            title.TextStyle = FontStyle.Bold;
+            //title.TextSize = 12;
+            title.inherits_text_style = true;
 
-            description = uiControl.Create<uiText>("desc", this);
+
+            description = uiControl.Create<uiTextArea>("desc", this);
             description.Set_Margin(1, 1, 1, 1);
             description.TextSize = 12;
             description.TextStyle = FontStyle.Italic;
@@ -73,10 +84,6 @@ namespace SR_PluginLoader
         {
             icon.alignTop();
             icon.alignLeftSide();
-            /*
-            if (Icon == null) icon.Set_Size(0f, 0f);
-            else icon.FloodY();
-            */
 
             title.alignTop();
             title.moveRightOf(icon);

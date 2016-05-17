@@ -63,6 +63,9 @@ namespace SR_PluginLoader
             register(HOOK_ID.Ext_Pre_Game_Loaded, HookProxys.Ext_Pre_Game_Loaded);
             register(HOOK_ID.Ext_Post_Game_Loaded, HookProxys.Ext_Post_Game_Loaded);
             register(HOOK_ID.Ext_Spawn_Plot_Upgrades_UI, HookProxys.Ext_Spawn_Plot_Upgrades_UI);
+            register(HOOK_ID.Ext_Player_Death, HookProxys.Ext_Player_Death);
+            register(HOOK_ID.Ext_LockOnDeath_Start, HookProxys.Ext_LockOnDeath_Start);
+            register(HOOK_ID.Ext_LockOnDeath_End, HookProxys.Ext_LockOnDeath_End);
             #endregion
 
             #region Hook Prefab Instantiation Events
@@ -476,6 +479,7 @@ namespace SR_PluginLoader
     }
 
     #region PROXIES
+
     /// <summary>
     /// Here is where we keep any event hook extension proxys (Too keep things tidy!)
     /// An event hook extension proxy is a proxy function that extends or builds upon the information provided by a default hook coming from the generic hook system.
@@ -530,7 +534,35 @@ namespace SR_PluginLoader
             return new Sisco_Return(SiscosHooks.call(HOOK_ID.Game_Saved, sender, ref return_value, new object[] { saveFile }));
         }
 
-        
+        internal static bool is_player_dead = false;
+        internal static Sisco_Return Ext_Player_Death(ref object sender, ref object[] args, ref object return_value)
+        {
+            is_player_dead = true;
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Death, sender, ref return_value, args));
+        }
+
+        // The LockOnDeath class is used to lock player input for the game
+        // This means that it is used both when the player "goes to sleep" and when they die
+        // So we can use it to differentiate between the two
+        internal static Sisco_Return Ext_LockOnDeath_Start(ref object sender, ref object[] args, ref object return_value)
+        {
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Sleep_Begin, sender, ref return_value, args));
+        }
+
+        internal static Sisco_Return Ext_LockOnDeath_End(ref object sender, ref object[] args, ref object return_value)
+        {
+            if (is_player_dead)
+            {
+                is_player_dead = false;
+                return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Respawn, sender, ref return_value, new object[] {}));
+            }
+            else
+            {
+                return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Sleep_End, sender, ref return_value, args));
+            }
+        }
+
+
     }
     #endregion
 }

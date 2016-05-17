@@ -72,10 +72,10 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_SetEnergy, name = "PlayerState.SetEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_MoneyChanged, name = "PlayerState.AddCurrency" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_AddRads, name = "PlayerState.AddRads" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Player_Death, name = "PlayerDeathHandler.OnDeath", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_Death, name = "PlayerDeathHandler.OnDeath", pos=-1, ext = HOOK_ID.Ext_Player_Death },
 
-            new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Player_Sleep, name = "LockOnDeath.LockUntil", pos=-1 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Post_Player_Sleep, name = "LockOnDeath.Update", pos=1, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Ext_LockOnDeath_Start, name = "LockOnDeath.LockUntil", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Ext_LockOnDeath_End, name = "LockOnDeath.Update", pos=1, is_post=true, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Exit, relative = -1 },

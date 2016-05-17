@@ -69,7 +69,7 @@ namespace SR_PluginLoader
             if (nest_level < 9)
             {
                 // Start the process of listing all attached GameObjects
-                for (int idx = 0; idx < targ.transform.childCount; idx++)// start at offset 1 to avoid printing ourself again!
+                for (int idx = 0; idx < targ.transform.childCount; idx++)
                 {
                     Transform trans = targ.transform.GetChild(idx);
                     if (trans.gameObject == trans.parent || trans.parent == null) continue;

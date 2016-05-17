@@ -125,9 +125,10 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Player_MoneyChanged = new HOOK_ID();
         public static readonly HOOK_ID Player_AddRads = new HOOK_ID();
         public static readonly HOOK_ID Player_Death = new HOOK_ID();
+        public static readonly HOOK_ID Player_Respawn = new HOOK_ID();
 
-        public static readonly HOOK_ID Pre_Player_Sleep = new HOOK_ID();
-        public static readonly HOOK_ID Post_Player_Sleep = new HOOK_ID();
+        public static readonly HOOK_ID Player_Sleep_Begin = new HOOK_ID();
+        public static readonly HOOK_ID Player_Sleep_End = new HOOK_ID();
         #endregion
 
         public static readonly HOOK_ID Pre_Region_Spawn_Cycle = new HOOK_ID();
@@ -184,7 +185,16 @@ namespace SR_PluginLoader
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly HOOK_ID Ext_Spawn_Plot_Upgrades_UI = new HOOK_ID();
-        
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Player_Death = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_LockOnDeath_Start = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_LockOnDeath_End = new HOOK_ID();
+
         #endregion
 
     }

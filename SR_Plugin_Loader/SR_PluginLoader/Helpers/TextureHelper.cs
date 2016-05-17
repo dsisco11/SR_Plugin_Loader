@@ -41,6 +41,8 @@ namespace SR_PluginLoader
         public static Texture2D icon_checkmark = null;
         public static Texture2D icon_arrow_left = null;
         public static Texture2D icon_arrow_right = null;
+        public static Texture2D icon_node_arrow_right = null;
+        public static Texture2D icon_node_arrow_down = null;
         #endregion
 
 
@@ -291,8 +293,64 @@ namespace SR_PluginLoader
             TextureHelper.icon_arrow_left = (Texture2D)TextureHelper.Load_From_Resource("arrow_left.png", myNamespace, FLAGS);
             TextureHelper.icon_arrow_right = (Texture2D)TextureHelper.Load_From_Resource("arrow_right.png", myNamespace, FLAGS);
 
+            TextureHelper.icon_node_arrow_right = (Texture2D)TextureHelper.Load_From_Resource("node_arrow.png", myNamespace, FLAGS);
+            TextureHelper.icon_node_arrow_down = Rotate_90(icon_node_arrow_right);
+
             Util.Tint_Texture(TextureHelper.icon_close_dark, new Color(1f, 1f, 1f, 0.5f));
         }
 
+        #region Texture Manipulation
+
+        /// <summary>
+        /// Creates a copy of a given texture rotated 90 degrees Clockwise.
+        /// </summary>
+        public static Texture2D Rotate_90(Texture2D tex)
+        {
+            Texture2D cpy = new Texture2D(tex.width, tex.height);
+            for (int x = 0; x < tex.width; x++)
+            {
+                for (int y = 0; y < tex.height; y++)
+                {
+                    Color p = tex.GetPixel(x, y);
+                    cpy.SetPixel(y, (tex.width - (x + 1)), p);
+                }
+            }
+
+            cpy.Apply();
+            return cpy;
+        }
+        
+        public static Texture2D Flip_Horizontal(Texture2D tex)
+        {
+            Texture2D cpy = new Texture2D(tex.width, tex.height);
+            for (int x = 0; x < tex.width; x++)
+            {
+                for (int y = 0; y < tex.height; y++)
+                {
+                    Color p = tex.GetPixel(x, y);
+                    cpy.SetPixel((tex.width - (x + 1)), y, p);
+                }
+            }
+
+            cpy.Apply();
+            return cpy;
+        }
+        
+        public static Texture2D Flip_Vertical(Texture2D tex)
+        {
+            Texture2D cpy = new Texture2D(tex.width, tex.height);
+            for (int x = 0; x < tex.width; x++)
+            {
+                for (int y = 0; y < tex.height; y++)
+                {
+                    Color p = tex.GetPixel(x, y);
+                    cpy.SetPixel(x, (tex.height-(y + 1)), p);
+                }
+            }
+
+            cpy.Apply();
+            return cpy;
+        }
+        #endregion
     }
 }

@@ -25,8 +25,8 @@ namespace SR_PluginLoader
         protected Texture2D CurrentImage {
             get
             {
-                if (isMouseOver) return img_mouse_over;
-                else if (isMouseDown) return img_mouse_down;
+                if (isMouseOver && img_mouse_over!=null) return img_mouse_over;
+                else if (isMouseDown && img_mouse_down!=null) return img_mouse_down;
                 return (Texture2D)content.image;
             }
         }
