@@ -50,6 +50,8 @@ Temporary Items
 .apdisk
 *.log
 *.log
+SR_Plugin_Loader/SR_PluginLoader/obj/
+SR_Plugin_Loader/SR_PluginLoader/bin/
 *.pdb
 Installer/ildump.cs
 Installer/_ildump.bat
