@@ -432,13 +432,14 @@ namespace SR_PluginLoader
             }
             catch (WebException wex)
             {
+                SLog.Error(wex);
             }
             catch (Exception ex)
             {
                 SLog.Error(ex);
             }
 
-            SLog.Info("[Git_Updater] Unable to find file in repository: {0}", remote_file);
+            SLog.Debug("[Git_Updater] Unable to find file in repository: {0}", remote_file);
             return FILE_UPDATE_STATUS.NOT_FOUND;//no update
         }
 
