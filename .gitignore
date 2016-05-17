@@ -48,11 +48,10 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
-SR_Plugin_Loader/SR_PluginLoader/bin/Release/Assembly-CSharp.dll
 *.log
 *.log
-SR_Plugin_Loader/SR_PluginLoader/obj/Release/SR_PluginLoader.dll
-SR_Plugin_Loader/SR_PluginLoader/bin/Release/SR_PluginLoader.dll
+SR_Plugin_Loader/SR_PluginLoader/obj/*
+SR_Plugin_Loader/SR_PluginLoader/bin/*
 *.pdb
 Installer/ildump.cs
 Installer/_ildump.bat
