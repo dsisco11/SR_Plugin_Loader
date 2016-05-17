@@ -168,12 +168,12 @@
     <Compile Include="ObjLoader\TypeParsers\UseMaterialParser.cs" />
     <Compile Include="ObjLoader\TypeParsers\VertexParser.cs" />
     <Compile Include="Helpers\TextureHelper.cs" />
-    <Compile Include="Helpers\Upgrade System\PlotUpgradeTracker.cs" />
+    <Compile Include="Upgrade System\PlotUpgradeTracker.cs" />
     <Compile Include="SiscosHooks\Prefab_Spawn_Hook.cs" />
     <Compile Include="UI\Base\uiLayoutDirector.cs" />
     <Compile Include="UI\Base\uiList_Icon.cs" />
     <Compile Include="UI\Base\uiList_Item.cs" />
-    <Compile Include="Helpers\Upgrade System\IUpgrade.cs" />
+    <Compile Include="Upgrade System\IUpgrade.cs" />
     <Compile Include="UI\Interfaces\IScrollableUI.cs" />
     <Compile Include="Helpers\Unity Scripts\ButtonStyler_Overrider.cs" />
     <Compile Include="DebugHud\DebugHUD.cs" />
@@ -230,7 +230,7 @@
     <Compile Include="SiscosHooks\_hook_result.cs" />
     <Compile Include="Updaters\Web_Updater.cs" />
     <Compile Include="Updaters\WebAsync.cs" />
-    <Compile Include="Helpers\Upgrade System\Upgrades.cs" />
+    <Compile Include="Upgrade System\Upgrades.cs" />
     <Compile Include="Helpers\ViewModel.cs" />
     <Compile Include="Base\Watermark_UI.cs" />
     <Compile Include="Base\Active_State_Tracker.cs" />

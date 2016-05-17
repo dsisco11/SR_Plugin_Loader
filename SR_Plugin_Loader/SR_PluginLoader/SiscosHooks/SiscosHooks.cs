@@ -69,9 +69,9 @@ namespace SR_PluginLoader
             #endregion
 
             #region Hook Prefab Instantiation Events
-            Util.Inject_Into_Prefabs<Entity_Pref_Spawn_Hook>(Ident.ALL_IDENTS);
-            Util.Inject_Into_Prefabs<Plot_Pref_Spawn_Hook>(Ident.ALL_PLOTS);
-            Util.Inject_Into_Prefabs<Resource_Pref_Spawn_Hook>(Ident.ALL_GARDEN_PATCHES);
+            Util.Inject_Into_Prefabs<Entity_Pref_Hook>(Ident.ALL_IDENTS);
+            Util.Inject_Into_Prefabs<Plot_Pref_Hook>(Ident.ALL_PLOTS);
+            Util.Inject_Into_Prefabs<Resource_Pref_Hook>(Ident.ALL_GARDEN_PATCHES);
             #endregion
             
         }

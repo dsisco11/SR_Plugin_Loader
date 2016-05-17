@@ -14,23 +14,23 @@ namespace SR_PluginLoader
         RESOURCE,
     }
 
-    class Entity_Pref_Spawn_Hook : Prefab_Spawn_Hook
+    class Entity_Pref_Hook : Prefab_Hook
     {
         protected override void Start() { Kind = PrefabType.ENTITY; base.Start(); }
     }
 
-    class Plot_Pref_Spawn_Hook : Prefab_Spawn_Hook
+    class Plot_Pref_Hook : Prefab_Hook
     {
         protected override void Start() { Kind = PrefabType.PLOT; base.Start(); }
     }
     
-    class Resource_Pref_Spawn_Hook : Prefab_Spawn_Hook
+    class Resource_Pref_Hook : Prefab_Hook
     {
         protected override void Start() { Kind = PrefabType.RESOURCE; base.Start(); }
     }
 
 
-    class Prefab_Spawn_Hook : MonoBehaviour
+    class Prefab_Hook : MonoBehaviour
     {
         public PrefabType Kind = PrefabType.NONE;
         /// <summary>
@@ -41,20 +41,41 @@ namespace SR_PluginLoader
             switch (Kind)
             {
                 case PrefabType.ENTITY:
-                    Handle_Entity();
+                    Handle_Entity_Spawn();
                     break;
                 case PrefabType.PLOT:
-                    Handle_Land_Plot();
+                    Handle_Land_Plot_Spawn();
                     break;
                 case PrefabType.RESOURCE:
-                    Handle_Garden_Patch();
+                    Handle_Garden_Patch_Spawn();
                     break;
                 default:
                     throw new ArgumentException(String.Format("Unhandled PrefabType: {0}", this.Kind));
             }
         }
 
-        private void Handle_Entity()
+        protected void OnDestroy()
+        {
+            switch (Kind)
+            {
+                case PrefabType.ENTITY:
+                    Handle_Entity_Destroyed();
+                    break;
+                case PrefabType.PLOT:
+                    Handle_Land_Plot_Destroyed();
+                    break;
+                case PrefabType.RESOURCE:
+                    Handle_Garden_Patch_Destroyed();
+                    break;
+                default:
+                    throw new ArgumentException(String.Format("Unhandled PrefabType: {0}", this.Kind));
+            }
+
+        }
+
+        #region Spawn Handlers
+
+        private void Handle_Entity_Spawn()
         {
             Identifiable ident = base.gameObject.GetComponent<Identifiable>();
             Identifiable.Id ID = ident ? ident.id : Identifiable.Id.NONE;
@@ -73,7 +94,7 @@ namespace SR_PluginLoader
 
         }
 
-        private void Handle_Land_Plot()
+        private void Handle_Land_Plot_Spawn()
         {
             LandPlot plot = base.gameObject.GetComponent<LandPlot>();
             LandPlot.Id ID = plot ? plot.id : LandPlot.Id.NONE;
@@ -82,7 +103,7 @@ namespace SR_PluginLoader
             SiscosHooks.call(HOOK_ID.Spawned_Land_Plot, plot, ref return_value, new object[] { ID });
         }
 
-        private void Handle_Garden_Patch()
+        private void Handle_Garden_Patch_Spawn()
         {
             SpawnResource plot = base.gameObject.GetComponent<SpawnResource>();
             SpawnResource.Id ID = plot ? plot.id : SpawnResource.Id.NONE;
@@ -90,5 +111,46 @@ namespace SR_PluginLoader
             object return_value = new object();
             SiscosHooks.call(HOOK_ID.Spawned_Garden_Patch, base.gameObject, ref return_value, new object[] { ID });
         }
+        #endregion
+        
+        #region Destroy Handlers
+
+        private void Handle_Entity_Destroyed()
+        {
+            Identifiable ident = base.gameObject.GetComponent<Identifiable>();
+            Identifiable.Id ID = ident ? ident.id : Identifiable.Id.NONE;
+
+            object return_value = new object();
+            SiscosHooks.call(HOOK_ID.Destroyed_Entity, base.gameObject, ref return_value, new object[] { ID });
+
+            if (Identifiable.IsSlime(ID) || Identifiable.IsLargo(ID) || Identifiable.IsGordo(ID))
+                SiscosHooks.call(HOOK_ID.Destroyed_Slime, base.gameObject, ref return_value, new object[] { ID });
+
+            if (Identifiable.IsAnimal(ID))
+                SiscosHooks.call(HOOK_ID.Destroyed_Animal, base.gameObject, ref return_value, new object[] { ID });
+
+            if (Identifiable.IsFood(ID))
+                SiscosHooks.call(HOOK_ID.Destroyed_Food, base.gameObject, ref return_value, new object[] { ID });
+
+        }
+
+        private void Handle_Land_Plot_Destroyed()
+        {
+            LandPlot plot = base.gameObject.GetComponent<LandPlot>();
+            LandPlot.Id ID = plot ? plot.id : LandPlot.Id.NONE;
+
+            object return_value = new object();
+            SiscosHooks.call(HOOK_ID.Destroyed_Land_Plot, plot, ref return_value, new object[] { ID });
+        }
+
+        private void Handle_Garden_Patch_Destroyed()
+        {
+            SpawnResource plot = base.gameObject.GetComponent<SpawnResource>();
+            SpawnResource.Id ID = plot ? plot.id : SpawnResource.Id.NONE;
+
+            object return_value = new object();
+            SiscosHooks.call(HOOK_ID.Destroyed_Garden_Patch, base.gameObject, ref return_value, new object[] { ID });
+        }
+        #endregion
     }
 }
