@@ -59,6 +59,7 @@ namespace SR_PluginLoader
             SiscosHooks.register(HOOK_ID.Spawn_Plot_Upgrades_UI, onSpawn_PlotUpgrades_Kiosk, registrar);
             SiscosHooks.register(HOOK_ID.Plot_Load_Upgrades, onPlot_Loaded_Upgrades, registrar);
             SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded, registrar);
+            SiscosHooks.register(HOOK_ID.Demolished_Land_Plot, onPlot_Demolished, registrar);
         }
 
         #region Misc
@@ -257,7 +258,7 @@ namespace SR_PluginLoader
             LandPlot plot = (LandPlot)sender;
             PlotID id = new PlotID(plot);
 
-            var cached = Plot_Upgrades_Cache.FirstOrDefault(o => o.ID.Equals(id));
+            Plot_Upgrades cached = Plot_Upgrades_Cache.FirstOrDefault(o => o.ID.Equals(id));
 
             if (cached != null)
             {
@@ -266,6 +267,19 @@ namespace SR_PluginLoader
 
                 Plot_Upgrades_Cache.Remove(cached);
             }
+
+            return null;
+        }
+
+        private static Sisco_Return onPlot_Demolished(ref object sender, ref object[] args, ref object return_value)
+        {
+            LandPlot.Id ID = (LandPlot.Id)args[0];
+            LandPlot plot = sender as LandPlot;
+            PlotID id = new PlotID(plot);
+            SLog.Info("Plot({0}){1} Demolished", ID, id);
+
+            var track = plot.gameObject.GetComponent<PlotUpgradeTracker>();
+            track.Remove_All();
 
             return null;
         }
@@ -279,7 +293,7 @@ namespace SR_PluginLoader
                 System.Threading.Timer timer = null;
                 timer = new System.Threading.Timer((object o) =>
                 {
-                    SLog.Info("Flushing custom upgrades...");
+                    SLog.Debug("Flushing custom upgrades...");
                     Upgrades.setup = false;
                     Upgrades.Setup();
 

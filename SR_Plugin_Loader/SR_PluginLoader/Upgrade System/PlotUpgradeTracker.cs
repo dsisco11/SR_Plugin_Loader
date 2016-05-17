@@ -88,13 +88,30 @@ namespace SR_PluginLoader
         {
             return allUpgrades.Contains(upgrade.ID);
         }
-        
+
         #endregion
 
         public void Remove_Upgrade(PlotUpgrade upgrade)
         {
             bool b = upgrades.Remove(upgrade);
             if (!b) SLog.Warn("Failed to remove custom plot upgrade from tracker. Upgrade: {0}", upgrade);
+        }
+
+        public void Remove_All()
+        {
+            List<PlotUpgrade> list = new List<PlotUpgrade>(upgrades);
+            foreach(PlotUpgrade u in list)
+            {
+                try
+                {
+                    SLog.Info("Removing: {0}", u);
+                    u.Remove(plot);
+                }
+                catch(Exception ex)// No surprises kthx
+                {
+                    SLog.Error(ex);
+                }
+            }
         }
 
         #region Serialization / Deserialization

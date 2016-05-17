@@ -62,6 +62,7 @@ namespace SR_PluginLoader
             register(HOOK_ID.Ext_Game_Saved, HookProxys.Ext_Game_Saved);
             register(HOOK_ID.Ext_Pre_Game_Loaded, HookProxys.Ext_Pre_Game_Loaded);
             register(HOOK_ID.Ext_Post_Game_Loaded, HookProxys.Ext_Post_Game_Loaded);
+            register(HOOK_ID.Ext_Demolish_Plot, HookProxys.Ext_Demolish_Plot_Upgrade);
             register(HOOK_ID.Ext_Spawn_Plot_Upgrades_UI, HookProxys.Ext_Spawn_Plot_Upgrades_UI);
             register(HOOK_ID.Ext_Player_Death, HookProxys.Ext_Player_Death);
             register(HOOK_ID.Ext_LockOnDeath_Start, HookProxys.Ext_LockOnDeath_Start);
@@ -488,9 +489,32 @@ namespace SR_PluginLoader
     /// </summary>
     internal static class HookProxys
     {
+        internal static LandPlot.Id Get_Plot_ID_From_Upgrades_UI_Class(object sender)
+        {
+            LandPlot.Id kind = LandPlot.Id.NONE;
+            Type type = sender.GetType();
+            if (type == typeof(GardenUI)) kind = LandPlot.Id.GARDEN;
+            else if (type == typeof(CoopUI)) kind = LandPlot.Id.COOP;
+            else if (type == typeof(CorralUI)) kind = LandPlot.Id.CORRAL;
+            else if (type == typeof(PondUI)) kind = LandPlot.Id.POND;
+            else if (type == typeof(SiloUI)) kind = LandPlot.Id.SILO;
+            else if (type == typeof(IncineratorUI)) kind = LandPlot.Id.INCINERATOR;
+
+            return kind;
+        }
+
+        internal static Sisco_Return Ext_Demolish_Plot_Upgrade(ref object sender, ref object[] args, ref object return_value)
+        {
+            LandPlot.Id kind = Get_Plot_ID_From_Upgrades_UI_Class(sender);
+            LandPlotUI ui = sender as LandPlotUI;
+            LandPlot plot = ui.Get_LandPlot();
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Demolished_Land_Plot, plot, ref return_value, new object[] { kind }));
+        }
 
         internal static Sisco_Return Ext_Spawn_Plot_Upgrades_UI(ref object sender, ref object[] args, ref object return_value)
         {
+            LandPlot.Id kind = Get_Plot_ID_From_Upgrades_UI_Class(sender);
+            /*
             LandPlot.Id kind = LandPlot.Id.NONE;
             switch (sender.GetType().Name)
             {
@@ -513,6 +537,7 @@ namespace SR_PluginLoader
                     kind = LandPlot.Id.INCINERATOR;
                     break;
             }
+            */
             return new Sisco_Return(SiscosHooks.call(HOOK_ID.Spawn_Plot_Upgrades_UI, sender, ref return_value, new object[] { kind }));
         }
 

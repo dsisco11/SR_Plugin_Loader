@@ -122,6 +122,8 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Destroyed_Land_Plot = new HOOK_ID();
         public static readonly HOOK_ID Destroyed_Garden_Patch = new HOOK_ID();
 
+        public static readonly HOOK_ID Demolished_Land_Plot = new HOOK_ID();
+
         #endregion
 
         public static readonly HOOK_ID Pre_Economy_Init = new HOOK_ID();
@@ -197,6 +199,8 @@ namespace SR_PluginLoader
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly HOOK_ID Ext_Spawn_Plot_Upgrades_UI = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly HOOK_ID Ext_Player_Death = new HOOK_ID();

@@ -223,17 +223,25 @@ namespace SR_PluginLoader
         /// <summary>
         /// Removes the upgrades effects from the LandPlot
         /// </summary>
-        public void Remove(LandPlot plot)
+        public void Remove(LandPlot plot) { Remove(false, plot); }
+
+        /// <summary>
+        /// Removes the upgrades effects from the LandPlot
+        /// </summary>
+        public void Remove(bool ignore_tracker, LandPlot plot)
         {
             PlotID pID = new PlotID(plot);
             // Clear any save data this upgrade might have set for this plot.
             Upgrades.Clear_Upgrade_Data(pID, this.ID);
-            // Remove the upgrade from this plot's tracker.
-            PlotUpgradeTracker tracker = plot.GetComponent<PlotUpgradeTracker>();
-            if (tracker == null) SLog.Info("Failed to remove upgrade from plot {0}. Cannot find PlotUpgradeTracker!", pID);
-            else tracker.Remove_Upgrade(this);
+            if (!ignore_tracker)
+            {
+                // Remove the upgrade from this plot's tracker.
+                PlotUpgradeTracker tracker = plot.GetComponent<PlotUpgradeTracker>();
+                if (tracker == null) SLog.Warn("Failed to remove upgrade from plot {0}. Cannot find PlotUpgradeTracker!", pID);
+                else tracker.Remove_Upgrade(this);
+            }
             // Call the upgrades cleanup logic.
-            if(removal_function != null) removal_function(plot);
+            removal_function?.Invoke(plot);
         }
         /// <summary>
         /// 

@@ -17,16 +17,19 @@ namespace SR_PluginLoader
     class Entity_Pref_Hook : Prefab_Hook
     {
         protected override void Start() { Kind = PrefabType.ENTITY; base.Start(); }
+        protected override void OnDestroy() { Kind = PrefabType.ENTITY; base.OnDestroy(); }
     }
 
     class Plot_Pref_Hook : Prefab_Hook
     {
         protected override void Start() { Kind = PrefabType.PLOT; base.Start(); }
+        protected override void OnDestroy() { Kind = PrefabType.PLOT; base.OnDestroy(); }
     }
     
     class Resource_Pref_Hook : Prefab_Hook
     {
         protected override void Start() { Kind = PrefabType.RESOURCE; base.Start(); }
+        protected override void OnDestroy() { Kind = PrefabType.RESOURCE; base.OnDestroy(); }
     }
 
 
@@ -49,12 +52,14 @@ namespace SR_PluginLoader
                 case PrefabType.RESOURCE:
                     Handle_Garden_Patch_Spawn();
                     break;
+                case PrefabType.NONE:
+                    break;
                 default:
                     throw new ArgumentException(String.Format("Unhandled PrefabType: {0}", this.Kind));
             }
         }
 
-        protected void OnDestroy()
+        protected virtual void OnDestroy()
         {
             switch (Kind)
             {
@@ -66,6 +71,8 @@ namespace SR_PluginLoader
                     break;
                 case PrefabType.RESOURCE:
                     Handle_Garden_Patch_Destroyed();
+                    break;
+                case PrefabType.NONE:
                     break;
                 default:
                     throw new ArgumentException(String.Format("Unhandled PrefabType: {0}", this.Kind));

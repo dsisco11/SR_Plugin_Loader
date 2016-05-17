@@ -55,7 +55,7 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Can_Capture, name = "Vacuumable.canCapture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, name = "Vacuumable.capture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, name = "WeaponVacuum.Update" },
-            
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Save", pos = 0, ext = HOOK_ID.Ext_Game_Saved },
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Game_Loaded, name = "GameData.Load", pos = 0, ext = HOOK_ID.Ext_Pre_Game_Loaded },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Game_Loaded, name = "GameData.Load", pos = -1, ext = HOOK_ID.Ext_Post_Game_Loaded },
@@ -64,7 +64,7 @@ namespace SR_PluginLoader
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Entity_Spawn, name = "DirectedActorSpawner.Spawn" },
             new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, name = "DirectedActorSpawner.Start" },
-            
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_CanBuyUpgrade, name = "PlayerState.CanGetUpgrade", pos=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_ApplyUpgrade, name="PlayerState.ApplyUpgrade", pos=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_Damaged, name = "PlayerState.Damage" },
@@ -81,9 +81,10 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Start },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Region_Spawn_Cycle, name = "CellDirector.Update", pos = 4, method = debug_positioning.Cond_Branch_Exit, relative = -1 },
 
-            
+
             new Hook_Dbg_Data() { hook = HOOK_ID.Plot_Load_Upgrades, name = "LandPlot.SetUpgrades", pos=-1 },
 
+            #region Upgrade UI Spawns
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Player_Upgrades_UI, name = "PersonalUpgradeUI.CreatePurchaseUI", pos=-1 },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "EmptyPlotUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "GardenUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
@@ -92,6 +93,16 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "PondUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "SiloUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
             new Hook_Dbg_Data() { hook = HOOK_ID.Spawn_Plot_Upgrades_UI, name = "IncineratorUI.CreatePurchaseUI", pos=-1, ext=HOOK_ID.Ext_Spawn_Plot_Upgrades_UI },
+            #endregion
+
+            #region Upgrade UI Demolish
+            new Hook_Dbg_Data() { hook = HOOK_ID.Demolished_Land_Plot, name = "GardenUI.Demolish", pos=1, relative = -1, method = debug_positioning.Cond_Branch_Exit, ext=HOOK_ID.Ext_Demolish_Plot },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Demolished_Land_Plot, name = "CorralUI.Demolish", pos=1, relative = -1, method = debug_positioning.Cond_Branch_Exit, ext=HOOK_ID.Ext_Demolish_Plot },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Demolished_Land_Plot, name = "CoopUI.Demolish", pos=1, relative = -1, method = debug_positioning.Cond_Branch_Exit, ext=HOOK_ID.Ext_Demolish_Plot },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Demolished_Land_Plot, name = "PondUI.Demolish", pos=1, relative = -1, method = debug_positioning.Cond_Branch_Exit, ext=HOOK_ID.Ext_Demolish_Plot },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Demolished_Land_Plot, name = "SiloUI.Demolish", pos=1, relative = -1, method = debug_positioning.Cond_Branch_Exit, ext=HOOK_ID.Ext_Demolish_Plot },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Demolished_Land_Plot, name = "IncineratorUI.Demolish", pos=1, relative = -1, method = debug_positioning.Cond_Branch_Exit, ext=HOOK_ID.Ext_Demolish_Plot },
+            #endregion
 
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Economy_Init, name = "EconomyDirector.InitForLevel", pos=0 },
