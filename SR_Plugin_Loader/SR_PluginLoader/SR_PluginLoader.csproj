@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\Unity Scripts\DebugUI_Visualizer.cs" />
     <Compile Include="Dev_Menu\Dev_Hierarchy_Browser.cs" />
     <Compile Include="Dev_Menu\Dev_SpawnMenu.cs" />
     <Compile Include="Helpers\Unity Scripts\ActionDelayer.cs" />
@@ -79,7 +80,8 @@
     <Compile Include="Base\LoaderVersion.cs" />
     <Compile Include="Base\Loader_AsyncUpdatesCheck.cs" />
     <Compile Include="Helpers\Unity Scripts\DevCamera.cs" />
-    <Compile Include="Helpers\Unity Scripts\Debug_Object_Visualizer.cs" />
+    <Compile Include="Helpers\Unity Scripts\Debug_Visualizer.cs" />
+    <Compile Include="Helpers\Unity Scripts\SelectableCollider.cs" />
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
     <Compile Include="SiscosHooks\HOOK_SHAS.cs" />

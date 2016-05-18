@@ -67,7 +67,7 @@ namespace SR_PluginLoader
         {
             string FILE_TMP = String.Concat(FILE, ".tmp");
             FileStream strm = File.Open(FILE_TMP, FileMode.OpenOrCreate);
-            byte[] buf = Encoding.UTF8.GetBytes(json.ToString());
+            byte[] buf = Encoding.UTF8.GetBytes(json.ToString(""));
             strm.BeginWrite(buf, 0, buf.Length, (IAsyncResult result) => {
                 strm.EndWrite(result);
                 strm.Close();

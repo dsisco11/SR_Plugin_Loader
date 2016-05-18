@@ -16,19 +16,19 @@ namespace SR_PluginLoader
         /// </summary>
         public static bool isFlying { get { return DevCamera.FLYING; } }
         private static PlayerState player { get { return SRSingleton<SceneContext>.Instance.PlayerState; } }
-        private static GameObject pObj { get { return SRSingleton<SceneContext>.Instance.Player; } }
+        public static vp_FPInput Input { get { return gameObject.GetComponentInChildren<vp_FPInput>(); } }
 
-        public static GameObject gameObject { get { return pObj; } }
+        public static GameObject gameObject { get { return SRSingleton<SceneContext>.Instance.Player; } }
         public static PlayerState state { get { return player; } }
-        public static WeaponVacuum Weapon { get { if(pObj==null) { return null; } return pObj.GetComponentInChildren<WeaponVacuum>(); } }
-        public static EnergyJetpack Jetpack { get { if (pObj == null) { return null; } return pObj.GetComponent<EnergyJetpack>(); } }
+        public static WeaponVacuum Weapon { get { if(gameObject==null) { return null; } return gameObject.GetComponentInChildren<WeaponVacuum>(); } }
+        public static EnergyJetpack Jetpack { get { if (gameObject == null) { return null; } return gameObject.GetComponent<EnergyJetpack>(); } }
 
         #region Getters / Setters
 
         /// <summary>
         /// Returns <c>True</c> if the Player has a valid <c>GameObject</c>, <c>False</c> otherwise.
         /// </summary>
-        public static bool isValid { get { return (pObj!=null); } }
+        public static bool isValid { get { return (gameObject!=null); } }
 
         /// <summary>
         /// The players current health. To alter health <see cref="Player.Damage(int)"/>
@@ -58,7 +58,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Player's position within the game world.
         /// </summary>
-        public static Vector3 Pos { get { return pObj.transform.position; } set { pObj.transform.position.Set(value.x, value.y, value.z); } }
+        public static Vector3 Pos { get { return gameObject.transform.position; } set { gameObject.transform.position.Set(value.x, value.y, value.z); } }
 
 #if !SR_VANILLA
         public static int MaxHealth { get { return player.maxHealth; } set { player.maxHealth = value; Health = Health; } }
@@ -176,7 +176,7 @@ namespace SR_PluginLoader
         /// </summary>
         public static void Teleport(Vector3 pos, Vector3? rot, bool playFX=false)
         {
-            Weapon.DropAllVacced();
+            if(Weapon!=null) Weapon.DropAllVacced();
             vp_FPPlayerEventHandler vp_evt = gameObject.GetComponentInChildren<vp_FPPlayerEventHandler>();
             if (vp_evt != null)
             {

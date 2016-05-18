@@ -90,7 +90,11 @@ namespace SR_PluginLoader
             if (rt == null) return new Rect(obj.transform.localPosition, new Vector2(5, 5));
 
             Vector2 hSZ = (rt.sizeDelta * 0.5f);
-            return new Rect(new Vector2(rt.position.x - hSZ.x, Screen.height - (rt.position.y + hSZ.y)), rt.sizeDelta);
+            //Vector2 asz = (rt.anchorMax - rt.anchorMin);
+            //Vector2 anchor = rt.anchorMin + new Vector2(asz.x* rt.anchoredPosition.x, asz.y* rt.anchoredPosition.y);
+            Vector2 offset = Vector2.zero;//rt.offsetMin;
+            Vector2 pos = new Vector2(rt.position.x - hSZ.x - offset.x, Screen.height - (rt.position.y + hSZ.y + offset.y));
+            return new Rect(pos, rt.sizeDelta);
             //return new Rect(rt.anchoredPosition + new Vector2(rt.position.x, rt.position.y), rt.sizeDelta);
         }
 
