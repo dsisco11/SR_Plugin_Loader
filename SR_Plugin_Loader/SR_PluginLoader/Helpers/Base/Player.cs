@@ -199,6 +199,26 @@ namespace SR_PluginLoader
         }
         #endregion
 
+        #region Input
+
+        /// <summary>
+        /// Freezes all user input to the player object/camera
+        /// </summary>
+        public static void Freeze()
+        {
+            var lod = gameObject.GetComponent<LockOnDeath>();
+            if (lod != null) lod.Freeze();
+        }
+
+        /// <summary>
+        /// unfreezes all user input to the player object/camera
+        /// </summary>
+        public static void Unfreeze()
+        {
+            var lod = gameObject.GetComponent<LockOnDeath>();
+            if (lod != null) lod.Unfreeze();
+        }
+        #endregion
 
         #region DEBUG FUNCTIONALITY
 

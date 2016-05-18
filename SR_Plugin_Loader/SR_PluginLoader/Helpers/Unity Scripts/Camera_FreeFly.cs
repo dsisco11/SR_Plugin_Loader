@@ -45,14 +45,18 @@ namespace SR_PluginLoader
         {
             if(_is_flying)
             {
+                SLog.Info("FREE-CAM: OFF");
                 _is_flying = false;
                 Camera.main.enabled = true;
                 cam.enabled = false;
+                Player.Unfreeze();
             }
             else
             {
+                SLog.Info("FREE-CAM: ON");
                 _is_flying = true;
                 Camera.main.enabled = false;
+                Player.Freeze();
                 cam.enabled = true;
                 cam.transform.position = Camera.main.transform.position;
                 cam.transform.rotation = Camera.main.transform.rotation;
