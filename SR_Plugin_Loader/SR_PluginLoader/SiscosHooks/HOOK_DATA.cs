@@ -72,7 +72,7 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_SetEnergy, name = "PlayerState.SetEnergy" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_MoneyChanged, name = "PlayerState.AddCurrency" },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_AddRads, name = "PlayerState.AddRads" },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Player_Spawn, name = "PlayerState.Awake", pos=-1 },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Player_Spawn, name = "Identifiable.Awake", pos=-1, ext = HOOK_ID.Ext_Identifiable_Spawn },
             new Hook_Dbg_Data() { hook = HOOK_ID.Player_Death, name = "PlayerDeathHandler.OnDeath", pos=-1, ext = HOOK_ID.Ext_Player_Death },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Ext_LockOnDeath_Start, name = "LockOnDeath.LockUntil", pos=-1 },

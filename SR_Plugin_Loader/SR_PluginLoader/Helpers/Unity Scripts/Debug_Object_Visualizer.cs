@@ -44,40 +44,37 @@ namespace SR_PluginLoader
                 lineMaterial.SetInt("_ZWrite", 0);
             }
         }
-        private void Start()
-        {
-            CreateLineMaterial();
-        }
 
-
-        private void Update()
-        {
-            CalcPositons();
-        }
+        private void Awake() { CreateLineMaterial(); }
+        
+        private void Update() { CalcPositons(); }
 
         private void OnRenderObject()
         {
-            DoRender();
         }
 
         void OnPostRender()
         {
-            //DoRender();
-        }
-
-        void DoRender()
-        {
             GL.PushMatrix();
-            GL.LoadIdentity();
-            //GL.MultMatrix(transform.localToWorldMatrix);
+            try
+            {
+                GL.LoadIdentity();
+                //GL.MultMatrix(transform.localToWorldMatrix);
+                GL.MultMatrix(Camera.current.cameraToWorldMatrix.inverse);
+                lineMaterial.SetPass(0);
 
-            lineMaterial.SetPass(0);
-
-
-            DrawBox();
-            GL.PopMatrix();
+                DrawBox();
+            }
+            catch (Exception ex)
+            {
+                SLog.Error(ex);
+            }
+            finally
+            {
+                GL.PopMatrix();
+            }
         }
-
+        
         void CalcPositons()
         {
             Bounds bounds;

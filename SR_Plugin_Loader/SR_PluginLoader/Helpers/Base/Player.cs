@@ -11,6 +11,10 @@ namespace SR_PluginLoader
     /// </summary>
     public static class Player
     {
+        /// <summary>
+        /// Is the camera in free-fly mode?
+        /// </summary>
+        public static bool isFlying { get { return Camera_FreeFly.FLYING; } }
         private static PlayerState player { get { return SRSingleton<SceneContext>.Instance.PlayerState; } }
         private static GameObject pObj { get { return SRSingleton<SceneContext>.Instance.Player; } }
 
@@ -193,7 +197,15 @@ namespace SR_PluginLoader
             for (int i = 0; i < num; i++) { player.SpendKey(); }
             return true;
         }
-    #endregion
+        #endregion
 
+
+        #region DEBUG FUNCTIONALITY
+
+        public static void Toggle_Fly_Mode()
+        {
+            Camera_FreeFly.Instance.Toggle();
+        }
+        #endregion
     }
 }

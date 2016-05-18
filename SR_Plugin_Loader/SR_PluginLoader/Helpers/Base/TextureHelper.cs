@@ -143,9 +143,14 @@ namespace SR_PluginLoader
         {
             if (data == null || data.Length <= 0) return null;
             Texture2D tex = (Texture2D)TextureHelper.Load(data, name);
-            if((flags & TextureOpFlags.NO_MIPMAPPING) == TextureOpFlags.NO_MIPMAPPING) tex.mipMapBias = -(tex.mipmapCount);
-            if((flags & TextureOpFlags.NO_WRAPPING) == TextureOpFlags.NO_WRAPPING) tex.wrapMode = TextureWrapMode.Clamp;
+            Enforce_Flags(ref tex, flags);
             return tex;
+        }
+
+        internal static void Enforce_Flags(ref Texture2D tex, TextureOpFlags flags)
+        {
+            if ((flags & TextureOpFlags.NO_MIPMAPPING) == TextureOpFlags.NO_MIPMAPPING) tex.mipMapBias = -(tex.mipmapCount);
+            if ((flags & TextureOpFlags.NO_WRAPPING) == TextureOpFlags.NO_WRAPPING) tex.wrapMode = TextureWrapMode.Clamp;
         }
 
         /// <summary>
@@ -294,7 +299,7 @@ namespace SR_PluginLoader
             TextureHelper.icon_arrow_right = (Texture2D)TextureHelper.Load_From_Resource("arrow_right.png", myNamespace, FLAGS);
 
             TextureHelper.icon_node_arrow_right = (Texture2D)TextureHelper.Load_From_Resource("node_arrow.png", myNamespace, FLAGS);
-            TextureHelper.icon_node_arrow_down = Rotate_90(icon_node_arrow_right);
+            TextureHelper.icon_node_arrow_down = Rotate_90(icon_node_arrow_right, FLAGS);
 
             Util.Tint_Texture(TextureHelper.icon_close_dark, new Color(1f, 1f, 1f, 0.5f));
         }
@@ -304,7 +309,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Creates a copy of a given texture rotated 90 degrees Clockwise.
         /// </summary>
-        public static Texture2D Rotate_90(Texture2D tex)
+        public static Texture2D Rotate_90(Texture2D tex, TextureOpFlags flags)
         {
             Texture2D cpy = new Texture2D(tex.width, tex.height);
             for (int x = 0; x < tex.width; x++)
@@ -317,10 +322,11 @@ namespace SR_PluginLoader
             }
 
             cpy.Apply();
+            Enforce_Flags(ref cpy, flags);
             return cpy;
         }
         
-        public static Texture2D Flip_Horizontal(Texture2D tex)
+        public static Texture2D Flip_Horizontal(Texture2D tex, TextureOpFlags flags)
         {
             Texture2D cpy = new Texture2D(tex.width, tex.height);
             for (int x = 0; x < tex.width; x++)
@@ -333,10 +339,11 @@ namespace SR_PluginLoader
             }
 
             cpy.Apply();
+            Enforce_Flags(ref cpy, flags);
             return cpy;
         }
         
-        public static Texture2D Flip_Vertical(Texture2D tex)
+        public static Texture2D Flip_Vertical(Texture2D tex, TextureOpFlags flags)
         {
             Texture2D cpy = new Texture2D(tex.width, tex.height);
             for (int x = 0; x < tex.width; x++)
@@ -349,6 +356,7 @@ namespace SR_PluginLoader
             }
 
             cpy.Apply();
+            Enforce_Flags(ref cpy, flags);
             return cpy;
         }
         #endregion

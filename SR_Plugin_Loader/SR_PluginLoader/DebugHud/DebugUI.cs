@@ -156,10 +156,12 @@ namespace SR_PluginLoader
         {
             // Implement some convinient debugging functions at the press of a button!
 
-            if (Input.GetKeyUp(KeyCode.F2))
+            if (Input.GetKeyUp(KeyCode.F4))
             {
-                DebugUI.Toggle();// Toggling on/off
-                //uiControl.DEBUG_DRAW_MODE = uiDebugDrawMode.NONE;// Reset the draw mode
+                if (!(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+                {
+                    Player.Toggle_Fly_Mode();
+                }
             }
 
             if (Input.GetKeyUp(KeyCode.F3))// Toggle rendering uiControl area outlines on/off

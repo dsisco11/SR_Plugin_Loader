@@ -64,6 +64,7 @@ namespace SR_PluginLoader
             register(HOOK_ID.Ext_Post_Game_Loaded, HookProxys.Ext_Post_Game_Loaded);
             register(HOOK_ID.Ext_Demolish_Plot, HookProxys.Ext_Demolish_Plot_Upgrade);
             register(HOOK_ID.Ext_Spawn_Plot_Upgrades_UI, HookProxys.Ext_Spawn_Plot_Upgrades_UI);
+            register(HOOK_ID.Ext_Identifiable_Spawn, HookProxys.Ext_Identifiable_Spawn);
             register(HOOK_ID.Ext_Player_Death, HookProxys.Ext_Player_Death);
             register(HOOK_ID.Ext_LockOnDeath_Start, HookProxys.Ext_LockOnDeath_Start);
             register(HOOK_ID.Ext_LockOnDeath_End, HookProxys.Ext_LockOnDeath_End);
@@ -82,7 +83,7 @@ namespace SR_PluginLoader
             try
             {
 #if DEBUG
-                if (HOOKS_TO_ANNOUNCE.Contains(hook)) SLog.Info("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
+                SLog.Info("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
 #endif
 
                 _hook_result result = new _hook_result(args);
@@ -505,10 +506,14 @@ namespace SR_PluginLoader
 
         internal static Sisco_Return Ext_Demolish_Plot_Upgrade(ref object sender, ref object[] args, ref object return_value)
         {
+#if !SR_VANILLA
             LandPlot.Id kind = Get_Plot_ID_From_Upgrades_UI_Class(sender);
             LandPlotUI ui = sender as LandPlotUI;
             LandPlot plot = ui.Get_LandPlot();
             return new Sisco_Return(SiscosHooks.call(HOOK_ID.Demolished_Land_Plot, plot, ref return_value, new object[] { kind }));
+#else
+            return null;
+#endif
         }
 
         internal static Sisco_Return Ext_Spawn_Plot_Upgrades_UI(ref object sender, ref object[] args, ref object return_value)
@@ -559,6 +564,16 @@ namespace SR_PluginLoader
             return new Sisco_Return(SiscosHooks.call(HOOK_ID.Game_Saved, sender, ref return_value, new object[] { saveFile }));
         }
 
+        internal static Sisco_Return Ext_Identifiable_Spawn(ref object sender, ref object[] args, ref object return_value)
+        {
+            Identifiable ident = sender as Identifiable;
+            if (ident.id == Identifiable.Id.PLAYER)
+            {
+                SiscosHooks.call(HOOK_ID.Player_Spawn, ident.gameObject, ref return_value, args);
+            }
+            return null;
+        }
+
         internal static bool is_player_dead = false;
         internal static Sisco_Return Ext_Player_Death(ref object sender, ref object[] args, ref object return_value)
         {
@@ -589,5 +604,5 @@ namespace SR_PluginLoader
 
 
     }
-    #endregion
+#endregion
 }

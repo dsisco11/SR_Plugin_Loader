@@ -12,6 +12,7 @@ using System.Net.Security;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Logging;
+using System.Threading;
 
 namespace SR_PluginLoader
 {
