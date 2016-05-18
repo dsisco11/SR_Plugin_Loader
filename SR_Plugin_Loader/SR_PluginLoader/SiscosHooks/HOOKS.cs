@@ -201,6 +201,10 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Ext_Spawn_Plot_Upgrades_UI = new HOOK_ID();
 
         [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Demolish_Plot = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Identifiable_Spawn = new HOOK_ID();
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly HOOK_ID Ext_Player_Death = new HOOK_ID();
