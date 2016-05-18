@@ -14,7 +14,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Is the camera in free-fly mode?
         /// </summary>
-        public static bool isFlying { get { return Camera_FreeFly.FLYING; } }
+        public static bool isFlying { get { return DevCamera.FLYING; } }
         private static PlayerState player { get { return SRSingleton<SceneContext>.Instance.PlayerState; } }
         private static GameObject pObj { get { return SRSingleton<SceneContext>.Instance.Player; } }
 
@@ -71,6 +71,7 @@ namespace SR_PluginLoader
         #endregion
 
         #region Inventory Helpers
+
         /// <summary>
         /// Returns the number of a certain item that the player has in their inventory.
         /// </summary>
@@ -92,6 +93,7 @@ namespace SR_PluginLoader
 #endregion
 
         #region VacPak Helpers
+
         /// <summary>
         /// Returns an array of GameObject which are currently being sucked in by the players weapon.
         /// </summary>
@@ -124,35 +126,6 @@ namespace SR_PluginLoader
             return Get_Captive_Items().Count(o => o.id == id);
         }
 
-        /// <summary>
-        /// Returns the <c>Vector3</c> position that the player is currently looking at.
-        /// </summary>
-        public static Vector3? RaycastPos()
-        {
-            Ray ray = new Ray(Weapon.vacOrigin.transform.position, Weapon.vacOrigin.transform.up);
-            RaycastHit raycastHit;
-            if (Physics.Raycast(ray, out raycastHit, float.MaxValue, -1610612997))
-            {
-                return raycastHit.point;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Returns the players current view raycast.
-        /// </summary>
-        public static RaycastHit? Raycast()
-        {
-            Ray ray = new Ray(Weapon.vacOrigin.transform.position, Weapon.vacOrigin.transform.up);
-            RaycastHit raycastHit;
-            if (Physics.Raycast(ray, out raycastHit, float.MaxValue, -1610612997))
-            {
-                return raycastHit;
-            }
-
-            return null;
-        }
         #endregion
 
         #region Upgrade Helpers
@@ -197,6 +170,54 @@ namespace SR_PluginLoader
             for (int i = 0; i < num; i++) { player.SpendKey(); }
             return true;
         }
+
+        /// <summary>
+        /// Moves the player to a specified position and makes them face a given direction.
+        /// </summary>
+        public static void Teleport(Vector3 pos, Vector3? rot, bool playFX=false)
+        {
+            Weapon.DropAllVacced();
+            vp_FPPlayerEventHandler vp_evt = gameObject.GetComponentInChildren<vp_FPPlayerEventHandler>();
+            if (vp_evt != null)
+            {
+                vp_evt.Position.Set(pos);
+                if(rot.HasValue) vp_evt.Rotation.Set(rot.Value);
+            }
+
+            if (playFX) Directors.overlay.PlayTeleport();
+        }
+
+        /// <summary>
+        /// Returns the <c>Vector3</c> position that the player is currently looking at.
+        /// </summary>
+        public static Vector3? RaycastPos()
+        {
+            if (Weapon == null) return null;
+            Ray ray = new Ray(Weapon.vacOrigin.transform.position, Weapon.vacOrigin.transform.up);
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, float.MaxValue, -1610612997))
+            {
+                return raycastHit.point;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the players current view raycast.
+        /// </summary>
+        public static RaycastHit? Raycast()
+        {
+            if (Weapon == null) return null;
+            Ray ray = new Ray(Weapon.vacOrigin.transform.position, Weapon.vacOrigin.transform.up);
+            RaycastHit raycastHit;
+            if (Physics.Raycast(ray, out raycastHit, float.MaxValue, -1610612997))
+            {
+                return raycastHit;
+            }
+
+            return null;
+        }
         #endregion
 
         #region Input
@@ -224,7 +245,7 @@ namespace SR_PluginLoader
 
         public static void Toggle_Fly_Mode()
         {
-            Camera_FreeFly.Instance.Toggle();
+            DevCamera.Instance.Toggle();
         }
         #endregion
     }

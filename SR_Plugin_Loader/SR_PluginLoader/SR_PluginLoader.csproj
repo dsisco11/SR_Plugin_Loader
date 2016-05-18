@@ -78,7 +78,7 @@
     <Compile Include="Base\PluginLoader_AutoUpdater.cs" />
     <Compile Include="Base\LoaderVersion.cs" />
     <Compile Include="Base\Loader_AsyncUpdatesCheck.cs" />
-    <Compile Include="Helpers\Unity Scripts\Camera_FreeFly.cs" />
+    <Compile Include="Helpers\Unity Scripts\DevCamera.cs" />
     <Compile Include="Helpers\Unity Scripts\Debug_Object_Visualizer.cs" />
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />

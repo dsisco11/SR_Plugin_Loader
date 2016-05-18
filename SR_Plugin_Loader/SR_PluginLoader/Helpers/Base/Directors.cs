@@ -14,5 +14,7 @@ namespace SR_PluginLoader
         public static AutoSaveDirector autosaveDirector { get { return SRSingleton<GameContext>.Instance.AutoSaveDirector; } }
 
         public static TimeDirector timeDirector { get { return SRSingleton<SceneContext>.Instance.TimeDirector; } }
+
+        public static Overlay overlay { get { return SRSingleton<Overlay>.Instance; } }
     }
 }
