@@ -17,6 +17,10 @@ namespace SR_PluginLoader
         /// Shows the gameobject currently intercepting the unity GUI raycast event.
         /// </summary>
         UNITY_RAYCAST_TARGET,
+        /// <summary>
+        /// Shows all of the hud elements for SlimeRancher
+        /// </summary>
+        SR_HUD,
         SELECTED_ONLY,
         /// <summary>
         /// Only active controls will be outlined.

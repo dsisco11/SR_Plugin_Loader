@@ -6,6 +6,6 @@ namespace SR_PluginLoader
         /// <summary>
         /// The version for the loader itself
         /// </summary>
-        public static Plugin_Version VERSION = new Plugin_Version(0, 6, 9);
+        public static Plugin_Version VERSION = new Plugin_Version(0, 7, 4);
     }
 }

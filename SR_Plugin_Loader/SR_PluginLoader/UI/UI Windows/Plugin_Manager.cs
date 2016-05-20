@@ -145,7 +145,7 @@ namespace SR_PluginLoader
             ins_title.TextStyle = FontStyle.Bold;
 
             ins_text = Create<uiTextArea>(tabPanel);
-            ins_text.Text = "Select a plugin from the list on the left to manage it's settings.\nOr, to browse more plugins for download, click the button below!";
+            ins_text.Text = "Select a plugin from the list on the left to manage it's settings.\nOr, to browse more plugins for download, click the \"Plugin Store\" button at the top left of this window!";
             ins_text.TextStyle = FontStyle.Italic;
             ins_text.Autosize = true;
 

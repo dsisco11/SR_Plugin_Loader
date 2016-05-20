@@ -257,7 +257,7 @@ namespace SR_PluginLoader
         public override void doLayout()
         {
             base.doLayout();
-            if(layout != null) layout.Handle(this, children.ToArray());
+            if(layout != null && children!=null && children.Count>0) layout.Handle(this, children.ToArray());
         }
         
         protected override void Display()

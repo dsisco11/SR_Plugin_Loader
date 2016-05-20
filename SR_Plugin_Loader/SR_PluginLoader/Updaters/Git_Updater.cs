@@ -16,6 +16,7 @@ namespace SR_PluginLoader
         public static Git_Updater instance { get { return _instance; } }
         public static readonly UPDATER_TYPE type = UPDATER_TYPE.GIT;
         private static SettingsFile Tracker = new SettingsFile("git_tracker");
+        private static char[] PATH_SEP = new char[] { '\\', '/' };
 
         public delegate void Git_Updater_Repo_Result(JSONArray arr);
 
@@ -61,11 +62,11 @@ namespace SR_PluginLoader
             if (!host_is_github(uri.Host)) return uri.AbsolutePath;
             string repo_url = null;
 
-            if (String.Compare("repos", uri.Segments[1].TrimEnd(new char[] { '\\', '/' })) == 0) { repo_url = String.Concat(uri.Segments[2], uri.Segments[3]); }
-            else { repo_url = String.Concat(uri.Segments[1], uri.Segments[2]); }
+            if (String.Compare("repos", uri.Segments[1].TrimEnd(PATH_SEP)) == 0) { repo_url = String.Concat(uri.Segments[2].TrimEnd(PATH_SEP), "/", uri.Segments[3]); }
+            else { repo_url = String.Concat(uri.Segments[1].TrimEnd(PATH_SEP), "/", uri.Segments[2]); }
 
             string result = url;
-            result = String.Concat("https://api.github.com/repos/", repo_url);
+            result = String.Concat("https://api.github.com/repos/", repo_url).TrimEnd(PATH_SEP);
             return result;
         }
 
@@ -85,19 +86,7 @@ namespace SR_PluginLoader
             //PLog.Info("Format_As_Raw_GitHub_Url:  {0}", result);
             return result;
         }
-        /*
-        private static WebClient GetClient()
-        {
-            // Add a handler for SSL certs because mono doesnt have any trusted ones by default
-            ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback((sender, certificate, chain, policyErrors) => { return true; });
-            WebClient client = new WebClient();
-            // Add a useragent string so GitHub doesnt return 403 and also so they can have a chat if they like.
-            client.Headers.Add(HttpRequestHeader.UserAgent, USER_AGENT);
-
-            return client;
-        }
-        */
-
+        
         private static JSONArray Cache_Git_Repo(string repo_url)
         {
             //EXAMPLE:  https://api.github.com/repos/dsisco11/SR_Plugin_Loader/git/trees/master?recursive=1
@@ -277,7 +266,7 @@ namespace SR_PluginLoader
             JSONClass nr = new JSONClass();
             nr["sha"] = rSHA;
             Tracker[repo_url] = nr;
-            //PLog.Debug("Reset tracker for repo. SHA: {0} | URL: {1}", rSHA, repo_url);
+            SLog.Debug("Reset tracker for repo. SHA: {0} | URL: {1}", rSHA, repo_url);
             Tracker.Save();
         }
 
@@ -361,7 +350,7 @@ namespace SR_PluginLoader
                 //if we DID cache the result from a past check against this file then return it here and don't waste time.
                 if (lastResult.HasValue)
                 {
-                    SLog.Debug("Cached {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
+                    SLog.Debug("Returning Cached Result: {2}  |  \"{0}\"  |  SHA({1})", local_file, cSHA, Enum.GetName(typeof(FILE_UPDATE_STATUS), lastResult.Value));
                     return lastResult.Value;
                 }
 

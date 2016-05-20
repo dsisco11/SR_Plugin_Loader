@@ -15,6 +15,8 @@ namespace SR_PluginLoader
         
         private void Start()
         {
+            // Hide the dialogue window buttons while we are downloading so the user doesn't get confused and exit it.
+            updatesView.Disable_Buttons();
             StartCoroutine(Start_Update());
         }   
         

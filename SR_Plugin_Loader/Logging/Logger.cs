@@ -22,10 +22,6 @@ namespace Logging
         /// </summary>
         public static bool showTimestamps = true;
         /// <summary>
-        /// Should colors be stripped from log lines before they are output to file?
-        /// </summary>
-        public static bool stripXTERM = true;
-        /// <summary>
         /// If <c>TRUE</c> then every log line output will show it's LogLevel at the start of the line.
         /// Meaning that debug lines start with "DEBUG: " and error lines start with "ERROR: " etc.
         /// </summary>
@@ -118,7 +114,7 @@ namespace Logging
             }
 
             string formattedString = String.Concat(timeStr, moduleStr, logLevelStr, lineStr);
-            string fileFormattedString = strip_html_tags(Logger.stripXTERM ? XTERM.Strip(formattedString) : formattedString);
+            string fileFormattedString = strip_html_tags(formattedString);
 
             if (level >= FileLogLevel)
             {
@@ -127,8 +123,7 @@ namespace Logging
             }
             if (level >= OutputLevel)
             {
-                XTERM.WriteLine(formattedString);
-                onLog?.Invoke(level, moduleStr, XTERM.Strip(formattedString));
+                onLog?.Invoke(level, moduleStr, formattedString);
             }
         }
         #endregion
@@ -184,7 +179,7 @@ namespace Logging
 
         #region Stripping
 
-        private static string strip_html_tags(string str)
+        public static string strip_html_tags(string str)
         {
             if (HTML_TAGS == null) init_html_tags();
 

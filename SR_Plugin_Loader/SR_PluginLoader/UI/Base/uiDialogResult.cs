@@ -99,5 +99,17 @@ namespace SR_PluginLoader
             contentPanel.snapBottomSideTo(btnPanel);
             contentPanel.FloodX();
         }
+
+        public void Enable_Buttons()
+        {
+            btn_ok.isDisabled = false;
+            btn_later.isDisabled = false;
+        }
+
+        public void Disable_Buttons()
+        {
+            btn_ok.isDisabled = true;
+            btn_later.isDisabled = true;
+        }
     }
 }

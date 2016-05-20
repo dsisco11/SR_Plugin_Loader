@@ -5,6 +5,7 @@ namespace SR_PluginLoader
 {
     /// <summary>
     /// Provides a simple way to track the active state of something which can be activated/deactivated multiple times and which should only be active if the number of times it was activated & deactivated are equal.
+    /// (NOTE: Default state is inactive)
     /// </summary>
     public class Active_State_Tracker
     {
@@ -23,7 +24,8 @@ namespace SR_PluginLoader
             SLog.Info("["+nameof(Active_State_Tracker)+"]({0}) {1}", Name, msg);
         }
 
-        public Active_State_Tracker(string name, bool allow_negative_values=false) { Name = name; AllowNegative = allow_negative_values; }
+        public Active_State_Tracker(string name, bool allow_negative_values = false) { Name = name; AllowNegative = allow_negative_values; }
+        public Active_State_Tracker(string name, bool defaults_to_active, bool allow_negative_values = false) { Name = name; AllowNegative = allow_negative_values; if (defaults_to_active) { state = 1; } }
         /// <summary>
         /// "Activates" the state and returns <c>True</c> if the state is now active.
         /// </summary>

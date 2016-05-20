@@ -646,7 +646,7 @@ namespace SR_PluginLoader
 
         public static T Create<T>(string name, uiPanel parent = null) where T : uiControl
         {
-            GameObject obj = new GameObject();
+            GameObject obj = new GameObject(typeof(T).Name);
             obj.SetActive(true);
             obj.layer = 5;//GUI layer
             UnityEngine.GameObject.DontDestroyOnLoad(obj);

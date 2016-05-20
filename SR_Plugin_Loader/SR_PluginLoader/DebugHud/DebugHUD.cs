@@ -115,7 +115,7 @@ namespace SR_PluginLoader
         public static void LogSilent(Exception ex)
         {
             string str = DebugHud.Format_Exception_Log(ex, 0);
-            DebugHud.write_log(str, true);
+            DebugHud.write_log(str);
         }
 
         private static string strip_html_tags(string str)
@@ -139,11 +139,11 @@ namespace SR_PluginLoader
 
         private static void write_log(string str, bool write_to_unity=false)
         {
-            if (DebugHud.log_file == null) DebugHud.open_log_stream();
+            //if (DebugHud.log_file == null) DebugHud.open_log_stream();
 
             if (!str.EndsWith("\n")) str += "\n";
-            str = DebugHud.strip_html_tags(str);
-            if(write_to_unity) UnityEngine.Debug.Log(str);
+            str = Logging.Logger.strip_html_tags(str);
+            if(write_to_unity) UnityEngine.Debug.Log(String.Format("[DebugHUD] {0}", str));
 
             /*
 

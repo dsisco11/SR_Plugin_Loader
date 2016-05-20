@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace SR_PluginLoader
 {
@@ -22,6 +23,7 @@ namespace SR_PluginLoader
         public float? Size_Height_Collapsed { get { return size_height_collapsed; } set { size_height_collapsed = value; resize(); } }
         #endregion
 
+        public event Action<uiCollapser> onCollapsed, onExpanded;
 
         protected bool collapsed = false;
         public bool isCollapsed { get { return collapsed; } }
@@ -59,8 +61,14 @@ namespace SR_PluginLoader
         /// </summary>
         public bool Set_Collapsed(bool state)
         {
+            bool changed = (state != collapsed);
             collapsed = state;
             resize();
+            if(changed)
+            {
+                if (collapsed == true) onCollapsed?.Invoke(this);
+                else onExpanded?.Invoke(this);
+            }
             return collapsed;
         }
 

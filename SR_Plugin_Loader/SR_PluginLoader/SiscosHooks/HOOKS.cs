@@ -93,10 +93,19 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Pre_Entity_Spawn = new HOOK_ID();
         public static readonly HOOK_ID EntitySpawner_Init = new HOOK_ID();
 
+        #region Spawn Events
         public static readonly HOOK_ID Spawned_Entity = new HOOK_ID();
         public static readonly HOOK_ID Spawned_Slime = new HOOK_ID();
         public static readonly HOOK_ID Spawned_Animal = new HOOK_ID();
         public static readonly HOOK_ID Spawned_Food = new HOOK_ID();
+        #endregion
+
+        #region Destroy Events
+        public static readonly HOOK_ID Destroyed_Entity = new HOOK_ID();
+        public static readonly HOOK_ID Destroyed_Slime = new HOOK_ID();
+        public static readonly HOOK_ID Destroyed_Animal = new HOOK_ID();
+        public static readonly HOOK_ID Destroyed_Food = new HOOK_ID();
+        #endregion
 
         [ObsoleteAttribute("This hook name is obsolete, use Spawned_Entity instead.", false)]
         public static readonly HOOK_ID Entity_Spawned = new HOOK_ID(Spawned_Entity);
@@ -109,6 +118,11 @@ namespace SR_PluginLoader
 
         public static readonly HOOK_ID Spawned_Land_Plot = new HOOK_ID();
         public static readonly HOOK_ID Spawned_Garden_Patch = new HOOK_ID();
+
+        public static readonly HOOK_ID Destroyed_Land_Plot = new HOOK_ID();
+        public static readonly HOOK_ID Destroyed_Garden_Patch = new HOOK_ID();
+
+        public static readonly HOOK_ID Demolished_Land_Plot = new HOOK_ID();
 
         #endregion
 
@@ -125,9 +139,10 @@ namespace SR_PluginLoader
         public static readonly HOOK_ID Player_MoneyChanged = new HOOK_ID();
         public static readonly HOOK_ID Player_AddRads = new HOOK_ID();
         public static readonly HOOK_ID Player_Death = new HOOK_ID();
+        public static readonly HOOK_ID Player_Spawn = new HOOK_ID();
 
-        public static readonly HOOK_ID Pre_Player_Sleep = new HOOK_ID();
-        public static readonly HOOK_ID Post_Player_Sleep = new HOOK_ID();
+        public static readonly HOOK_ID Player_Sleep_Begin = new HOOK_ID();
+        public static readonly HOOK_ID Player_Sleep_End = new HOOK_ID();
         #endregion
 
         public static readonly HOOK_ID Pre_Region_Spawn_Cycle = new HOOK_ID();
@@ -184,7 +199,22 @@ namespace SR_PluginLoader
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static readonly HOOK_ID Ext_Spawn_Plot_Upgrades_UI = new HOOK_ID();
-        
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Demolish_Plot = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Identifiable_Spawn = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_Player_Death = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_LockOnDeath_Start = new HOOK_ID();
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static readonly HOOK_ID Ext_LockOnDeath_End = new HOOK_ID();
+
         #endregion
 
     }

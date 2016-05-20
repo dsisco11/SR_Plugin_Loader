@@ -9,6 +9,7 @@ namespace SR_PluginLoader
 {
     public static class DebugUI
     {
+        private static Active_State_Tracker State = new Active_State_Tracker("DebugUI");
         /// <summary>
         /// The panel that holds all of the DebugUI controls, so we can easily deactivate it if needed.
         /// </summary>
@@ -21,34 +22,53 @@ namespace SR_PluginLoader
         /// </summary>
         internal static uiVarText lbl_player_pos = null;
         /// <summary>
+        /// A convenient label to display the active camera's position
+        /// </summary>
+        internal static uiVarText lbl_cam_pos = null;
+        /// <summary>
+        /// A convenient label to display the active camera's rotation
+        /// </summary>
+        internal static uiVarText lbl_cam_rot = null;
+        /// <summary>
         /// A label that shows the current debug drawing mode for uiControls
         /// </summary>
         internal static uiText lbl_debug_mode = null;
-
-
+        
         public static void Setup()
         {
             SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded);
             Create_Mat();
             Init();
 
-
             Root = uiControl.Create<uiPanel>();
             Root.Name = "DebugUI";
             Root.Set_Padding(5);
             Root.FloodXY();
             Root.local_style.normal.background = null;
+            Root.isVisible = false;//Because our State var is inactive by default
 
-            lbl_player_pos = uiControl.Create<uiVarText>(Root);
+            var list = uiControl.Create<uiListView>(Root);// Using a uiListView to contain all of our debug var displays makes them all auto layout, which is nice
+            list.alignLeftSide();
+            list.alignTop(200);
 
-            lbl_player_pos.alignLeftSide();
-            lbl_player_pos.alignTop();
+            lbl_player_pos = uiControl.Create<uiVarText>(list);
             lbl_player_pos.Text = "Player Pos:";
+            lbl_player_pos.Set_Margin(0);
+            lbl_player_pos.Set_Padding(0);
 
-            lbl_debug_mode = uiControl.Create<uiText>(Root);
-            lbl_debug_mode.alignLeftSide();
-            lbl_debug_mode.moveBelow(lbl_player_pos);
-            lbl_debug_mode.isVisible = false;//only shows when the debug drawing mode isnt NONE
+            lbl_cam_pos = uiControl.Create<uiVarText>(list);
+            lbl_cam_pos.Text = "Cam Pos:";
+            lbl_cam_pos.Set_Margin(0);
+            lbl_cam_pos.Set_Padding(0);
+
+            lbl_cam_rot = uiControl.Create<uiVarText>(list);
+            lbl_cam_rot.Text = "Cam Rot:";
+            lbl_cam_rot.Set_Margin(0);
+            lbl_cam_rot.Set_Padding(0);
+
+
+            lbl_debug_mode = uiControl.Create<uiText>(list);
+            //lbl_debug_mode.isVisible = false;//only shows when the debug drawing mode isnt NONE
 
             uiControl.dbg_mouse_tooltip_style = new GUIStyle();
             uiControl.dbg_mouse_tooltip_style.normal.textColor = Color.white;
@@ -66,7 +86,8 @@ namespace SR_PluginLoader
             if (Camera.main == null) return;
             if (Camera.main.gameObject.GetComponent<DebugUI_Script>() != null) return;
 
-            Camera.main.gameObject.AddComponent<DebugUI_Script>();
+            GameObject gm = Camera.main.gameObject;
+            gm.AddComponent<DebugUI_Script>();
         }
 
         private static void Create_Mat()
@@ -112,7 +133,6 @@ namespace SR_PluginLoader
         public static void Draw_Point(Vector2 pos)
         {
             const float Z = 0f;
-            const float o = 0f;// 1f;
             float rx = (float)Math.Round(pos.x) + 0.5f;// center of the pixel
             float ry = (float)Math.Round(pos.y) + 0.5f;// center of the pixel
             float rw = (float)Math.Round(6f) - 1;
@@ -144,26 +164,27 @@ namespace SR_PluginLoader
 
         public static bool isVisible { get { return Root.isVisible; } }
 
-        public static void Hide() { Root.isVisible = false; }
-        public static void Show() { Root.isVisible = true; }
-        public static void Toggle() { Root.isVisible = !Root.isVisible; }
+        public static void Hide() { Root.isVisible = State.Deactivate(); }
+        public static void Show() { Root.isVisible = State.Activate(); }
     }
 
     public class DebugUI_Script : MonoBehaviour
     {
-        private void Start() { DebugUI.Hide(); }
+        private void Start() { /*DebugUI.Hide();*/ }
 
         private void Update()
         {
             // Implement some convinient debugging functions at the press of a button!
 
-            if (Input.GetKeyUp(KeyCode.F2))
+            if (Input.GetKeyUp(KeyCode.F3))
             {
-                DebugUI.Toggle();// Toggling on/off
-                //uiControl.DEBUG_DRAW_MODE = uiDebugDrawMode.NONE;// Reset the draw mode
+                if (!(Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)))
+                {
+                    Player.Toggle_Fly_Mode();
+                }
             }
 
-            if (Input.GetKeyUp(KeyCode.F3))// Toggle rendering uiControl area outlines on/off
+            if (Input.GetKeyUp(KeyCode.F4))// Toggle rendering uiControl area outlines on/off
             {
                 if (!DebugUI.isVisible) DebugUI.Show();
                 if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
@@ -182,7 +203,7 @@ namespace SR_PluginLoader
                     uiControl.DEBUG_DRAW_MODE = (uiDebugDrawMode)mode;
                 }
 
-                DebugUI.lbl_debug_mode.isVisible = !(uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.NONE);
+                //DebugUI.lbl_debug_mode.isVisible = !(uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.NONE);
                 DebugUI.lbl_debug_mode.Text = Enum.GetName(typeof(uiDebugDrawMode), uiControl.DEBUG_DRAW_MODE);
             }
 
@@ -190,15 +211,15 @@ namespace SR_PluginLoader
             {
                 HUD.Toggle();
                 ViewModel.Toggle(HUD.isActive);
-            }            
+            }
         }
 
         private void OnGUI()
         {
             if (Event.current.type != EventType.Repaint) return;
-            if(uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.UNITY_RAYCAST_TARGET)// Special mode
+            if (uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.UNITY_RAYCAST_TARGET)// Special mode
             {
-                if(EventSystem.current.IsPointerOverGameObject())
+                if (EventSystem.current.IsPointerOverGameObject())
                 {
                     //RaycastHit hit = new RaycastHit();
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -223,11 +244,28 @@ namespace SR_PluginLoader
                     if (MainMenu.Instance != null)
                     {
                         Transform MenuPanel = MainMenu.Instance.transform.FindChild("StandardModePanel");
-                        if(MenuPanel != null) DebugUI.Draw_GameObj_Bounds(MenuPanel.gameObject);
+                        if (MenuPanel != null) DebugUI.Draw_GameObj_Bounds(MenuPanel.gameObject);
                     }
                     GL.End();
                     GL.PopMatrix();
                 }
+            }
+            else if (uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.SR_HUD)// Special mode
+            {
+                GL.PushMatrix();
+                DebugUI.DEBUG_LINE_MAT.SetPass(0);
+                GL.Begin(GL.LINES);
+
+                var hud = GameObject.FindObjectOfType<HudUI>();
+                for (int i = 0; i < hud.transform.childCount; i++)
+                {
+                    GameObject gm = hud.transform.GetChild(i).gameObject;
+                    DebugUI.Draw_GameObj_Bounds(gm);
+                }
+                
+                GL.End();
+                GL.PopMatrix();
+
             }
             else if (uiControl.DEBUG_DRAW_MODE != uiDebugDrawMode.NONE)
             {
@@ -249,20 +287,21 @@ namespace SR_PluginLoader
         private void LateUpdate()
         {
             if (Player.isValid && DebugUI.lbl_player_pos.isVisible) DebugUI.lbl_player_pos.Value = Player.Pos.ToString();
+            if (DebugUI.lbl_cam_pos.isVisible) DebugUI.lbl_cam_pos.Value = Camera.main.transform.position.ToString();
 
             // Figure out which uiControl the mouse is overtop
             uiControl.debug_current_mouse_over = null;
             uiControl.dbg_mouse_tooltip.text = null;
 
-            if(uiControl.DEBUG_DRAW_MODE != uiDebugDrawMode.NONE && Input.mousePresent && DebugUI.ROOT.isVisible)
+            if (uiControl.DEBUG_DRAW_MODE != uiDebugDrawMode.NONE && Input.mousePresent && DebugUI.ROOT.isVisible)
             {
                 Vector2 mousePos = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
-                IEnumerable<uiControl> list = uiControl.ALL.Select(o => o.Value).Where(o => !o.isChild).Where(o => o!=DebugUI.ROOT);// It's for debug functionality screw it, we don't NEED to optimize it.
+                IEnumerable<uiControl> list = uiControl.ALL.Select(o => o.Value).Where(o => !o.isChild).Where(o => o != DebugUI.ROOT);// It's for debug functionality screw it, we don't NEED to optimize it.
                 //PLog.Info("{0}", String.Join(", ", list.Select(o => o.Name).ToArray()));
                 const int MAX_LOOP = 999;// Limit for safety
                 int loop = 0;
 
-                while(++loop < MAX_LOOP)
+                while (++loop < MAX_LOOP)
                 {
                     bool done = true;
                     // Since we early exit the loop once we find a control the mouse lies within;
@@ -281,10 +320,10 @@ namespace SR_PluginLoader
                             break;// exit foreach
                         }
                     }
-                    if(done) break;// exit while
+                    if (done) break;// exit while
                 }
 
-                if(uiControl.debug_current_mouse_over != null)
+                if (uiControl.debug_current_mouse_over != null)
                 {
                     uiControl.dbg_mouse_tooltip.text = uiControl.debug_current_mouse_over.FullName;
 
@@ -294,9 +333,11 @@ namespace SR_PluginLoader
                     if (sz.x > tt_width_max) sz.x = tt_width_max;
                     sz.y = uiControl.dbg_mouse_tooltip_style.CalcHeight(uiControl.dbg_mouse_tooltip, sz.x);
 
-                    uiControl.dbg_mouse_tooltop_area.Set(mousePos.x, mousePos.y+sz.y+3+mouseHeight, sz.x, sz.y);
+                    uiControl.dbg_mouse_tooltop_area.Set(mousePos.x, mousePos.y + sz.y + 3 + mouseHeight, sz.x, sz.y);
                 }
             }
         }
+        
     }
+    
 }

@@ -62,13 +62,18 @@ namespace SR_PluginLoader
             register(HOOK_ID.Ext_Game_Saved, HookProxys.Ext_Game_Saved);
             register(HOOK_ID.Ext_Pre_Game_Loaded, HookProxys.Ext_Pre_Game_Loaded);
             register(HOOK_ID.Ext_Post_Game_Loaded, HookProxys.Ext_Post_Game_Loaded);
+            register(HOOK_ID.Ext_Demolish_Plot, HookProxys.Ext_Demolish_Plot_Upgrade);
             register(HOOK_ID.Ext_Spawn_Plot_Upgrades_UI, HookProxys.Ext_Spawn_Plot_Upgrades_UI);
+            register(HOOK_ID.Ext_Identifiable_Spawn, HookProxys.Ext_Identifiable_Spawn);
+            register(HOOK_ID.Ext_Player_Death, HookProxys.Ext_Player_Death);
+            register(HOOK_ID.Ext_LockOnDeath_Start, HookProxys.Ext_LockOnDeath_Start);
+            register(HOOK_ID.Ext_LockOnDeath_End, HookProxys.Ext_LockOnDeath_End);
             #endregion
 
             #region Hook Prefab Instantiation Events
-            Util.Inject_Into_Prefabs<Entity_Pref_Spawn_Hook>(Ident.ALL_IDENTS);
-            Util.Inject_Into_Prefabs<Plot_Pref_Spawn_Hook>(Ident.ALL_PLOTS);
-            Util.Inject_Into_Prefabs<Resource_Pref_Spawn_Hook>(Ident.ALL_GARDEN_PATCHES);
+            Util.Inject_Into_Prefabs<Entity_Pref_Hook>(Ident.ALL_IDENTS);
+            Util.Inject_Into_Prefabs<Plot_Pref_Hook>(Ident.ALL_PLOTS);
+            Util.Inject_Into_Prefabs<Resource_Pref_Hook>(Ident.ALL_GARDEN_PATCHES);
             #endregion
             
         }
@@ -78,7 +83,7 @@ namespace SR_PluginLoader
             try
             {
 #if DEBUG
-                if (HOOKS_TO_ANNOUNCE.Contains(hook)) SLog.Info("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
+                SLog.Info("[SiscosHooks] {0}({1})", hook, Get_Arg_String(args));
 #endif
 
                 _hook_result result = new _hook_result(args);
@@ -476,6 +481,7 @@ namespace SR_PluginLoader
     }
 
     #region PROXIES
+
     /// <summary>
     /// Here is where we keep any event hook extension proxys (Too keep things tidy!)
     /// An event hook extension proxy is a proxy function that extends or builds upon the information provided by a default hook coming from the generic hook system.
@@ -484,9 +490,36 @@ namespace SR_PluginLoader
     /// </summary>
     internal static class HookProxys
     {
+        internal static LandPlot.Id Get_Plot_ID_From_Upgrades_UI_Class(object sender)
+        {
+            LandPlot.Id kind = LandPlot.Id.NONE;
+            Type type = sender.GetType();
+            if (type == typeof(GardenUI)) kind = LandPlot.Id.GARDEN;
+            else if (type == typeof(CoopUI)) kind = LandPlot.Id.COOP;
+            else if (type == typeof(CorralUI)) kind = LandPlot.Id.CORRAL;
+            else if (type == typeof(PondUI)) kind = LandPlot.Id.POND;
+            else if (type == typeof(SiloUI)) kind = LandPlot.Id.SILO;
+            else if (type == typeof(IncineratorUI)) kind = LandPlot.Id.INCINERATOR;
+
+            return kind;
+        }
+
+        internal static Sisco_Return Ext_Demolish_Plot_Upgrade(ref object sender, ref object[] args, ref object return_value)
+        {
+#if !SR_VANILLA
+            LandPlot.Id kind = Get_Plot_ID_From_Upgrades_UI_Class(sender);
+            LandPlotUI ui = sender as LandPlotUI;
+            LandPlot plot = ui.Get_LandPlot();
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Demolished_Land_Plot, plot, ref return_value, new object[] { kind }));
+#else
+            return null;
+#endif
+        }
 
         internal static Sisco_Return Ext_Spawn_Plot_Upgrades_UI(ref object sender, ref object[] args, ref object return_value)
         {
+            LandPlot.Id kind = Get_Plot_ID_From_Upgrades_UI_Class(sender);
+            /*
             LandPlot.Id kind = LandPlot.Id.NONE;
             switch (sender.GetType().Name)
             {
@@ -509,6 +542,7 @@ namespace SR_PluginLoader
                     kind = LandPlot.Id.INCINERATOR;
                     break;
             }
+            */
             return new Sisco_Return(SiscosHooks.call(HOOK_ID.Spawn_Plot_Upgrades_UI, sender, ref return_value, new object[] { kind }));
         }
 
@@ -530,7 +564,45 @@ namespace SR_PluginLoader
             return new Sisco_Return(SiscosHooks.call(HOOK_ID.Game_Saved, sender, ref return_value, new object[] { saveFile }));
         }
 
-        
+        internal static Sisco_Return Ext_Identifiable_Spawn(ref object sender, ref object[] args, ref object return_value)
+        {
+            Identifiable ident = sender as Identifiable;
+            if (ident.id == Identifiable.Id.PLAYER)
+            {
+                SiscosHooks.call(HOOK_ID.Player_Spawn, ident.gameObject, ref return_value, args);
+            }
+            return null;
+        }
+
+        internal static bool is_player_dead = false;
+        internal static Sisco_Return Ext_Player_Death(ref object sender, ref object[] args, ref object return_value)
+        {
+            is_player_dead = true;
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Death, sender, ref return_value, args));
+        }
+
+        // The LockOnDeath class is used to lock player input for the game
+        // This means that it is used both when the player "goes to sleep" and when they die
+        // So we can use it to differentiate between the two
+        internal static Sisco_Return Ext_LockOnDeath_Start(ref object sender, ref object[] args, ref object return_value)
+        {
+            return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Sleep_Begin, sender, ref return_value, args));
+        }
+
+        internal static Sisco_Return Ext_LockOnDeath_End(ref object sender, ref object[] args, ref object return_value)
+        {
+            if (is_player_dead)
+            {
+                is_player_dead = false;
+                return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Spawn, sender, ref return_value, new object[] {}));
+            }
+            else
+            {
+                return new Sisco_Return(SiscosHooks.call(HOOK_ID.Player_Sleep_End, sender, ref return_value, args));
+            }
+        }
+
+
     }
-    #endregion
+#endregion
 }

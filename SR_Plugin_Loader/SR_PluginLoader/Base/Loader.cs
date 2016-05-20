@@ -12,6 +12,7 @@ using System.Net.Security;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Logging;
+using System.Threading;
 
 namespace SR_PluginLoader
 {
@@ -36,63 +37,68 @@ namespace SR_PluginLoader
         private static Plugin_Update_Viewer plugin_updater = null;
         private static DevMenu dev_tools = null;
         private static bool loaded_symbols = false;
+        internal static object locker = new object();
         
 
         public static void init(string hash)
         {
-            if (Loader.Config != null) return;
-            Application.stackTraceLogType = StackTraceLogType.Full;
-            Logger.Begin(Path.Combine(Application.dataPath, "plugins.log"));
-            
-            Stopwatch timer = new Stopwatch();
-            timer.Start();
-
-            if (!Loader.Load_Config_Stream()) return;
-
-            try
-            {                
-                DebugHud.Init();
-                TextureHelper.Load_Common();
-                SiscosHooks.Setup();
-                PluginLoader_Watermark.Setup();
-                MainMenu.Setup();
-                DebugUI.Setup();
-
-                Setup_Update_Helper();
-                bool ok = Verify_PluginLoader_Hash(hash);
-                if (!ok) return;
-
-                IN_LOADING_PHASE = true;
-                Setup_Plugin_Dir();
-                
-                Check_For_Updates();
-
-                Setup_Assembly_Resolver();
-                Upgrades.Setup();
-                Assemble_Plugin_List(); 
-                Load_Config();
-                IN_LOADING_PHASE = false;
-                ResourceExt.map_SR_Icons();
-
-                plugin_updater = uiControl.Create<Plugin_Update_Viewer>();// This control manages itself and is only able to become visible under certain conditions which it will control. Therefore it needs no var to track it.
-                plugin_updater.Show();
-
-                dev_tools = uiControl.Create<DevMenu>();
-                //dev_tools.Show();
-                //dev_tools.onShown += (uiWindow w) => { GameTime.Pause(); };
-                //dev_tools.onHidden += (uiWindow w) => { GameTime.Unpause(); };
-
-                //Misc_Experiments.Find_Common_Classes_For_Idents(new HashSet<Identifiable.Id> { Identifiable.Id.PINK_RAD_LARGO });
-            }
-            catch(Exception ex)
+            lock (locker)
             {
-                SLog.Error("Exception during PluginLoader initialization!");
-                SLog.Error(ex);
-            }
-            finally
-            {
-                timer.Stop();
-                SLog.Debug("Plugin Loader initialized! Took: {0}ms", timer.ElapsedMilliseconds);
+                if (Loader.Config != null) return;
+                //Application.stackTraceLogType = StackTraceLogType.Full;
+                Logger.Begin(Path.Combine(Application.dataPath, "plugins.log"));
+
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
+
+                if (!Loader.Load_Config_Stream()) return;
+
+                try
+                {
+                    DebugHud.Init();
+                    TextureHelper.Setup();
+                    MaterialHelper.Setup();
+                    SiscosHooks.Setup();
+                    PluginLoader_Watermark.Setup();
+                    MainMenu.Setup();
+                    DebugUI.Setup();
+
+                    Setup_Update_Helper();
+                    bool ok = Verify_PluginLoader_Hash(hash);
+                    if (!ok) return;
+
+                    IN_LOADING_PHASE = true;
+                    Setup_Plugin_Dir();
+
+                    Check_For_Updates();
+
+                    Setup_Assembly_Resolver();
+                    Upgrades.Setup();
+                    Assemble_Plugin_List();
+                    Load_Config();
+                    IN_LOADING_PHASE = false;
+                    ResourceExt.map_SR_Icons();
+
+                    plugin_updater = uiControl.Create<Plugin_Update_Viewer>();// This control manages itself and is only able to become visible under certain conditions which it will control. Therefore it needs no var to track it.
+                    plugin_updater.Show();
+
+                    dev_tools = uiControl.Create<DevMenu>();
+                    //dev_tools.Show();
+                    //dev_tools.onShown += (uiWindow w) => { GameTime.Pause(); };
+                    //dev_tools.onHidden += (uiWindow w) => { GameTime.Unpause(); };
+
+                    //Misc_Experiments.Find_Common_Classes_For_Idents(new HashSet<Identifiable.Id> { Identifiable.Id.PINK_RAD_LARGO });
+                }
+                catch (Exception ex)
+                {
+                    SLog.Error("Exception during PluginLoader initialization!");
+                    SLog.Error(ex);
+                }
+                finally
+                {
+                    timer.Stop();
+                    SLog.Debug("Plugin Loader initialized! Took: {0}ms", timer.ElapsedMilliseconds);
+                }
             }
         }
 
