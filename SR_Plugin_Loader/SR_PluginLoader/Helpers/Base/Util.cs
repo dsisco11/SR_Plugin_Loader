@@ -535,13 +535,7 @@ namespace SR_PluginLoader
             foreach (Identifiable.Id id in ID_LIST)
             {
                 var pref = Ident.GetPrefab(id);
-                if (pref != null)
-                {
-                    if (pref.GetComponent<Script>()==null)
-                    {
-                        pref.AddComponent<Script>();
-                    }
-                }
+                if (pref != null) { pref.AddOnce<Script>(); }
             }
         }
 
@@ -551,13 +545,7 @@ namespace SR_PluginLoader
             foreach (LandPlot.Id id in ID_LIST)
             {
                 var pref = Directors.lookupDirector.GetPlotPrefab(id);
-                if (pref != null)
-                {
-                    if (pref.GetComponent<Script>() == null)
-                    {
-                        pref.AddComponent<Script>();
-                    }
-                }
+                if (pref != null) { pref.AddOnce<Script>(); }
             }
         }
 
@@ -567,13 +555,7 @@ namespace SR_PluginLoader
             foreach (SpawnResource.Id id in ID_LIST)
             {
                 var pref = Directors.lookupDirector.GetResourcePrefab(id);
-                if (pref != null)
-                {
-                    if (pref.GetComponent<Script>() == null)
-                    {
-                        pref.AddComponent<Script>();
-                    }
-                }
+                if (pref != null) { pref.AddOnce<Script>(); }
             }
         }
         #endregion

@@ -49,6 +49,7 @@ namespace SR_PluginLoader
 
         internal static void Setup()
         {
+            SLog.Info("[SiscosHooks] Initialized...");
             int max = HOOK_ID.Count;
             // foreach(var hook in HOOKS.HooksList) { max = Math.Max(max, hook.id); }
             
@@ -519,30 +520,6 @@ namespace SR_PluginLoader
         internal static Sisco_Return Ext_Spawn_Plot_Upgrades_UI(ref object sender, ref object[] args, ref object return_value)
         {
             LandPlot.Id kind = Get_Plot_ID_From_Upgrades_UI_Class(sender);
-            /*
-            LandPlot.Id kind = LandPlot.Id.NONE;
-            switch (sender.GetType().Name)
-            {
-                case nameof(GardenUI):
-                    kind = LandPlot.Id.GARDEN;
-                    break;
-                case nameof(CoopUI):
-                    kind = LandPlot.Id.COOP;
-                    break;
-                case nameof(CorralUI):
-                    kind = LandPlot.Id.CORRAL;
-                    break;
-                case nameof(PondUI):
-                    kind = LandPlot.Id.POND;
-                    break;
-                case nameof(SiloUI):
-                    kind = LandPlot.Id.SILO;
-                    break;
-                case nameof(IncineratorUI):
-                    kind = LandPlot.Id.INCINERATOR;
-                    break;
-            }
-            */
             return new Sisco_Return(SiscosHooks.call(HOOK_ID.Spawn_Plot_Upgrades_UI, sender, ref return_value, new object[] { kind }));
         }
 

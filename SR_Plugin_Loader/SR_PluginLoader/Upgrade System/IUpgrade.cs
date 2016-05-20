@@ -243,6 +243,7 @@ namespace SR_PluginLoader
             // Call the upgrades cleanup logic.
             removal_function?.Invoke(plot);
         }
+
         /// <summary>
         /// 
         /// </summary>

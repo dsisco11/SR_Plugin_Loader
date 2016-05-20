@@ -16,20 +16,23 @@ namespace SR_PluginLoader
 
     class Entity_Pref_Hook : Prefab_Hook
     {
-        protected override void Start() { Kind = PrefabType.ENTITY; base.Start(); }
-        protected override void OnDestroy() { Kind = PrefabType.ENTITY; base.OnDestroy(); }
+        void Awake() { Kind = PrefabType.ENTITY; }
+        //protected override void Start() { Kind = PrefabType.ENTITY; base.Start(); }
+        //protected override void OnDestroy() { Kind = PrefabType.ENTITY; base.OnDestroy(); }
     }
 
     class Plot_Pref_Hook : Prefab_Hook
     {
-        protected override void Start() { Kind = PrefabType.PLOT; base.Start(); }
-        protected override void OnDestroy() { Kind = PrefabType.PLOT; base.OnDestroy(); }
+        void Awake() { Kind = PrefabType.PLOT; }
+        //protected override void Start() { Kind = PrefabType.PLOT; base.Start(); }
+        //protected override void OnDestroy() { Kind = PrefabType.PLOT; base.OnDestroy(); }
     }
     
     class Resource_Pref_Hook : Prefab_Hook
     {
-        protected override void Start() { Kind = PrefabType.RESOURCE; base.Start(); }
-        protected override void OnDestroy() { Kind = PrefabType.RESOURCE; base.OnDestroy(); }
+        void Awake() { Kind = PrefabType.RESOURCE; }
+        //protected override void Start() { Kind = PrefabType.RESOURCE; base.Start(); }
+        //protected override void OnDestroy() { Kind = PrefabType.RESOURCE; base.OnDestroy(); }
     }
 
 
@@ -39,7 +42,7 @@ namespace SR_PluginLoader
         /// <summary>
         /// Start occurs after all other behaviour scripts for th eobject have initiated and can now be interacted with.
         /// </summary>
-        protected virtual void Start()
+        protected void Start()
         {
             switch (Kind)
             {
@@ -59,7 +62,7 @@ namespace SR_PluginLoader
             }
         }
 
-        protected virtual void OnDestroy()
+        protected void OnDestroy()
         {
             switch (Kind)
             {
