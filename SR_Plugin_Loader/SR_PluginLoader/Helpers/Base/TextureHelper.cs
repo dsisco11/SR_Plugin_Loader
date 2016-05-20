@@ -277,7 +277,11 @@ namespace SR_PluginLoader
         }
         #endregion
 
-        
+        internal static void Setup()
+        {
+            Load_Common();
+        }
+
         /// <summary>
         /// Loads all of the predefined common texture resources.
         /// </summary>

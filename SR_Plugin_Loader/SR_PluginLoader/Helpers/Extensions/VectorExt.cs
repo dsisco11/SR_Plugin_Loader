@@ -32,9 +32,19 @@ namespace SR_PluginLoader
         /// </summary>
         public static bool NoZero(this Vector3 v) { return (!Util.floatEq(0f, v.x) && !Util.floatEq(0f, v.y) && !Util.floatEq(0f, v.z)); }
 
-        
+        /// <summary>
+        /// Returns <c>True</c> if a given vector has the same X/Y/Z values.
+        /// </summary>
+        public static bool SameAs(this Vector3 v, Vector3 b) { return (Util.floatEq(v.x, b.x) && Util.floatEq(v.y, b.y) && Util.floatEq(v.z, b.z)); }
+
+        /// <summary>
+        /// Returns <c>True</c> if a given vector extends less than this vector on the X, Y, or Z axis.
+        /// </summary>
         public static bool LessThan(this Vector3 v, Vector3 b) { return (v.x < b.x || v.y < b.y || v.z < b.z); }
-        
+
+        /// <summary>
+        /// Returns <c>True</c> if a given vector extends further than this vector on the X, Y, or Z axis.
+        /// </summary>
         public static bool GreaterThan(this Vector3 v, Vector3 b) { return (v.x > b.x || v.y > b.y || v.z > b.z); }
 
 

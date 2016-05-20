@@ -56,7 +56,8 @@ namespace SR_PluginLoader
                 try
                 {
                     DebugHud.Init();
-                    TextureHelper.Load_Common();
+                    TextureHelper.Setup();
+                    MaterialHelper.Setup();
                     SiscosHooks.Setup();
                     PluginLoader_Watermark.Setup();
                     MainMenu.Setup();

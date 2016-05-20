@@ -9,6 +9,7 @@ namespace SR_PluginLoader
 {
     public static class DebugUI
     {
+        private static Active_State_Tracker State = new Active_State_Tracker("DebugUI");
         /// <summary>
         /// The panel that holds all of the DebugUI controls, so we can easily deactivate it if needed.
         /// </summary>
@@ -21,11 +22,18 @@ namespace SR_PluginLoader
         /// </summary>
         internal static uiVarText lbl_player_pos = null;
         /// <summary>
+        /// A convenient label to display the active camera's position
+        /// </summary>
+        internal static uiVarText lbl_cam_pos = null;
+        /// <summary>
+        /// A convenient label to display the active camera's rotation
+        /// </summary>
+        internal static uiVarText lbl_cam_rot = null;
+        /// <summary>
         /// A label that shows the current debug drawing mode for uiControls
         /// </summary>
         internal static uiText lbl_debug_mode = null;
-
-
+        
         public static void Setup()
         {
             SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded);
@@ -37,17 +45,30 @@ namespace SR_PluginLoader
             Root.Set_Padding(5);
             Root.FloodXY();
             Root.local_style.normal.background = null;
+            Root.isVisible = false;//Because our State var is inactive by default
 
-            lbl_player_pos = uiControl.Create<uiVarText>(Root);
+            var list = uiControl.Create<uiListView>(Root);// Using a uiListView to contain all of our debug var displays makes them all auto layout, which is nice
+            list.alignLeftSide();
+            list.alignTop(200);
 
-            lbl_player_pos.alignLeftSide();
-            lbl_player_pos.alignTop();
+            lbl_player_pos = uiControl.Create<uiVarText>(list);
             lbl_player_pos.Text = "Player Pos:";
+            lbl_player_pos.Set_Margin(0);
+            lbl_player_pos.Set_Padding(0);
 
-            lbl_debug_mode = uiControl.Create<uiText>(Root);
-            lbl_debug_mode.alignLeftSide();
-            lbl_debug_mode.moveBelow(lbl_player_pos);
-            lbl_debug_mode.isVisible = false;//only shows when the debug drawing mode isnt NONE
+            lbl_cam_pos = uiControl.Create<uiVarText>(list);
+            lbl_cam_pos.Text = "Cam Pos:";
+            lbl_cam_pos.Set_Margin(0);
+            lbl_cam_pos.Set_Padding(0);
+
+            lbl_cam_rot = uiControl.Create<uiVarText>(list);
+            lbl_cam_rot.Text = "Cam Rot:";
+            lbl_cam_rot.Set_Margin(0);
+            lbl_cam_rot.Set_Padding(0);
+
+
+            lbl_debug_mode = uiControl.Create<uiText>(list);
+            //lbl_debug_mode.isVisible = false;//only shows when the debug drawing mode isnt NONE
 
             uiControl.dbg_mouse_tooltip_style = new GUIStyle();
             uiControl.dbg_mouse_tooltip_style.normal.textColor = Color.white;
@@ -143,14 +164,13 @@ namespace SR_PluginLoader
 
         public static bool isVisible { get { return Root.isVisible; } }
 
-        public static void Hide() { Root.isVisible = false; }
-        public static void Show() { Root.isVisible = true; }
-        public static void Toggle() { Root.isVisible = !Root.isVisible; }
+        public static void Hide() { Root.isVisible = State.Deactivate(); }
+        public static void Show() { Root.isVisible = State.Activate(); }
     }
 
     public class DebugUI_Script : MonoBehaviour
     {
-        private void Start() { DebugUI.Hide(); }
+        private void Start() { /*DebugUI.Hide();*/ }
 
         private void Update()
         {
@@ -183,7 +203,7 @@ namespace SR_PluginLoader
                     uiControl.DEBUG_DRAW_MODE = (uiDebugDrawMode)mode;
                 }
 
-                DebugUI.lbl_debug_mode.isVisible = !(uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.NONE);
+                //DebugUI.lbl_debug_mode.isVisible = !(uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.NONE);
                 DebugUI.lbl_debug_mode.Text = Enum.GetName(typeof(uiDebugDrawMode), uiControl.DEBUG_DRAW_MODE);
             }
 
@@ -267,6 +287,7 @@ namespace SR_PluginLoader
         private void LateUpdate()
         {
             if (Player.isValid && DebugUI.lbl_player_pos.isVisible) DebugUI.lbl_player_pos.Value = Player.Pos.ToString();
+            if (DebugUI.lbl_cam_pos.isVisible) DebugUI.lbl_cam_pos.Value = Camera.main.transform.position.ToString();
 
             // Figure out which uiControl the mouse is overtop
             uiControl.debug_current_mouse_over = null;
@@ -316,6 +337,7 @@ namespace SR_PluginLoader
                 }
             }
         }
+        
     }
     
 }

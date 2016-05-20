@@ -67,6 +67,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BoundsExt.cs" />
+    <Compile Include="DevTools\Gizmos\dGizmo_Vec.cs" />
+    <Compile Include="Helpers\Extensions\GameObjectExt.cs" />
+    <Compile Include="Helpers\Unity Scripts\Camera_Gizmo_Renderer.cs" />
+    <Compile Include="DevTools\Gizmos\dGizmo_Axis3D.cs" />
+    <Compile Include="DevTools\Gizmos\dGizmo_BB.cs" />
+    <Compile Include="DevTools\Gizmos\dGizmo.cs" />
+    <Compile Include="DevTools\Gizmos\GizmoType.cs" />
     <Compile Include="Helpers\Unity Scripts\DebugUI_Visualizer.cs" />
     <Compile Include="Dev_Menu\Dev_Hierarchy_Browser.cs" />
     <Compile Include="Dev_Menu\Dev_SpawnMenu.cs" />
@@ -82,6 +90,8 @@
     <Compile Include="Helpers\Unity Scripts\DevCamera.cs" />
     <Compile Include="Helpers\Unity Scripts\Debug_Visualizer.cs" />
     <Compile Include="Helpers\Unity Scripts\SelectableCollider.cs" />
+    <Compile Include="Helpers\Base\MaterialHelper.cs" />
+    <Compile Include="Helpers\Unity Scripts\onDeathEvent.cs" />
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
     <Compile Include="SiscosHooks\HOOK_SHAS.cs" />
@@ -239,6 +249,7 @@
     <Compile Include="Base\Watermark_UI.cs" />
     <Compile Include="Base\Active_State_Tracker.cs" />
     <Compile Include="Helpers\Extensions\VectorExt.cs" />
+    <Compile Include="Helpers\Unity Scripts\WorldText.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
