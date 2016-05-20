@@ -11,15 +11,15 @@ namespace SR_PluginLoader
     public class Upgrades
     {
         private static bool setup = false;
-        public static object registrar = new object();
+        private static List<HookUID> hooks = new List<HookUID>();// We are responsible for tracking any and all hooks we have registered
         /// <summary>
         /// A complete map of all existing custom upgrades.
         /// Since this upgrade list is only populated when plugins load/unload we do not want to reset it in the Upgrade_system's Setup logic.
         /// </summary>
-        private static Dictionary<Upgrade_Type, List<IUpgrade>> ALL = new Dictionary<Upgrade_Type, List<IUpgrade>>()
+        private static Dictionary<Upgrade_Type, Dictionary<string, IUpgrade>> ALL = new Dictionary<Upgrade_Type, Dictionary<string, IUpgrade>>()
         {
-            { Upgrade_Type.PLOT_UPGRADE, new List<IUpgrade>() },
-            { Upgrade_Type.PLAYER_UPGRADE, new List<IUpgrade>() },
+            { Upgrade_Type.PLOT_UPGRADE, new Dictionary<string, IUpgrade>() },
+            { Upgrade_Type.PLAYER_UPGRADE, new Dictionary<string, IUpgrade>() },
         };
         /// <summary>
         /// The list of custom upgrades the player has bought
@@ -50,35 +50,45 @@ namespace SR_PluginLoader
             Plot_Upgrades_Cache = new List<Plot_Upgrades>();
             Plot_Upgrade_Data = new Dictionary<PlotID, Dictionary<string, Dictionary<string, byte[]>>>();
 
-            SiscosHooks.unregister_all(registrar);
+            foreach (HookUID hk in hooks) { SiscosHooks.unregister(hk); }
 
-            SiscosHooks.register(HOOK_ID.Game_Saved, onGameSaved, registrar);
-            SiscosHooks.register(HOOK_ID.Pre_Game_Loaded, onPreGameLoaded, registrar);
-            SiscosHooks.register(HOOK_ID.Post_Game_Loaded, onPostGameLoaded, registrar);
-            SiscosHooks.register(HOOK_ID.Spawn_Player_Upgrades_UI, onSpawn_PlayerUpgrades_Kiosk, registrar);
-            SiscosHooks.register(HOOK_ID.Spawn_Plot_Upgrades_UI, onSpawn_PlotUpgrades_Kiosk, registrar);
-            SiscosHooks.register(HOOK_ID.Plot_Load_Upgrades, onPlot_Loaded_Upgrades, registrar);
-            SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded, registrar);
-            SiscosHooks.register(HOOK_ID.Demolished_Land_Plot, onPlot_Demolished, registrar);
+            hooks.Add(SiscosHooks.register(HOOK_ID.Game_Saved, onGameSaved));
+            hooks.Add(SiscosHooks.register(HOOK_ID.Pre_Game_Loaded, onPreGameLoaded));
+            hooks.Add(SiscosHooks.register(HOOK_ID.Post_Game_Loaded, onPostGameLoaded));
+            hooks.Add(SiscosHooks.register(HOOK_ID.Spawn_Player_Upgrades_UI, onSpawn_PlayerUpgrades_Kiosk));
+            hooks.Add(SiscosHooks.register(HOOK_ID.Spawn_Plot_Upgrades_UI, onSpawn_PlotUpgrades_Kiosk));
+            hooks.Add(SiscosHooks.register(HOOK_ID.Plot_Load_Upgrades, onPlot_Loaded_Upgrades));
+            hooks.Add(SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded));
+            hooks.Add(SiscosHooks.register(HOOK_ID.Demolished_Land_Plot, onPlot_Demolished));
         }
 
         #region Misc
         internal static void Register(IUpgrade upgrade)
         {
-            if (!ALL.ContainsKey(upgrade.Type)) ALL.Add(upgrade.Type, new List<IUpgrade>());
+            if (!ALL.ContainsKey(upgrade.Type)) ALL.Add(upgrade.Type, new Dictionary<string, IUpgrade>());
 
-            var old = ALL[upgrade.Type].FirstOrDefault(o => String.Compare(o.ID, upgrade.ID) == 0);
-            if (old != null) ALL[upgrade.Type].Remove(old);
+            var dict = ALL[upgrade.Type];
+            if (dict.ContainsKey(upgrade.ID))
+            {
+                SLog.Warn("[Upgrades] Blocked Attempt to register duplicate {0} upgrade instance for \"{1}\"", upgrade.Type, upgrade.ID);
+                return;
+            }
+            //var old = ALL[upgrade.Type].FirstOrDefault(o => String.Compare(o.ID, upgrade.ID) == 0);
+            //if (old != null) ALL[upgrade.Type].Remove(old);
 
-            //PLog.Info("[Upgrades] registered: {0}", upgrade.ID);
-            ALL[upgrade.Type].Add(upgrade);
+            SLog.Debug("[Upgrades] Registered: {0}", upgrade.ID);
+            ALL[upgrade.Type].Add(upgrade.ID, upgrade);
         }
 
         public static IUpgrade Get_Upgrade(Upgrade_Type type, string ID)
         {
             if (!ALL.ContainsKey(type)) return null;
 
-            return ALL[type].FirstOrDefault(o => (String.Compare(o.ID, ID) == 0));
+            //return ALL[type].FirstOrDefault(o => (String.Compare(o.ID, ID) == 0));
+            IUpgrade up = null;
+            if (!ALL[type].TryGetValue(ID, out up)) return null;
+
+            return up;
         }
         #endregion
 
@@ -276,7 +286,7 @@ namespace SR_PluginLoader
             LandPlot.Id ID = (LandPlot.Id)args[0];
             LandPlot plot = sender as LandPlot;
             PlotID id = new PlotID(plot);
-            SLog.Info("Plot({0}){1} Demolished", ID, id);
+            //SLog.Debug("Plot({0}){1} Demolished", ID, id);
 
             var track = plot.gameObject.GetComponent<PlotUpgradeTracker>();
             track.Remove_All();
@@ -293,7 +303,7 @@ namespace SR_PluginLoader
                 System.Threading.Timer timer = null;
                 timer = new System.Threading.Timer((object o) =>
                 {
-                    SLog.Debug("Flushing custom upgrades...");
+                    SLog.Debug("[Upgrades] Flushing custom upgrades...");
                     Upgrades.setup = false;
                     Upgrades.Setup();
 
@@ -311,7 +321,7 @@ namespace SR_PluginLoader
             GameObject panel = return_value as GameObject;
             var ui = panel.GetComponent<PurchaseUI>();
             
-            foreach (PlayerUpgrade up in ALL[Upgrade_Type.PLAYER_UPGRADE])
+            foreach (PlayerUpgrade up in ALL[Upgrade_Type.PLAYER_UPGRADE].Values)
             {
                 ui.AddButton(new PurchaseUI.Purchasable(up.Name, up.Sprite, up.PreviewSprite, up.Description, up.Cost, new PediaDirector.Id?(), new UnityAction(() => { up.Purchase(kiosk.gameObject); }), Player.CanBuyUpgrade(up)));
             }
@@ -332,7 +342,7 @@ namespace SR_PluginLoader
             GameObject panel = return_value as GameObject;
             var ui = panel.GetComponent<PurchaseUI>();
 
-            foreach (PlotUpgrade up in ALL[Upgrade_Type.PLOT_UPGRADE])
+            foreach (PlotUpgrade up in ALL[Upgrade_Type.PLOT_UPGRADE].Values)
             {
                 if (up.Kind != kind) continue;
                 bool can_buy = up.CanBuy(tracker);

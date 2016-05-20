@@ -67,7 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BoundsExt.cs" />
+    <Compile Include="Helpers\Extensions\BoundsExt.cs" />
     <Compile Include="DevTools\Gizmos\dGizmo_Vec.cs" />
     <Compile Include="Helpers\Extensions\GameObjectExt.cs" />
     <Compile Include="Helpers\Unity Scripts\Camera_Gizmo_Renderer.cs" />
