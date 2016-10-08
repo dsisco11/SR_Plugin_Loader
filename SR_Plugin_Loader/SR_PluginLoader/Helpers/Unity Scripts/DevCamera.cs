@@ -16,7 +16,10 @@ namespace SR_PluginLoader
     /// </summary>
     public class DevCamera : MonoBehaviour
     {
+        #region Events
         public event Action onActivate, onDeactivate;
+        #endregion
+
         #region Variables
 
         /// <summary>
@@ -46,6 +49,10 @@ namespace SR_PluginLoader
         /// Rotation value limits for the X/Y axi.
         /// </summary>
         public Vector2 rotationLimit = new Vector2(180, 360);
+        #endregion
+
+        #region Throw-Away Vars
+        dGizmo_Cam defaultCam_Marker = null;
         #endregion
 
         #region State Variables
@@ -100,6 +107,8 @@ namespace SR_PluginLoader
             var overlay = cam.GetComponent<Overlay>();
             if(overlay!=null) Destroy(overlay);
             //cam.gameObject.AddComponent<SECTR_Member>();
+            cam.gameObject.AddComponent<SECTR_RegionLoader>();
+            cam.gameObject.AddComponent<SECTR_PointSource>();
 
             return dc;
         }
@@ -118,7 +127,8 @@ namespace SR_PluginLoader
                 RenderSettings.fog = enable_fog;
                 Player.Freeze();
                 ViewModel.Toggle(false);
-
+                if (defaultCam_Marker != null) defaultCam_Marker.Dispose();
+                defaultCam_Marker = new dGizmo_Cam(defaultCam);
             }
             else
             {
@@ -126,6 +136,7 @@ namespace SR_PluginLoader
                 RenderSettings.fog = true;
                 Player.Unfreeze();
                 ViewModel.Toggle(true);
+                if(defaultCam_Marker!=null) defaultCam_Marker.Dispose();
             }
 
             if(FLYING) onActivate?.Invoke();
@@ -134,6 +145,7 @@ namespace SR_PluginLoader
 
         void LateUpdate()
         {
+            if (GameTime.isPaused) return;
             Rotate();
             Move();
             doPicking();

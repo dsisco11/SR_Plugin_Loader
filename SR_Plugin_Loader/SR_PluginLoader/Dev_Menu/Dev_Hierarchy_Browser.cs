@@ -11,7 +11,7 @@ namespace SR_PluginLoader
         GameObject selection = null;
 
         uiListView list = null;
-        uiWrapperPanel info_panel = null;
+        uiPanel info_panel = null;
         uiText lbl_components = null;
         uiListView var_components = null;
         uiVarText var_child_count = null;
@@ -19,6 +19,7 @@ namespace SR_PluginLoader
 
         public Dev_Hierarchy_Browser()
         {
+            onShown += (uiControl c) => { Refresh(); };
             Autosize = true;
             Autosize_Method = AutosizeMethod.FILL;
 
@@ -28,7 +29,10 @@ namespace SR_PluginLoader
             //list.CONFIRM_LAYOUT = true;
 
 
-            info_panel = uiControl.Create<uiWrapperPanel>(this);
+            info_panel = uiControl.Create<uiPanel>(this);
+            info_panel.Scrollable = false;
+            info_panel.Autosize = true;
+            info_panel.Autosize_Method = AutosizeMethod.FILL;
             info_panel.onLayout += Info_panel_onLayout;
             info_panel.Set_Padding(3);
 
@@ -36,11 +40,49 @@ namespace SR_PluginLoader
             lbl_components.Text = "Scripts";
 
             var_components = Create<uiListView>(info_panel);
+            //var_components.Autosize = false;
 
             var_child_count = Create<uiVarText>(info_panel);
             var_child_count.Text = "Children: ";
+        }
 
-            Init();
+        public void Refresh()
+        {
+            list.Clear_Children();
+
+            HashSet<GameObject> rootObjects = new HashSet<GameObject>();
+            foreach (GameObject go in UnityEngine.Object.FindObjectsOfType<GameObject>())
+            {
+                if (go.transform == null)
+                {
+                    rootObjects.Add(go);
+                }
+                else
+                {
+                    Transform xform = go.transform;
+                    if (xform.parent == null && xform.gameObject != null)
+                    {
+                        rootObjects.Add(xform.gameObject);
+                    }
+                }
+            }
+
+            foreach (GameObject go in rootObjects)
+            {
+                var node = Spawn_Node(go, list);
+                Populate_Single_Node(node);
+            }
+
+            set_layout_dirty();
+            //set_area_dirty();
+        }
+
+        public void Collapse_All()
+        {
+            foreach(uiList_TreeNode node in list.Get_Children())
+            {
+                node.Collapse();
+            }
         }
 
         private void Update_info()
@@ -52,7 +94,7 @@ namespace SR_PluginLoader
                 Component[] comps = selection.GetComponents<Component>();
                 foreach(var c in comps)
                 {
-                    uiListItem n = Create<uiListItem>(var_components);
+                    var n = Create<uiList_TreeNode>(var_components);
                     n.Title = c.GetType().Name;
                     n.TextSize = 12;
                     n.Selectable = false;
@@ -77,35 +119,7 @@ namespace SR_PluginLoader
             info_panel.moveRightOf(list);
             info_panel.FloodXY();
         }
-
-        private uiList_TreeNode Spawn_Node(GameObject gm, uiPanel parent)
-        {
-            uiList_TreeNode node = Create<uiList_TreeNode>(parent);
-            node.tag = gm;
-            node.Title = gm.name;
-            node.onExpanded += Populate_Node;
-            node.onClicked += (uiControl c) => { var sel = ((c as uiList_TreeNode).tag as GameObject);  if (sel != selection) { selection = sel; }  Update_info(); };
-            return node;
-        }
-
-        private void Init()
-        {
-            HashSet<GameObject> rootObjects = new HashSet<GameObject>();
-            foreach (Transform xform in UnityEngine.Object.FindObjectsOfType<Transform>())
-            {
-                if (xform.parent == null && xform.gameObject!=null)
-                {
-                    rootObjects.Add(xform.gameObject);
-                }
-            }
-
-            foreach(GameObject gm in rootObjects)
-            {
-                var node = Spawn_Node(gm, list);
-                Populate_Single_Node(node);
-            }
-        }
-
+        
         private void Populate_Node(uiList_TreeNode node)
         {
             node.Clear_Children();
@@ -128,6 +142,31 @@ namespace SR_PluginLoader
                 if (trans.gameObject == trans.parent || trans.parent == null) continue;
                 Spawn_Node(trans.gameObject, node);
             }
+        }
+
+        private uiList_TreeNode Spawn_Node(GameObject gm, uiPanel parent)
+        {
+            uiList_TreeNode node = Create<uiList_TreeNode>(parent);
+            node.tag = gm;
+            node.Title = gm.name;
+            node.onExpanded += Populate_Node;
+            node.onClicked += (uiControl c) => 
+            {
+                c.Parent.Collapse_All();
+                var sel = ((c as uiList_TreeNode).tag as GameObject);
+                if (sel != selection)
+                {
+                    selection = sel;
+                }
+                else if(!c.isChild)
+                {
+                    selection = null;
+                }
+
+                Update_info();
+                if (selection != null) { (c as uiList_TreeNode).Expand(); }
+            };
+            return node;
         }
     }
 }

@@ -6,6 +6,8 @@ namespace SR_PluginLoader
 {
     public class uiWindow : uiPanel
     {
+
+        protected override List<uiControl> children { get { if (content_panel==null) { throw new Exception("uiWindow content_panel not ready!"); } return content_panel.Get_Children(); } }
         /// <summary>
         /// Tracks all uiWindow instances by their ID.
         /// </summary>
@@ -197,8 +199,8 @@ namespace SR_PluginLoader
 
         public void ToggleShow()
         {
-            if (isVisible) Hide();
-            else Show();
+            if (!isVisible) Show();
+            else Hide();
         }
 
         public void Center()
@@ -228,7 +230,7 @@ namespace SR_PluginLoader
             return content_panel.withinChild(p);
         }
 
-        public override IList<uiControl> Get_Children() { return content_panel.Get_Children(); }
+        //public override IList<uiControl> Get_Children() { return content_panel.Get_Children(); }
         #endregion
 
         public override void doLayout()

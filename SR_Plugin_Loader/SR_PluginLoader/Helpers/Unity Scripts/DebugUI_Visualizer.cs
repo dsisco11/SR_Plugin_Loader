@@ -12,11 +12,15 @@ namespace SR_PluginLoader
         {
             if (Event.current.type != EventType.Repaint) return;
             //GL.PushMatrix();
-            DebugUI.DEBUG_LINE_MAT.SetPass(0);
-            GL.Begin(GL.LINES);
-            GL.Color(uiControl.color_purple);
-            DebugUI.Draw_GameObj_Bounds(base.gameObject);
-            GL.End();
+
+            if (MaterialHelper.mat_line.SetPass(0))
+            {
+                //DebugUI.DEBUG_LINE_MAT.SetPass(0);
+                GL.Begin(GL.LINES);
+                GL.Color(uiControl.color_purple);
+                DebugUI.Draw_GameObj_Bounds(base.gameObject);
+                GL.End();
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ namespace SR_PluginLoader
     /// <summary>
     /// A simple wrapper panel with the ability to be collapsed and expanded.
     /// </summary>
-    public class uiCollapser : uiWrapperPanel
+    public class uiCollapser : uiWrapperPanel, ICollapsable
     {
         #region State Sizes (Collapsed/Expanded)
 

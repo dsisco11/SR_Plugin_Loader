@@ -9,7 +9,7 @@ namespace SR_PluginLoader
     /// <summary>
     /// A collapsable tree-view node, such as one would see in a file browser.
     /// </summary>
-    public class uiList_TreeNode : uiWrapperPanel
+    public class uiList_TreeNode : uiWrapperPanel, ICollapsable
     {
         public object tag = null;
         public event Action<uiList_TreeNode> onCollapsed, onExpanded;
@@ -23,7 +23,7 @@ namespace SR_PluginLoader
         uiListView list = null;
         #endregion
 
-        public override IList<uiControl> Get_Children() { if (list == null) { return null; } return list.Get_Children(); }
+        protected override List<uiControl> children { get { if (list == null) { return null; } return list.Get_Children(); } }
         public override void Clear_Children() { list.Clear_Children(); update_icon(); }
         public override uiControl Add(uiControl c) { list.Add(c); update_icon(); return c; }
 
@@ -98,8 +98,8 @@ namespace SR_PluginLoader
             collapser.moveBelow(title);
         }
 
-        public void Collapse() { collapser.Collapse(); }
-        public void Expand() { collapser.Expand(); }
+        public bool Collapse() { return collapser.Collapse(); }
+        public bool Expand() { return collapser.Expand(); }
 
     }
 }

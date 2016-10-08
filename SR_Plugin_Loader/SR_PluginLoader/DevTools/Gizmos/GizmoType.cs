@@ -8,5 +8,6 @@ namespace SR_PluginLoader
         XYZ_AXIS_DISPLAY,
         BOUNDING_BOX,
         VECTOR,
+        CAMERA,
     }
 }

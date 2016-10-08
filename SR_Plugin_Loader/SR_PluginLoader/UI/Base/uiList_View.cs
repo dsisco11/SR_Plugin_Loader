@@ -17,6 +17,7 @@ namespace SR_PluginLoader
         {
             onChildAdded += UiListView_onChildAdded;
             Scrollable = true;
+            Autosize_Method = AutosizeMethod.NONE;
             Layout = new Layout_Default();
             Set_Margin(1);
         }

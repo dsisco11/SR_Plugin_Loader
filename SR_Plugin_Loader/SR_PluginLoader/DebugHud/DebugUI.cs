@@ -16,7 +16,6 @@ namespace SR_PluginLoader
         private static uiPanel Root = null;
         public static uiPanel ROOT { get { return Root; } }
 
-        internal static Material DEBUG_LINE_MAT;
         /// <summary>
         /// A convenient label to output the players coordinates onscreen
         /// </summary>
@@ -37,7 +36,6 @@ namespace SR_PluginLoader
         public static void Setup()
         {
             SiscosHooks.register(HOOK_ID.Level_Loaded, onLevelLoaded);
-            Create_Mat();
             Init();
 
             Root = uiControl.Create<uiPanel>();
@@ -89,24 +87,7 @@ namespace SR_PluginLoader
             GameObject gm = Camera.main.gameObject;
             gm.AddComponent<DebugUI_Script>();
         }
-
-        private static void Create_Mat()
-        {
-            // Unity has a built-in shader that is useful for drawing
-            // simple colored things.
-            var shader = Shader.Find("Hidden/Internal-Colored");
-            DEBUG_LINE_MAT = new Material(shader);
-            DEBUG_LINE_MAT.hideFlags = HideFlags.HideAndDontSave;
-            // Turn on alpha blending
-            DEBUG_LINE_MAT.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            DEBUG_LINE_MAT.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-            // Turn backface culling off
-            DEBUG_LINE_MAT.SetInt("_Cull", (int)UnityEngine.Rendering.CullMode.Off);
-            // Turn off depth writes
-            DEBUG_LINE_MAT.SetInt("_ZWrite", 0);
-
-        }
-
+        
         public static void Draw_Rect(Rect r)
         {
             const float Z = 0f;
@@ -228,57 +209,66 @@ namespace SR_PluginLoader
                     pointer.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
                     EventSystem.current.RaycastAll(pointer, hits);
 
-                    GL.PushMatrix();
-                    DebugUI.DEBUG_LINE_MAT.SetPass(0);
-                    GL.Begin(GL.LINES);
-                    if (hits.Count > 0)
+
+                    if (MaterialHelper.mat_line.SetPass(0))
                     {
-                        //PLog.Info("Drawing: {0} {{{1}}}", hits.Count, String.Join(", ", hits.Select(h => String.Format("{0}({1})[p:{2}]", h.gameObject.name, h.gameObject.GetType().Name, h.gameObject.transform.parent.gameObject.name)).ToArray()));
-                        foreach (RaycastResult res in hits)
+                        GL.PushMatrix();
+                        //DebugUI.DEBUG_LINE_MAT.SetPass(0);
+                        GL.Begin(GL.LINES);
+                        if (hits.Count > 0)
                         {
-                            DebugUI.Draw_GameObj_Bounds(res.gameObject);
+                            //PLog.Info("Drawing: {0} {{{1}}}", hits.Count, String.Join(", ", hits.Select(h => String.Format("{0}({1})[p:{2}]", h.gameObject.name, h.gameObject.GetType().Name, h.gameObject.transform.parent.gameObject.name)).ToArray()));
+                            foreach (RaycastResult res in hits)
+                            {
+                                DebugUI.Draw_GameObj_Bounds(res.gameObject);
+                            }
                         }
-                    }
 
 
-                    if (MainMenu.Instance != null)
-                    {
-                        Transform MenuPanel = MainMenu.Instance.transform.FindChild("StandardModePanel");
-                        if (MenuPanel != null) DebugUI.Draw_GameObj_Bounds(MenuPanel.gameObject);
+                        if (MainMenu.Instance != null)
+                        {
+                            Transform MenuPanel = MainMenu.Instance.transform.FindChild("StandardModePanel");
+                            if (MenuPanel != null) DebugUI.Draw_GameObj_Bounds(MenuPanel.gameObject);
+                        }
+                        GL.End();
+                        GL.PopMatrix();
                     }
-                    GL.End();
-                    GL.PopMatrix();
                 }
             }
             else if (uiControl.DEBUG_DRAW_MODE == uiDebugDrawMode.SR_HUD)// Special mode
             {
-                GL.PushMatrix();
-                DebugUI.DEBUG_LINE_MAT.SetPass(0);
-                GL.Begin(GL.LINES);
-
-                var hud = GameObject.FindObjectOfType<HudUI>();
-                for (int i = 0; i < hud.transform.childCount; i++)
+                if (MaterialHelper.mat_line.SetPass(0))
                 {
-                    GameObject gm = hud.transform.GetChild(i).gameObject;
-                    DebugUI.Draw_GameObj_Bounds(gm);
-                }
-                
-                GL.End();
-                GL.PopMatrix();
+                    GL.PushMatrix();
+                    //DebugUI.DEBUG_LINE_MAT.SetPass(0);
+                    GL.Begin(GL.LINES);
 
+                    var hud = GameObject.FindObjectOfType<HudUI>();
+                    for (int i = 0; i < hud.transform.childCount; i++)
+                    {
+                        GameObject gm = hud.transform.GetChild(i).gameObject;
+                        DebugUI.Draw_GameObj_Bounds(gm);
+                    }
+
+                    GL.End();
+                    GL.PopMatrix();
+                }
             }
             else if (uiControl.DEBUG_DRAW_MODE != uiDebugDrawMode.NONE)
             {
                 var eType = Event.current.rawType;
                 if (eType != EventType.Repaint) return;
 
-                GL.PushMatrix();
-                DebugUI.DEBUG_LINE_MAT.SetPass(0);
-                GL.Color(Color.white);
+                if (MaterialHelper.mat_line.SetPass(0))
+                {
+                    GL.PushMatrix();
+                    //DebugUI.DEBUG_LINE_MAT.SetPass(0);
+                    GL.Color(Color.white);
 
-                if (uiControl.DEBUG_DRAW_MODE != uiDebugDrawMode.NONE) uiControl.Draw_Debug_Outlines();
+                    if (uiControl.DEBUG_DRAW_MODE != uiDebugDrawMode.NONE) uiControl.Draw_Debug_Outlines();
 
-                GL.PopMatrix();
+                    GL.PopMatrix();
+                }
 
                 uiControl.Debug_Draw_Tooltip();
             }

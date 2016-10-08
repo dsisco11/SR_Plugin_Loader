@@ -29,6 +29,7 @@ namespace SR_PluginLoader
     /// </summary>
     public abstract class dGizmo : IDisposable
     {
+        private Color? color = null;
         internal static List<dGizmo> ALL = new List<dGizmo>();
         #region Variables
         public GameObject gameObject { get; private set; }
@@ -124,12 +125,23 @@ namespace SR_PluginLoader
         {
             foreach (GizmoLine line in Lines)
             {
-                GL.Color(line.c1);
+                if(color.HasValue) GL.Color(line.c1 * color.Value);
+                else GL.Color(line.c1);
                 GL.Vertex(line.v1);
 
-                if(line.c2.HasValue) GL.Color(line.c2.Value);
+                if (line.c2.HasValue)
+                {
+                    if (color.HasValue) GL.Color(line.c2.Value * color.Value);
+                    else GL.Color(line.c2.Value);
+                }
                 GL.Vertex(line.v2);
             }
+        }
+
+
+        protected void Add_Line(Vector3 v1, Vector3 v2, Color color)
+        {
+            Lines.Add(new GizmoLine(v1, v2, color));
         }
 
         /// <summary>
@@ -153,6 +165,89 @@ namespace SR_PluginLoader
             Lines.Add(new GizmoLine(pos, fade_start, c1, c1));
             if(!Util.floatEq(0f, fade_pct)) Lines.Add(new GizmoLine(fade_start, cap_start, c1, c2));
             Lines.Add(new GizmoLine(cap_start, cap_start + (dir * cap_size), c2, c2));
+        }
+
+        protected void Add_Box(Vector3 center, Vector3 extents, Color color)
+        {
+            Vector3 hExtents = extents * 0.5f;
+
+            var v3FrontTopLeft = new Vector3(center.x - hExtents.x, center.y + hExtents.y, center.z - hExtents.z);  // Front top left corner
+            var v3FrontTopRight = new Vector3(center.x + hExtents.x, center.y + hExtents.y, center.z - hExtents.z);  // Front top right corner
+            var v3FrontBottomLeft = new Vector3(center.x - hExtents.x, center.y - hExtents.y, center.z - hExtents.z);  // Front bottom left corner
+            var v3FrontBottomRight = new Vector3(center.x + hExtents.x, center.y - hExtents.y, center.z - hExtents.z);  // Front bottom right corner
+            var v3BackTopLeft = new Vector3(center.x - hExtents.x, center.y + hExtents.y, center.z + hExtents.z);  // Back top left corner
+            var v3BackTopRight = new Vector3(center.x + hExtents.x, center.y + hExtents.y, center.z + hExtents.z);  // Back top right corner
+            var v3BackBottomLeft = new Vector3(center.x - hExtents.x, center.y - hExtents.y, center.z + hExtents.z);  // Back bottom left corner
+            var v3BackBottomRight = new Vector3(center.x + hExtents.x, center.y - hExtents.y, center.z + hExtents.z);  // Back bottom right corner
+
+
+            Add_Line(v3FrontTopLeft, v3FrontTopRight, color);
+            Add_Line(v3FrontTopRight, v3FrontBottomRight, color);
+            Add_Line(v3FrontBottomRight, v3FrontBottomLeft, color);
+            Add_Line(v3FrontBottomLeft, v3FrontTopLeft, color);
+
+            Add_Line(v3BackTopLeft, v3BackTopRight, color);
+            Add_Line(v3BackTopRight, v3BackBottomRight, color);
+            Add_Line(v3BackBottomRight, v3BackBottomLeft, color);
+            Add_Line(v3BackBottomLeft, v3BackTopLeft, color);
+
+            Add_Line(v3FrontTopLeft, v3BackTopLeft, color);
+            Add_Line(v3FrontTopRight, v3BackTopRight, color);
+            Add_Line(v3FrontBottomRight, v3BackBottomRight, color);
+            Add_Line(v3FrontBottomLeft, v3BackBottomLeft, color);
+
+        }
+
+        /// <summary>
+        /// Creates a trapezoid shaped box where the front and back sides are different sizes
+        /// </summary>
+        /// <param name="hLength">Length of the shape between it's starting side and ending side</param>
+        protected void Add_Box_Trapezoid(Vector3 center, float length, Vector2 start_size, Vector2 end_size, Color color)
+        {
+            float hLength = length * 0.5f;
+            Vector3 hStart_Size = start_size * 0.5f;
+            var v3FrontTopLeft = new Vector3(center.x - hStart_Size.x, center.y + hStart_Size.y, center.z - hLength);  // Front top left corner
+            var v3FrontTopRight = new Vector3(center.x + hStart_Size.x, center.y + hStart_Size.y, center.z - hLength);  // Front top right corner
+            var v3FrontBottomLeft = new Vector3(center.x - hStart_Size.x, center.y - hStart_Size.y, center.z - hLength);  // Front bottom left corner
+            var v3FrontBottomRight = new Vector3(center.x + hStart_Size.x, center.y - hStart_Size.y, center.z - hLength);  // Front bottom right corner
+
+            Vector3 hEnd_Size = end_size * 0.5f;
+            var v3BackTopLeft = new Vector3(center.x - hEnd_Size.x, center.y + hEnd_Size.y, center.z + hLength);  // Back top left corner
+            var v3BackTopRight = new Vector3(center.x + hEnd_Size.x, center.y + hEnd_Size.y, center.z + hLength);  // Back top right corner
+            var v3BackBottomLeft = new Vector3(center.x - hEnd_Size.x, center.y - hEnd_Size.y, center.z + hLength);  // Back bottom left corner
+            var v3BackBottomRight = new Vector3(center.x + hEnd_Size.x, center.y - hEnd_Size.y, center.z + hLength);  // Back bottom right corner
+
+
+            Add_Line(v3FrontTopLeft, v3FrontTopRight, color);
+            Add_Line(v3FrontTopRight, v3FrontBottomRight, color);
+            Add_Line(v3FrontBottomRight, v3FrontBottomLeft, color);
+            Add_Line(v3FrontBottomLeft, v3FrontTopLeft, color);
+
+            Add_Line(v3BackTopLeft, v3BackTopRight, color);
+            Add_Line(v3BackTopRight, v3BackBottomRight, color);
+            Add_Line(v3BackBottomRight, v3BackBottomLeft, color);
+            Add_Line(v3BackBottomLeft, v3BackTopLeft, color);
+
+            Add_Line(v3FrontTopLeft, v3BackTopLeft, color);
+            Add_Line(v3FrontTopRight, v3BackTopRight, color);
+            Add_Line(v3FrontBottomRight, v3BackBottomRight, color);
+            Add_Line(v3FrontBottomLeft, v3BackBottomLeft, color);
+
+        }
+
+        protected void Add_Cross(Vector3 origin, float size, Color color)
+        {
+            Lines.Add(new GizmoLine((Vector3.up * -size) + origin, (Vector3.up * size) + origin, color));
+            Lines.Add(new GizmoLine((Vector3.right * -size) + origin, (Vector3.right * size) + origin, color));
+            Lines.Add(new GizmoLine((Vector3.forward * -size) + origin, (Vector3.forward * size) + origin, color));
+        }
+
+        protected void Add_Star(Vector3 origin, float size, Color color)
+        {
+            const float zScale = 0.4f;
+            Lines.Add(new GizmoLine((Vector3.up * -size * zScale) + origin, (Vector3.up * size * zScale) + origin, color));
+            Lines.Add(new GizmoLine((Vector3.right * -size) + origin, (Vector3.right * size) + origin, color));
+            Lines.Add(new GizmoLine(origin, (Vector3.forward * size) + origin, color));
         }
     }
     

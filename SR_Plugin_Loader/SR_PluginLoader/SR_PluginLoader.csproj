@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DevTools\Gizmos\dGizmo_Cam.cs" />
     <Compile Include="Helpers\Extensions\BoundsExt.cs" />
     <Compile Include="DevTools\Gizmos\dGizmo_Vec.cs" />
     <Compile Include="Helpers\Extensions\GameObjectExt.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Helpers\Unity Scripts\SelectableCollider.cs" />
     <Compile Include="Helpers\Base\MaterialHelper.cs" />
     <Compile Include="Helpers\Unity Scripts\onDeathEvent.cs" />
+    <Compile Include="UI\Interfaces\ICollapsable.cs" />
     <Compile Include="SiscosHooks\HookUID.cs" />
     <Compile Include="Plugins\Plugin_Static.cs" />
     <Compile Include="SiscosHooks\HOOK_SHAS.cs" />
