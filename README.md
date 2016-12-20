@@ -46,11 +46,6 @@ This issue isn't unique to my mod installer either, it's an issue with a lot of 
 Here is an alternate form of the main download link: <a href="https://raw.github.com/dsisco11/SR_Plugin_Loader/master/Installer.zip">Alt. Link</a>.  
 If that link will not work then you can try downloading the entire project source code and all (from <a href="https://github.com/dsisco11/SR_Plugin_Loader/archive/master.zip">here</a>), then opening the project folder and finding the folder named "Installer" and running the installer from there.  
 If you cannot use either of those links then your anti-virus will probably block ANY link with a zip file containing an .exe or .dll file among others. There is nothing we can do from our end to fix that and youll need to fix it from your computer itself possibly by disabling your anti-virus while you download the file.
-  
-  
-### "Why can't I see the code for your installer?"  
-Because it's my own proprietary creation and I have choosen to protect it.  
-If I open sourced it then it would be too easy for certain developers of other games who are very opposed to mods to alter their game in a way that might prevent it from working with that game in the future. Needless to say im very very opposed to being told how I can and cant play my own games and so should you be.  
 
 
 ## ScreenShot
