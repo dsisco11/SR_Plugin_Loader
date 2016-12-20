@@ -124,6 +124,7 @@ namespace SR_PluginLoader
         /// This variable tracks the status of said process.
         /// </summary>
         private bool _first_frame = true;
+        protected bool isFirstFrame { get { return _first_frame; } }
 
         /// <summary>
         /// Is this control in an activated / selected state?
@@ -400,6 +401,14 @@ namespace SR_PluginLoader
 
         public event controlEvent<uiControl> onClicked;
         public event controlEvent<uiControl> onSelected;
+        /// <summary>
+        /// Fires whenever this controls isVisible value changes to True
+        /// </summary>
+        public event controlEvent<uiControl> onShown;
+        /// <summary>
+        /// Fires whenever this controls isVisible value changes to False
+        /// </summary>
+        public event controlEvent<uiControl> onHidden;
         public event parentEvent onLayout;// Fired by parent controls so child controls can do their positioning logic.
         /// <summary>
         /// Fires each frame, used to process custom logic for controls.
@@ -558,6 +567,7 @@ namespace SR_PluginLoader
 
         #region Parent related variables
 
+        public uiPanel Parent { get { return parent; } }
         protected List<uiPanel> parent_chain = new List<uiPanel>();
         protected uiPanel parent { get { return _parent; } set { if (value != this) _parent = value; else _parent = null; handle_ParentChange(); } }
         private uiPanel _parent = null;
@@ -592,6 +602,9 @@ namespace SR_PluginLoader
         private Vector2? _parentScroll = null;
         protected Vector2 parentScroll { get { if (_parentScroll.HasValue) { return _parentScroll.Value; } Vector2 spos = ((this is uiScrollPanel) ? ((uiScrollPanel)this).ScrollPos : Vector2.zero); foreach(uiPanel p in parent_chain){ spos += p.ScrollPos; }; _parentScroll = spos; return _parentScroll.Value; } }
 
+
+        private bool dirty_parent_chain = false;
+        private bool dirty_parent_scroll = false;
         /// <summary>
         /// The total space within the parent control or screen that this control may potentially occupy.
         /// </summary>
@@ -1004,6 +1017,12 @@ namespace SR_PluginLoader
 
         public void parent_scroll_updated()
         {
+            if (isFirstFrame)
+            {
+                dirty_parent_scroll = true;
+                return;
+            }
+            dirty_parent_scroll = false;
             _parentScroll = null;
             reset_cached_abs_areas();
             //set_area_dirty();// we need to cause absArea/absInnerArea to update.
@@ -1020,6 +1039,12 @@ namespace SR_PluginLoader
         // One of the controls within this control's parent-chain changed.
         public void parent_chain_updated()
         {
+            if (isFirstFrame)
+            {
+                dirty_parent_chain = true;
+                return;
+            }
+            dirty_parent_chain = false;
             parent_chain.Clear();
             uiPanel p = parent;
             while (p != null)
@@ -1888,12 +1913,17 @@ namespace SR_PluginLoader
         
         private void OnGUI()
         {
-            bool was_visible = _was_visible;
+            bool was_vis = _was_visible;
             _was_visible = isVisible;
             //see if our visibility has changed since last frame, if so and we are a parent control then notify our children.
             // We do this because some controls override the isVisible field accessor and make their visibility dependent on other variables which can't be tracked accurately.
-            if(isParent && was_visible != _was_visible) (this as uiPanel).handle_visibility_change();
+            if (was_vis != _was_visible)// Visibility Changed
+            {
+                if (isParent) { (this as uiPanel).handle_visibility_change(); }
 
+                if (_was_visible) onShown?.Invoke(this);
+                else onHidden?.Invoke(this);
+            }
             if (!isVisible) return;//non-visible controls should also not get events, so don't...
 
             // Abort drawing the panel IF we are not currently visible

@@ -1,0 +1,5 @@
+<project outputDir="C:\CODE\GAME_MODS\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin" baseDir="C:\CODE\GAME_MODS\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin" debug="true" xmlns="http://confuser.codeplex.com">
+  <packer id="compressor" />
+  <module path="SR_PluginLoader_Installer.exe" />
+  <module path="Mono.Cecil.dll" />
+</project>

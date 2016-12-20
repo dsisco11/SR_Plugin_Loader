@@ -46,36 +46,11 @@ namespace SR_PluginLoader
             Vector3 v3Center = bounds.center;
             Vector3 v3Extents = bounds.extents;
 
-            v3FrontTopLeft = new Vector3(v3Center.x - v3Extents.x, v3Center.y + v3Extents.y, v3Center.z - v3Extents.z);  // Front top left corner
-            v3FrontTopRight = new Vector3(v3Center.x + v3Extents.x, v3Center.y + v3Extents.y, v3Center.z - v3Extents.z);  // Front top right corner
-            v3FrontBottomLeft = new Vector3(v3Center.x - v3Extents.x, v3Center.y - v3Extents.y, v3Center.z - v3Extents.z);  // Front bottom left corner
-            v3FrontBottomRight = new Vector3(v3Center.x + v3Extents.x, v3Center.y - v3Extents.y, v3Center.z - v3Extents.z);  // Front bottom right corner
-            v3BackTopLeft = new Vector3(v3Center.x - v3Extents.x, v3Center.y + v3Extents.y, v3Center.z + v3Extents.z);  // Back top left corner
-            v3BackTopRight = new Vector3(v3Center.x + v3Extents.x, v3Center.y + v3Extents.y, v3Center.z + v3Extents.z);  // Back top right corner
-            v3BackBottomLeft = new Vector3(v3Center.x - v3Extents.x, v3Center.y - v3Extents.y, v3Center.z + v3Extents.z);  // Back bottom left corner
-            v3BackBottomRight = new Vector3(v3Center.x + v3Extents.x, v3Center.y - v3Extents.y, v3Center.z + v3Extents.z);  // Back bottom right corner
+            Add_Box(v3Center, v3Extents, color);
 
-
-            BuildLine(v3FrontTopLeft, v3FrontTopRight);
-            BuildLine(v3FrontTopRight, v3FrontBottomRight);
-            BuildLine(v3FrontBottomRight, v3FrontBottomLeft);
-            BuildLine(v3FrontBottomLeft, v3FrontTopLeft);
-
-            BuildLine(v3BackTopLeft, v3BackTopRight);
-            BuildLine(v3BackTopRight, v3BackBottomRight);
-            BuildLine(v3BackBottomRight, v3BackBottomLeft);
-            BuildLine(v3BackBottomLeft, v3BackTopLeft);
-
-            BuildLine(v3FrontTopLeft, v3BackTopLeft);
-            BuildLine(v3FrontTopRight, v3BackTopRight);
-            BuildLine(v3FrontBottomRight, v3BackBottomRight);
-            BuildLine(v3FrontBottomLeft, v3BackBottomLeft);
-
-            const float CROSS_SIZE = 0.2f;
+            const float CROSS_SIZE = 0.15f;
             Color clr = new Color(1f, 0.3f, 0.3f, 0.5f);
-            Lines.Add(new GizmoLine((Vector3.up * -CROSS_SIZE) + v3Center, (Vector3.up * CROSS_SIZE) + v3Center, clr));
-            Lines.Add(new GizmoLine((Vector3.right * -CROSS_SIZE) + v3Center, (Vector3.right * CROSS_SIZE) + v3Center, clr));
-            Lines.Add(new GizmoLine((Vector3.forward * -CROSS_SIZE) + v3Center, (Vector3.forward * CROSS_SIZE) + v3Center, clr));
+            Add_Cross(v3Center, CROSS_SIZE, clr);
         }
 
         private void BuildLine(Vector3 v1, Vector3 v2)

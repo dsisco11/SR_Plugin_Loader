@@ -12,7 +12,8 @@ namespace SR_PluginLoader
     {
         #region Variables
 
-        protected List<uiControl> children = new List<uiControl>();
+        private List<uiControl> _children = new List<uiControl>();
+        protected virtual List<uiControl> children { get { return _children; } }
         protected Dictionary<string, uiControl> child_map = new Dictionary<string, uiControl>();
         #endregion
 
@@ -65,19 +66,20 @@ namespace SR_PluginLoader
 
         #region Child Management
 
-        public virtual IList<uiControl> Get_Children() { return (children as IList<uiControl>); }
+        public List<uiControl> Get_Children() { return children; }
         public virtual void Set_Child_Index(uiControl child, int i)
         {
-            int cidx = Get_Children().IndexOf(child);
+            int cidx = children.IndexOf(child);
             if(cidx > -1)
             {
                 if (i < 0) i += cidx;
-                if(Get_Children().Remove(child)) Get_Children().Insert(i, child);
+                if(children.Remove(child)) children.Insert(i, child);
             }
         }
 
         public virtual void Clear_Children()
         {
+            foreach (uiControl c in children) { GameObject.Destroy(c); }
             children.Clear();
             child_map.Clear();
             update_area();
@@ -118,6 +120,28 @@ namespace SR_PluginLoader
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Collapses any children that are able
+        /// </summary>
+        public virtual void Collapse_All()
+        {
+            foreach (uiControl c in children)
+            {
+                if (c is ICollapsable) (c as ICollapsable).Collapse();
+            }
+        }
+
+        /// <summary>
+        /// Expands any children that are able
+        /// </summary>
+        public virtual void Expand_All()
+        {
+            foreach (uiControl c in children)
+            {
+                if (c is ICollapsable) (c as ICollapsable).Expand();
+            }
         }
         #endregion
 
@@ -182,9 +206,9 @@ namespace SR_PluginLoader
 
         #region Parent to Child Events
 
-        internal virtual void handle_enabled_change() { foreach (var child in children) { child.parent_enable_updated(); } }
+        internal virtual void handle_enabled_change() { if (isFirstFrame) { return; } foreach (var child in children) { child.parent_enable_updated(); } }
 
-        internal virtual void handle_visibility_change() { foreach (var child in children) { child.parent_visibility_updated(); } }
+        internal virtual void handle_visibility_change() { if (isFirstFrame) { return; } foreach (var child in children) { child.parent_visibility_updated(); } }
         #endregion
 
         #region Event Management

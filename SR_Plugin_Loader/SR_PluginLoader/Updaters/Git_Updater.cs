@@ -643,34 +643,54 @@ namespace SR_PluginLoader
                 yield break;
             }
 
-            while (e.MoveNext()) { yield return null; }// wait for response to arrive
+            bool failed = false;
+            bool done = false;
+
+            do// wait for response to arrive
+            {
+                try
+                {
+                    done = !e.MoveNext();
+                }
+                catch (Exception ex)
+                {
+                    SLog.Error(ex);
+                    failed = true;
+                }
+
+                yield return null;
+            }
+            while (!done);
+
             while (!webAsync.isResponseCompleted) yield return null;// double check for clarity & safety
 
-            bool failed = false;
-            try
+            if (!failed)
             {
-                RequestState result = webAsync.requestState;
-                response = (HttpWebResponse)result.webResponse;
-            }
-            catch (WebException wex)
-            {
-                if (wex.Status == WebExceptionStatus.ProtocolError)
+                try
                 {
-                    var wres = wex.Response as HttpWebResponse;
-                    if (wres != null)
+                    RequestState result = webAsync.requestState;
+                    response = (HttpWebResponse)result.webResponse;
+                }
+                catch (WebException wex)
+                {
+                    if (wex.Status == WebExceptionStatus.ProtocolError)
                     {
-                        if (wres.StatusCode == HttpStatusCode.NotFound)// A file for this hash does not exist on the github repo. So this must be a Dev version.
+                        var wres = wex.Response as HttpWebResponse;
+                        if (wres != null)
                         {
-                            failed = true;
+                            if (wres.StatusCode == HttpStatusCode.NotFound)// A file for this hash does not exist on the github repo. So this must be a Dev version.
+                            {
+                                failed = true;
+                            }
                         }
                     }
+
+                    failed = true;
                 }
-                
-                failed = true;
-            }
-            finally
-            {
-                if (response != null) response.Close();
+                finally
+                {
+                    if (response != null) response.Close();
+                }
             }
 
             yield return !failed;
