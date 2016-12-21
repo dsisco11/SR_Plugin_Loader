@@ -122,8 +122,8 @@ namespace SR_PluginLoader
 
                 VerticalLayoutGroup layout = MenuPanel.GetComponent<VerticalLayoutGroup>();
                 Logging.Logger.Assert(layout != null, "", "Cannot find VerticalLayoutGroup component in MenuPanel");
-                // Locate the last button in the menu
-                Transform lastBtnTrans = MenuPanel.transform.GetChild(MenuPanel.childCount - 1);
+                // Locate the second to last button in the menu, as the last button is the locale selector
+                Transform lastBtnTrans = MenuPanel.transform.GetChild(MenuPanel.childCount - 2);
                 //Transform lastBtnTrans = MenuPanel.transform.FindChild("QuitButton");
                 Logging.Logger.Assert(lastBtnTrans != null, "", "Cannot find last button in MenuPanel");
                 GameObject lastBtn = lastBtnTrans.gameObject;
@@ -138,7 +138,7 @@ namespace SR_PluginLoader
                 // We need to make the Menu panel taller now so it properly fits the buttons
                 var menuTrans = (MenuPanel as RectTransform);
                 // Since the height of the menu buttons is relative to the height of the menu itself we want to increase the menus height by the size of a single button + the VerticalLayoutGroup's padding value + the set spacing value
-                float btnH = (menuTrans.sizeDelta.y / (MenuPanel.transform.childCount - 1)) * 0.5f;
+                float btnH = (menuTrans.sizeDelta.y / (MenuPanel.transform.childCount - 2)) * 0.5f;
                 float yInc = (btnH + layout.padding.vertical + layout.spacing);
                 //MenuPanel.GetComponent<RectTransform>().sizeDelta = new Vector2(menuTrans.sizeDelta.x, menuTrans.sizeDelta.y + yInc);
                 menuTrans.anchorMin = new Vector2(menuTrans.anchorMin.x, 1f);
