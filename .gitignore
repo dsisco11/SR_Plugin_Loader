@@ -56,3 +56,6 @@ SR_Plugin_Loader/SR_PluginLoader/bin/
 Installer/ildump.cs
 Installer/_ildump.bat
 ildump.cs
+ReferenceLibs/*.dll
+.vs/
+[Oo]bj/
