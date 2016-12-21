@@ -296,17 +296,8 @@
   <Import Project="..\Logging\Logging.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>CD "$(TargetDir)/../../../"
-"./tools/pdb2mdb/pdb2mdb.exe" "$(TargetDir)/$(TargetFileName)"
-COPY "$(TargetDir)/" "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/" /Y
-if $(ConfigurationName) == Release (
-COPY "$(TargetDir)" "$(TargetDir)/../../../../Installer/" /Y
-"./tools/7za.exe" a "./../Installer.zip" -w "./../Installer/"
-CD "./../Installer/"
-) else (
-CD "C:/Program Files (x86)/Steam/steamapps/common/Slime Rancher/SlimeRancher_Data/Managed/"
-)
-START SR_PluginLoader_Installer.exe -fast</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
