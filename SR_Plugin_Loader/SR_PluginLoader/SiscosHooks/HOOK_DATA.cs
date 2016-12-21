@@ -56,11 +56,9 @@ namespace SR_PluginLoader
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Capture, name = "Vacuumable.capture" },
             new Hook_Dbg_Data() { hook = HOOK_ID.VacPak_Think, name = "WeaponVacuum.Update" },
 
-            new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Save", pos = 0, ext = HOOK_ID.Ext_Game_Saved },
+            new Hook_Dbg_Data() { hook = HOOK_ID.Game_Saved, name = "GameData.Write", pos = 0, ext = HOOK_ID.Ext_Game_Saved },
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Game_Loaded, name = "GameData.Load", pos = 0, ext = HOOK_ID.Ext_Pre_Game_Loaded },
             new Hook_Dbg_Data() { hook = HOOK_ID.Post_Game_Loaded, name = "GameData.Load", pos = -1, ext = HOOK_ID.Ext_Post_Game_Loaded },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Get_Available_Saves, name = "GameData.AvailableGames", pos = 0 },
-            new Hook_Dbg_Data() { hook = HOOK_ID.Get_Save_Directory, name = "GameData.ToPath", pos = 0 },
 
             new Hook_Dbg_Data() { hook = HOOK_ID.Pre_Entity_Spawn, name = "DirectedActorSpawner.Spawn" },
             new Hook_Dbg_Data() { hook = HOOK_ID.EntitySpawner_Init, name = "DirectedActorSpawner.Start" },
