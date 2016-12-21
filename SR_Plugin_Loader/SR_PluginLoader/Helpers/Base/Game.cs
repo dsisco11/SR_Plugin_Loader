@@ -22,7 +22,7 @@ namespace SR_PluginLoader
                 return null;
 #else
                 if (atMainMenu) { return null; }
-                if (Directors.autosaveDirector.current==null) { return null; } return Directors.autosaveDirector.current.gameName;
+                return Directors.autosaveDirector.ContinueGameName();
 #endif
             }
         }

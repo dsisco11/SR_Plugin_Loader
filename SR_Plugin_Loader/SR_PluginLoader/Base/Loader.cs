@@ -46,7 +46,7 @@ namespace SR_PluginLoader
             {
                 if (Loader.Config != null) return;
                 //Application.stackTraceLogType = StackTraceLogType.Full;
-                Logger.Begin(Path.Combine(Application.dataPath, "plugins.log"));
+                Logging.Logger.Begin(Path.Combine(Application.dataPath, "plugins.log"));
 
                 Stopwatch timer = new Stopwatch();
                 timer.Start();

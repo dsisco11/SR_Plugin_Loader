@@ -115,24 +115,24 @@ namespace SR_PluginLoader
             if (Instance != null)
             {
                 Transform MenuPanel = Instance.transform.FindChild("StandardModePanel");
-                Logger.Assert(MenuPanel != null, "", "MenuPanel is NULL!");
+                Logging.Logger.Assert(MenuPanel != null, "", "MenuPanel is NULL!");
 
                 Transform Status = Instance.transform.FindChild("Status");
                 RectTransform statusTrans = (Status as RectTransform);
 
                 VerticalLayoutGroup layout = MenuPanel.GetComponent<VerticalLayoutGroup>();
-                Logger.Assert(layout != null, "", "Cannot find VerticalLayoutGroup component in MenuPanel");
+                Logging.Logger.Assert(layout != null, "", "Cannot find VerticalLayoutGroup component in MenuPanel");
                 // Locate the last button in the menu
                 Transform lastBtnTrans = MenuPanel.transform.GetChild(MenuPanel.childCount - 1);
                 //Transform lastBtnTrans = MenuPanel.transform.FindChild("QuitButton");
-                Logger.Assert(lastBtnTrans != null, "", "Cannot find last button in MenuPanel");
+                Logging.Logger.Assert(lastBtnTrans != null, "", "Cannot find last button in MenuPanel");
                 GameObject lastBtn = lastBtnTrans.gameObject;
                 RectTransform lastBtnSize = lastBtnTrans.GetComponent<RectTransform>();
-                Logger.Assert(lastBtnSize != null, "", "Cannot find RectTransform in reference button");
+                Logging.Logger.Assert(lastBtnSize != null, "", "Cannot find RectTransform in reference button");
 
                 // Create a copy of the button so we can alter it to do our bidding. (We want to make a copy so we don't need to re-apply all the same styling and whatnot, thus ensuring it won't break as easily in the future)
                 GameObject newButton = UnityEngine.Object.Instantiate<GameObject>(lastBtnTrans.gameObject);
-                Logger.Assert(newButton!= null, "", "Failed to clone last button in MenuPanel!");
+                Logging.Logger.Assert(newButton!= null, "", "Failed to clone last button in MenuPanel!");
                 newButton.transform.SetParent(MenuPanel);
 
                 // We need to make the Menu panel taller now so it properly fits the buttons
