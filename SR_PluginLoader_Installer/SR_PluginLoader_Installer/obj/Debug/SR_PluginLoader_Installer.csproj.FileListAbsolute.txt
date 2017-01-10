@@ -19,3 +19,10 @@ C:\CODE\GAME_MODS\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin\Mono.C
 C:\CODE\GAME_MODS\SR_PluginLoader_Installer\SR_PluginLoader_Installer\obj\Debug\SR_PluginLoader_Installer.exe
 C:\CODE\GAME_MODS\SR_PluginLoader_Installer\SR_PluginLoader_Installer\obj\Debug\SR_PluginLoader_Installer.pdb
 C:\CODE\GAME_MODS\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin\SR_PluginLoader.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_PluginLoader_Installer\SR_PluginLoader_Installer\obj\Debug\SR_PluginLoader_Installer.exe
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_PluginLoader_Installer\SR_PluginLoader_Installer\obj\Debug\SR_PluginLoader_Installer.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin\App.config
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin\SR_PluginLoader_Installer.exe
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin\SR_PluginLoader_Installer.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin\Mono.Cecil.pdb
+C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_PluginLoader_Installer\SR_PluginLoader_Installer\bin\SR_PluginLoader.pdb

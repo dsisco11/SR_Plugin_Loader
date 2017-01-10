@@ -214,6 +214,7 @@ namespace SR_PluginLoader_Installer
                     {
                         Revert_DLL_Mods(dll, assembly_dll_file);
                         Log.Info(XTERM.redBright("Failed to install {0}"), LOADER_NAME);
+                        return;
                     }
                 }
 
