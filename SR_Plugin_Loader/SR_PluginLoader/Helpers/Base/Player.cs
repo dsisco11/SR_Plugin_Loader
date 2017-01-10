@@ -153,6 +153,11 @@ namespace SR_PluginLoader
             return upgrade.CanBuy(null);
         }
 
+        public static bool IsUpgradeUnlocked(PlayerUpgrade upgrade)
+        {
+            return upgrade.IsUnlocked(null);
+        }
+
         public static bool CanBuyUpgrade(PlayerState.Upgrade upgrade) { return player.CanGetUpgrade(upgrade); }
     #endregion
         

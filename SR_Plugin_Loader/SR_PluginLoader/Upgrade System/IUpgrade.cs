@@ -86,8 +86,9 @@ namespace SR_PluginLoader
 
         public abstract bool Purchase(GameObject obj);
         public Func<bool> can_buy_func = null;
-        
-        
+        public Func<bool> unlock_check_func = null;
+
+
         public UpgradeBase(Plugin parent, string id, int cost, string name, string desc, Action<GameObject> function, Texture2D icon, Texture2D preview)
         {
             Parent = parent;
@@ -143,6 +144,7 @@ namespace SR_PluginLoader
     {
         public override Upgrade_Type Type { get { return Upgrade_Type.PLAYER_UPGRADE; } }
         public override bool Purchase(GameObject sender) { return Upgrades.TryPurchase(sender.GetComponent<PersonalUpgradeUI>(), this); }
+        public bool IsUnlocked(GameObject obj) { if (!PrereqsMet(obj)) { return false; } if (unlock_check_func != null) { return unlock_check_func(); } return true; }
         public bool CanBuy(GameObject obj) { if (!PrereqsMet(obj)) { return false; } if (Player.HasUpgrade(this)) { return false; } if (can_buy_func != null) { return can_buy_func(); } return true; }
 
         /// <summary>

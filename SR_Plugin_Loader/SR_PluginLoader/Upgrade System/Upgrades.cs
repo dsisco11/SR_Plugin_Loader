@@ -323,7 +323,7 @@ namespace SR_PluginLoader
             
             foreach (PlayerUpgrade up in ALL[Upgrade_Type.PLAYER_UPGRADE].Values)
             {
-                ui.AddButton(new PurchaseUI.Purchasable(up.Name, up.Sprite, up.PreviewSprite, up.Description, up.Cost, new PediaDirector.Id?(), new UnityAction(() => { up.Purchase(kiosk.gameObject); }), Player.CanBuyUpgrade(up)));
+                ui.AddButton(new PurchaseUI.Purchasable(up.Name, up.Sprite, up.PreviewSprite, up.Description, up.Cost, new PediaDirector.Id?(), new UnityAction(() => { up.Purchase(kiosk.gameObject); }), Player.IsUpgradeUnlocked(up), Player.CanBuyUpgrade(up)));
             }
 
             return null;
