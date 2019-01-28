@@ -119,7 +119,6 @@ namespace SRPL.Logging
             if (level >= FileLogLevel)
             {
                 if(_FileStream != null) _FileStream.WriteLine(fileFormattedString);
-                UnityEngine.Debug.Log(fileFormattedString);
             }
             if (level >= OutputLevel)
             {
