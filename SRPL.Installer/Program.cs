@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
@@ -113,7 +113,7 @@ namespace SRPL.Installer
             log("Moving new assembly");
             File.Move(tmpPath, assemblyFilePath);
 
-            Logger.Info("Installer", "Installation complete");
+            Logger.Info("Installer", "Installation complete\nPress any key to continue");
             Console.ReadLine();
         }
 
