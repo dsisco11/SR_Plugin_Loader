@@ -13,6 +13,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SRPL.Logging", "SRPL.Loggin
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SRPL.Logging\Logging.projitems*{0cd363a7-96d9-4b5a-8651-ae597f6fca53}*SharedItemsImports = 4
 		SRPL.Logging\Logging.projitems*{4cb3f506-d64c-400c-95a1-36da4cb11d5b}*SharedItemsImports = 4
 		SRPL.Logging\Logging.projitems*{7449b8f1-db5f-4c04-9735-68bfa9c4c1c6}*SharedItemsImports = 13
 	EndGlobalSection

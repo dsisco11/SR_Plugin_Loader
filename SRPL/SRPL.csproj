@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Assembly-Csharp">
+      <HintPath>..\3rd_Party_Libs\UnityLibs\Assembly-Csharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -242,7 +245,9 @@
     <Compile Include="Debug\DebugHudRenderer.cs" />
     <Compile Include="Loader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\GameTime.cs" />
   </ItemGroup>
   <ItemGroup />
+  <Import Project="..\SRPL.Logging\Logging.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
