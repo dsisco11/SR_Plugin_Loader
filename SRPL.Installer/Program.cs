@@ -36,8 +36,9 @@ namespace SRPL.Installer
             if (!canOpenFile(assemblyFilePath)) error("Could not open file " + assemblyFilePath);
             string loaderFilePath = getLoaderFilePath();
             if (!canOpenFile(loaderFilePath)) error("Could not open file " + loaderFilePath);
-            
+
             // Copy Loader Assembly to game directory
+            log("Finding files...");
             string gamePath = getGameDirectory();
             if (!File.Exists(gamePath + "\\SRPL.dll"))
                 File.Copy(loaderFilePath, gamePath + "\\SRPL.dll");
@@ -45,11 +46,13 @@ namespace SRPL.Installer
             if (!canOpenFile(loaderFilePath)) error("Could not open file " + loaderFilePath);
 
             // Load both modules
+            log("Loading modules...");
             FileStream assemblyFileStream = File.Open(assemblyFilePath, FileMode.Open, FileAccess.ReadWrite);
             ModuleDefinition assemblyModule = ModuleDefinition.ReadModule(assemblyFileStream, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
             FileStream loaderFileStream = File.Open(loaderFilePath, FileMode.Open, FileAccess.ReadWrite);
             ModuleDefinition loaderModule = ModuleDefinition.ReadModule(loaderFileStream, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
 
+            log("Finding loader entry point...");
             // Find loader entry point type
             TypeDefinition loaderEntryPointType = loaderModule.GetType(LOADER_ENTRY_POINT_TYPE);
             if (loaderEntryPointType == null) error("Could not find entry point type in loader: " + LOADER_ENTRY_POINT_TYPE);
@@ -57,6 +60,7 @@ namespace SRPL.Installer
             MethodReference loaderEntryPointMethod = loaderEntryPointType.Methods.FirstOrDefault(x => x.Name == LOADER_ENTRY_POINT_METHOD);
             if (loaderEntryPointMethod == null) error("Could not find entry point method in loader: " + LOADER_ENTRY_POINT_TYPE + "." + LOADER_ENTRY_POINT_METHOD);
 
+            log("Finding game entry point...");
             // Find assembly entry point type
             TypeDefinition assemblyEntryPointType = assemblyModule.GetType(ASSEMBLY_ENTRY_POINT_TYPE);
             if (assemblyEntryPointType == null) error("Could not find entry point type in game: " + ASSEMBLY_ENTRY_POINT_TYPE);
@@ -64,6 +68,7 @@ namespace SRPL.Installer
             MethodDefinition assemblyEntryPointMethod = assemblyEntryPointType.Methods.FirstOrDefault(x => x.Name == ASSEMBLY_ENTRY_POINT_METHOD);
             if (assemblyEntryPointMethod == null || !assemblyEntryPointMethod.HasBody) error("Could not find entry point method in game: " + ASSEMBLY_ENTRY_POINT_TYPE + "." + ASSEMBLY_ENTRY_POINT_METHOD);
 
+            log("Finding instruction...");
             ILProcessor methodILProcessor = assemblyEntryPointMethod.Body.GetILProcessor();
             Instruction entryPoint = methodILProcessor.Create(OpCodes.Call, loaderEntryPointMethod);
 
@@ -80,16 +85,23 @@ namespace SRPL.Installer
             int entryPointIndex = findMatchingInstruction(assemblyEntryPointMethod.Body.Instructions, entryPointIndicator);
             if (entryPointIndex < 0) error("Could not find entry point instruction");
 
+            log("Injecting entry point");
             assemblyEntryPointMethod.Body.Instructions.Insert(entryPointIndex + 1, entryPoint);
             // We should insert instructions to load any arguments we need here
 
             // Temporary dll path
             string tmpPath = AppDomain.CurrentDomain.BaseDirectory + "\\tmp.dll";
+            log("Saving to " + tmpPath);
             // Write assembly changes
             assemblyModule.Write(tmpPath);
             // Backup original assembly
-            if (File.Exists(assemblyFilePath)) File.Move(assemblyFilePath, assemblyFilePath + ".old");
+            if (File.Exists(assemblyFilePath))
+            {
+                log("Backing up game assembly to " + assemblyFilePath + ".old");
+                File.Move(assemblyFilePath, assemblyFilePath + ".old");
+            }
             // Move modified assembly
+            log("Moving new assembly");
             File.Move(tmpPath, assemblyFilePath);
 
             Logger.Info("Installer", "Installation complete");
@@ -255,6 +267,10 @@ namespace SRPL.Installer
         private static void error(Exception ex)
         {
             Logger.Error("Installer", ex);
+        }
+        private static void log(string message)
+        {
+            Logger.Info("Installer", message);
         }
     }
 }
