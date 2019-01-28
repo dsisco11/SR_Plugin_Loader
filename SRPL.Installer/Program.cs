@@ -23,6 +23,9 @@ namespace SRPL.Installer
 
         private static void Main(string[] args)
         {
+            Logger.onLog += onLoggerLog;
+            Logger.showModuleNames = false;
+            Logger.showTimestamps = false;
             Logger.Begin("installer.log");
 
             asmResolver = new DefaultAssemblyResolver();
@@ -83,6 +86,11 @@ namespace SRPL.Installer
 
             Logger.Info("Installer", "Installation complete");
             Console.ReadLine();
+        }
+
+        private static void onLoggerLog(LogLevel level, string module, string msg)
+        {
+            XTERM.WriteLine(msg);
         }
 
         /// <summary>
