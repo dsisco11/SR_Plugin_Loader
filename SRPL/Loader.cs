@@ -12,7 +12,7 @@ namespace SRPL
         /// <summary>
         /// Initializes the plugin loader. Called from SECTR_AudioSystem.OnEnable
         /// </summary>
-        public static void Init()
+        public static void Init(MonoBehaviour parent)
         {
             // TODO: Initialize loader
         }
