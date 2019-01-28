@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,7 +107,7 @@ namespace SRPL.Installer
             return true;
         }
 
-        public static bool compareOpCodes(OpCode A, OpCode B)
+        private static bool compareOpCodes(OpCode A, OpCode B)
         {
             if (A == null ^ B == null) return false;
             if (A.Code != B.Code) return false;
@@ -115,7 +115,7 @@ namespace SRPL.Installer
             return true;
         }
 
-        public static bool compareOperands(object A, object B)
+        private static bool compareOperands(object A, object B)
         {
             if (A == null ^ B == null) return false;
             if (A == B) return true;
