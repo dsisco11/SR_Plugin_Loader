@@ -23,7 +23,7 @@ namespace SRPL.Installer
         {
             asmResolver = new DefaultAssemblyResolver();
 
-            // TODO: Add installer logic
+            // TODO: Clean up installer logic
             // TODO: Add error logging
             string assemblyFilePath = getAssemblyFilePath();
             if (!canOpenFile(assemblyFilePath)) return;
