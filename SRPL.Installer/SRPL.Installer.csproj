@@ -47,6 +47,12 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SRPL\SRPL.csproj">
+      <Project>{0cd363a7-96d9-4b5a-8651-ae597f6fca53}</Project>
+      <Name>SRPL</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\SRPL.Logging\Logging.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
