@@ -7,6 +7,8 @@ using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
+using SRPL.Logging;
+
 namespace SRPL.Installer
 {
     class Program
@@ -21,21 +23,23 @@ namespace SRPL.Installer
 
         private static void Main(string[] args)
         {
+            Logger.Begin("installer.log");
+
             asmResolver = new DefaultAssemblyResolver();
 
             // TODO: Clean up installer logic
             // TODO: Add error logging
             string assemblyFilePath = getAssemblyFilePath();
-            if (!canOpenFile(assemblyFilePath)) return;
+            if (!canOpenFile(assemblyFilePath)) Logger.Error("Installer", new Exception("Could not open file " + assemblyFilePath));
             string loaderFilePath = getLoaderFilePath();
-            if (!canOpenFile(loaderFilePath)) return;
+            if (!canOpenFile(loaderFilePath)) Logger.Error("Installer", new Exception("Could not open file " + loaderFilePath));
 
             // TODO: Backup Assembly DLL
             // Copy Loader Assembly to game directory
             string gamePath = getGameDirectory();
             File.Copy(loaderFilePath, gamePath + "\\SRPL.dll");
             loaderFilePath = gamePath + "\\SRPL.dll";
-            if (!canOpenFile(loaderFilePath)) return;
+            if (!canOpenFile(loaderFilePath)) Logger.Error("Installer", new Exception("Could not open file " + loaderFilePath));
 
             // Load both modules
             FileStream assemblyFileStream = File.Open(assemblyFilePath, FileMode.Open, FileAccess.ReadWrite);
