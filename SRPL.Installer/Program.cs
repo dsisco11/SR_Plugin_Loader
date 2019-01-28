@@ -68,10 +68,6 @@ namespace SRPL.Installer
 
             assemblyEntryPointMethod.Body.Instructions.Insert(entryPointIndex + 1, entryPoint);
             // We should insert instructions to load any arguments we need here
-
-            // Ldarg_0 pushes arg 0 to the stack, which in a non-static method is always the instance of the object
-            // Values on the stack are passed to a called method as arguments
-            assemblyEntryPointMethod.Body.Instructions.Insert(entryPointIndex + 1, methodILProcessor.Create(OpCodes.Ldarg_0));
         }
 
         /// <summary>
