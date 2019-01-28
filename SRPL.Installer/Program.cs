@@ -7,6 +7,7 @@ using System.IO;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 
+using SRPL;
 using SRPL.Logging;
 
 namespace SRPL.Installer
@@ -52,13 +53,21 @@ namespace SRPL.Installer
             FileStream loaderFileStream = File.Open(loaderFilePath, FileMode.Open, FileAccess.ReadWrite);
             ModuleDefinition loaderModule = ModuleDefinition.ReadModule(loaderFileStream, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
 
-            log("Finding loader entry point...");
+            log("Finding loader entry point type...");
             // Find loader entry point type
             TypeDefinition loaderEntryPointType = loaderModule.GetType(LOADER_ENTRY_POINT_TYPE);
             if (loaderEntryPointType == null) error("Could not find entry point type in loader: " + LOADER_ENTRY_POINT_TYPE);
+
+            log("Injecting type import...");
+            loaderEntryPointType = assemblyModule.ImportReference(loaderEntryPointType).Resolve();
+
+            log("Finding loader entry point method...");
             // Find loader entry point method
             MethodReference loaderEntryPointMethod = loaderEntryPointType.Methods.FirstOrDefault(x => x.Name == LOADER_ENTRY_POINT_METHOD);
             if (loaderEntryPointMethod == null) error("Could not find entry point method in loader: " + LOADER_ENTRY_POINT_TYPE + "." + LOADER_ENTRY_POINT_METHOD);
+
+            log("Injecting method import...");
+            loaderEntryPointMethod = assemblyModule.ImportReference(loaderEntryPointMethod);
 
             log("Finding game entry point...");
             // Find assembly entry point type
