@@ -173,7 +173,17 @@ namespace SRPL.Installer
         private static string getAssemblyFilePath()
         {
             // TODO: Add Autodetection logic
-            return @"D:\SteamLibrary\steamapps\common\Slime Rancher\SlimeRancher_Data\Managed\Assembly-Csharp.dll";
+            return getGameDirectory() + @"\SlimeRancher_Data\Managed\Assembly-Csharp.dll";
+        }
+
+        /// <summary>
+        /// Fetches the root directory of the game files
+        /// </summary>
+        /// <returns>Absolute install path of Slime Rancher</returns>
+        private static string getGameDirectory()
+        {
+            // TODO: Add Autodetection logic
+            return @"D:\SteamLibrary\steamapps\common\Slime Rancher";
         }
 
         /// <summary>
