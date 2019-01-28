@@ -5,6 +5,8 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 
+using SRPL.Debug;
+
 namespace SRPL
 {
     public static class Loader
@@ -15,6 +17,7 @@ namespace SRPL
         public static void Init()
         {
             // TODO: Initialize loader
+            DebugHud.Init();
         }
     }
 }
