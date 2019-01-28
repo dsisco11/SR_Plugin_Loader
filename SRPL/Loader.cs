@@ -11,6 +11,9 @@ namespace SRPL
 {
     public static class Loader
     {
+        public const string VERSION = "v1.0.0";
+        public const string TITLE = "SRPL " + VERSION;
+
         /// <summary>
         /// Initializes the plugin loader. Called from SECTR_AudioSystem.OnEnable
         /// </summary>
