@@ -30,6 +30,13 @@ namespace SRPL.Installer
             string loaderFilePath = getLoaderFilePath();
             if (!canOpenFile(loaderFilePath)) return;
 
+            // TODO: Backup Assembly DLL
+            // Copy Loader Assembly to game directory
+            string gamePath = getGameDirectory();
+            File.Copy(loaderFilePath, gamePath + "\\SRPL.dll");
+            loaderFilePath = gamePath + "\\SRPL.dll";
+            if (!canOpenFile(loaderFilePath)) return;
+
             // Load both modules
             FileStream assemblyFileStream = File.Open(assemblyFilePath, FileMode.Open, FileAccess.ReadWrite);
             ModuleDefinition assemblyModule = ModuleDefinition.ReadModule(assemblyFileStream, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
