@@ -10,11 +10,16 @@ namespace SRPL.Installer
 {
     class Program
     {
+        private const string ENTRY_POINT_TYPE = "SECTR_AudioSystem";
+        private const string ENTRY_POINT_METHOD = "OnEnable";
+
         private static IAssemblyResolver asmResolver;
 
         private static void Main(string[] args)
         {
             asmResolver = new DefaultAssemblyResolver();
+            
+            // TODO: Add installer logic
         }
 
         /// <summary>
