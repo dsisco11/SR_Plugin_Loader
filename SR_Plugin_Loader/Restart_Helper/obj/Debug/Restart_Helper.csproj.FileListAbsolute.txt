@@ -1,6 +1,0 @@
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\Restart_Helper\bin\Debug\Restart_Helper.exe.config
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\Restart_Helper\bin\Debug\Restart_Helper.exe
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\Restart_Helper\bin\Debug\Restart_Helper.pdb
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\Restart_Helper\obj\Debug\Restart_Helper.csprojResolveAssemblyReference.cache
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\Restart_Helper\obj\Debug\Restart_Helper.exe
-C:\CODE\GAME_MODS\SR_Plugin_Loader\SR_Plugin_Loader\Restart_Helper\obj\Debug\Restart_Helper.pdb

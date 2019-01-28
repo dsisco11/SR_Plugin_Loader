@@ -1,5 +1,0 @@
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\bin\Debug\GardenMastery.dll
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\bin\Debug\GardenMastery.pdb
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Debug\GardenMastery.csprojResolveAssemblyReference.cache
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Debug\GardenMastery.dll
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Debug\GardenMastery.pdb

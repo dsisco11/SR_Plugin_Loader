@@ -1,7 +1,0 @@
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\bin\Release\GardenMastery.dll
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\bin\Release\GardenMastery.pdb
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Release\GardenMastery.csprojResolveAssemblyReference.cache
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Release\GardenMastery.Properties.Resources.resources
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Release\GardenMastery.csproj.GenerateResource.Cache
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Release\GardenMastery.dll
-C:\CODE\GAME_MODS\GardenMastery\GardenMastery\obj\Release\GardenMastery.pdb
