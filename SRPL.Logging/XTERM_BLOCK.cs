@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SRPL.Installer
+namespace SRPL.Logging
 {
     internal struct XTERM_BLOCK
     {

@@ -69,7 +69,7 @@ namespace SRPL.Installer
             Instruction entryPoint = methodILProcessor.Create(OpCodes.Call, loaderEntryPointMethod);
 
             // Check if the entry point has already been injected
-            if (findMatchingInstruction(assemblyEntryPointMethod.Body.Instructions, entryPoint) != -1) return;
+            if (findMatchingInstruction(assemblyEntryPointMethod.Body.Instructions, entryPoint) != -1) error("Entry point already found, the loader has already been installed!");
 
             // Find the static field named "system"
             FieldDefinition sndSystem = assemblyEntryPointType.Fields.Single(o => o.Name == "system");
@@ -79,7 +79,7 @@ namespace SRPL.Installer
 
             // Find the index of the instruction in the method
             int entryPointIndex = findMatchingInstruction(assemblyEntryPointMethod.Body.Instructions, entryPointIndicator);
-            if (entryPointIndex < 0) return;
+            if (entryPointIndex < 0) error("Could not find entry point instruction");
 
             assemblyEntryPointMethod.Body.Instructions.Insert(entryPointIndex + 1, entryPoint);
             // We should insert instructions to load any arguments we need here

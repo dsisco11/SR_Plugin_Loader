@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SRPL.Installer
+namespace SRPL.Logging
 {
     /// <summary>
     /// Used internally by the XTERM utility class.

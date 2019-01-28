@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-using SRPL.Logging;
-
 // https://en.wikipedia.org/wiki/ANSI_escape_code#Windows_and_DOS
-namespace SRPL.Installer
+namespace SRPL.Logging
 {
 
     /// <summary>

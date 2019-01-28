@@ -14,5 +14,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)LogLevel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LogModule.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)StringTokenizer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XTERM.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XTERM_BLOCK.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)XTERM_COMMAND.cs" />
   </ItemGroup>
 </Project>

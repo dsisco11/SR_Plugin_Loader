@@ -26,6 +26,7 @@ namespace SRPL.Logging
         /// Meaning that debug lines start with "DEBUG: " and error lines start with "ERROR: " etc.
         /// </summary>
         public static bool Show_Log_Levels = true;
+        public static bool UseXTERM = true;
 
         private static StreamWriter _FileStream;
         public static LogLevel OutputLevel;
@@ -134,17 +135,17 @@ namespace SRPL.Logging
             switch (level)
             {
                 case LogLevel.Info:
-                    return String.Concat("<color=#ffffff>", msg, "</color>");
+                    return _White(msg);
                 case LogLevel.Debug:
-                    return String.Concat("<color=#888888>", msg, "</color>");
+                    return _Grey(msg);
                 case LogLevel.Success:
-                    return String.Concat("<color=#22bb22>", msg, "</color>");
+                    return _Green(msg);
                 case LogLevel.Warn:
-                    return String.Concat("<color=#bbbb00>", msg, "</color>");
+                    return _Yellow(msg);
                 case LogLevel.Error:
-                    return String.Concat("<color=#ff0000>", msg, "</color>");
+                    return _Red(msg);
                 case LogLevel.Assert:
-                    return String.Concat("<color=#ff00ff>", msg, "</color>");
+                    return _Cyan(msg);
                 case LogLevel.Interface:// Inteface really isnt applicable atm
                     return String.Concat("<color=#ffffff>", msg, "</color>");
                 default:
@@ -157,22 +158,53 @@ namespace SRPL.Logging
             switch (level)
             {
                 case LogLevel.Info:
-                    return String.Concat("<color=#ffffff>", msg, "</color>");
+                    return _White(msg);
                 case LogLevel.Debug:
-                    return String.Concat("<color=#888888>", msg, "</color>");
+                    return _Grey(msg);
                 case LogLevel.Success:
-                    return String.Concat("<color=#22bb22>", msg, "</color>");
+                    return _Green(msg);
                 case LogLevel.Warn:
-                    return String.Concat("<color=#bbbb00>", msg, "</color>");
+                    return _Yellow(msg);
                 case LogLevel.Error:
-                    return String.Concat("<color=#ff0000>", msg, "</color>");
+                    return _Red(msg);
                 case LogLevel.Assert:
-                    return String.Concat("<color=#ff00ff>", msg, "</color>");
+                    return _Cyan(msg);
                 case LogLevel.Interface:// Inteface really isnt applicable atm
                     return String.Concat("<color=#ffffff>", msg, "</color>");
                 default:
                     return msg;
             }
+        }
+
+        private static string _White(string msg)
+        {
+            return UseXTERM ? XTERM.whiteBright(msg)
+                : String.Concat("<color=#ffffff>", msg, "</color>");
+        }
+        private static string _Grey(string msg)
+        {
+            return UseXTERM ? XTERM.white(msg)
+                : String.Concat("<color=#888888>", msg, "</color>");
+        }
+        private static string _Green(string msg)
+        {
+            return UseXTERM ? XTERM.green(msg)
+                : String.Concat("<color=#22bb22>", msg, "</color>");
+        }
+        private static string _Yellow(string msg)
+        {
+            return UseXTERM ? XTERM.yellow(msg)
+                : String.Concat("<color=#bbbb00>", msg, "</color>");
+        }
+        private static string _Red(string msg)
+        {
+            return UseXTERM ? XTERM.redBright(msg)
+                : String.Concat("<color=#ff0000>", msg, "</color>");
+        }
+        private static string _Cyan(string msg)
+        {
+            return UseXTERM ? XTERM.cyanBright(msg)
+                : String.Concat("<color=#ff00ff>", msg, "</color>");
         }
         #endregion
 
