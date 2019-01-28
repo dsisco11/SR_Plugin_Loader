@@ -36,8 +36,7 @@ namespace SRPL.Installer
             if (!canOpenFile(assemblyFilePath)) error("Could not open file " + assemblyFilePath);
             string loaderFilePath = getLoaderFilePath();
             if (!canOpenFile(loaderFilePath)) error("Could not open file " + loaderFilePath);
-
-            // TODO: Backup Assembly DLL
+            
             // Copy Loader Assembly to game directory
             string gamePath = getGameDirectory();
             if (!File.Exists(gamePath + "\\SRPL.dll"))
@@ -83,6 +82,15 @@ namespace SRPL.Installer
 
             assemblyEntryPointMethod.Body.Instructions.Insert(entryPointIndex + 1, entryPoint);
             // We should insert instructions to load any arguments we need here
+
+            // Temporary dll path
+            string tmpPath = AppDomain.CurrentDomain.BaseDirectory + "\\tmp.dll";
+            // Write assembly changes
+            assemblyModule.Write(tmpPath);
+            // Backup original assembly
+            if (File.Exists(assemblyFilePath)) File.Move(assemblyFilePath, assemblyFilePath + ".old");
+            // Move modified assembly
+            File.Move(tmpPath, assemblyFilePath);
 
             Logger.Info("Installer", "Installation complete");
             Console.ReadLine();
