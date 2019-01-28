@@ -37,7 +37,8 @@ namespace SRPL.Installer
             // TODO: Backup Assembly DLL
             // Copy Loader Assembly to game directory
             string gamePath = getGameDirectory();
-            File.Copy(loaderFilePath, gamePath + "\\SRPL.dll");
+            if (!File.Exists(gamePath + "\\SRPL.dll"))
+                File.Copy(loaderFilePath, gamePath + "\\SRPL.dll");
             loaderFilePath = gamePath + "\\SRPL.dll";
             if (!canOpenFile(loaderFilePath)) error("Could not open file " + loaderFilePath);
 
