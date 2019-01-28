@@ -30,16 +30,16 @@ namespace SRPL.Installer
             // TODO: Clean up installer logic
             // TODO: Add error logging
             string assemblyFilePath = getAssemblyFilePath();
-            if (!canOpenFile(assemblyFilePath)) Logger.Error("Installer", new Exception("Could not open file " + assemblyFilePath));
+            if (!canOpenFile(assemblyFilePath)) error("Could not open file " + assemblyFilePath);
             string loaderFilePath = getLoaderFilePath();
-            if (!canOpenFile(loaderFilePath)) Logger.Error("Installer", new Exception("Could not open file " + loaderFilePath));
+            if (!canOpenFile(loaderFilePath)) error("Could not open file " + loaderFilePath);
 
             // TODO: Backup Assembly DLL
             // Copy Loader Assembly to game directory
             string gamePath = getGameDirectory();
             File.Copy(loaderFilePath, gamePath + "\\SRPL.dll");
             loaderFilePath = gamePath + "\\SRPL.dll";
-            if (!canOpenFile(loaderFilePath)) Logger.Error("Installer", new Exception("Could not open file " + loaderFilePath));
+            if (!canOpenFile(loaderFilePath)) error("Could not open file " + loaderFilePath);
 
             // Load both modules
             FileStream assemblyFileStream = File.Open(assemblyFilePath, FileMode.Open, FileAccess.ReadWrite);
@@ -49,17 +49,17 @@ namespace SRPL.Installer
 
             // Find loader entry point type
             TypeDefinition loaderEntryPointType = loaderModule.GetType(LOADER_ENTRY_POINT_TYPE);
-            if (loaderEntryPointType == null) return;
+            if (loaderEntryPointType == null) error("Could not find entry point type in loader: " + LOADER_ENTRY_POINT_TYPE);
             // Find loader entry point method
             MethodReference loaderEntryPointMethod = loaderEntryPointType.Methods.FirstOrDefault(x => x.Name == LOADER_ENTRY_POINT_METHOD);
-            if (loaderEntryPointMethod == null) return;
+            if (loaderEntryPointMethod == null) error("Could not find entry point method in loader: " + LOADER_ENTRY_POINT_TYPE + "." + LOADER_ENTRY_POINT_METHOD);
 
             // Find assembly entry point type
             TypeDefinition assemblyEntryPointType = assemblyModule.GetType(ASSEMBLY_ENTRY_POINT_TYPE);
-            if (assemblyEntryPointType == null) return;
+            if (assemblyEntryPointType == null) error("Could not find entry point type in game: " + ASSEMBLY_ENTRY_POINT_TYPE);
             // Find assembly entry point method
             MethodDefinition assemblyEntryPointMethod = assemblyEntryPointType.Methods.FirstOrDefault(x => x.Name == ASSEMBLY_ENTRY_POINT_METHOD);
-            if (assemblyEntryPointMethod == null || !assemblyEntryPointMethod.HasBody) return;
+            if (assemblyEntryPointMethod == null || !assemblyEntryPointMethod.HasBody) error("Could not find entry point method in game: " + ASSEMBLY_ENTRY_POINT_TYPE + "." + ASSEMBLY_ENTRY_POINT_METHOD);
 
             ILProcessor methodILProcessor = assemblyEntryPointMethod.Body.GetILProcessor();
             Instruction entryPoint = methodILProcessor.Create(OpCodes.Call, loaderEntryPointMethod);
@@ -79,6 +79,9 @@ namespace SRPL.Installer
 
             assemblyEntryPointMethod.Body.Instructions.Insert(entryPointIndex + 1, entryPoint);
             // We should insert instructions to load any arguments we need here
+
+            Logger.Info("Installer", "Installation complete");
+            Console.ReadLine();
         }
 
         /// <summary>
@@ -221,11 +224,20 @@ namespace SRPL.Installer
                     return true;
                 }
             }
-            catch (IOException)
+            catch (Exception)
             {
                 // TODO: Log exception
                 return false;
             }
+        }
+
+        private static void error(string message)
+        {
+            error(new Exception(message));
+        }
+        private static void error(Exception ex)
+        {
+            Logger.Error("Installer", ex);
         }
     }
 }
