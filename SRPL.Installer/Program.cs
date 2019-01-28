@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,10 +48,8 @@ namespace SRPL.Installer
 
             // Load both modules
             log("Loading modules...");
-            FileStream assemblyFileStream = File.Open(assemblyFilePath, FileMode.Open, FileAccess.ReadWrite);
-            ModuleDefinition assemblyModule = ModuleDefinition.ReadModule(assemblyFileStream, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
-            FileStream loaderFileStream = File.Open(loaderFilePath, FileMode.Open, FileAccess.ReadWrite);
-            ModuleDefinition loaderModule = ModuleDefinition.ReadModule(loaderFileStream, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
+            ModuleDefinition assemblyModule = ModuleDefinition.ReadModule(assemblyFilePath, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
+            ModuleDefinition loaderModule = ModuleDefinition.ReadModule(loaderFilePath, new ReaderParameters { AssemblyResolver = asmResolver, ReadingMode = ReadingMode.Immediate });
 
             log("Finding loader entry point type...");
             // Find loader entry point type
