@@ -9,7 +9,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPL.Analyzer", "SRPL.Analy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPL", "SRPL\SRPL.csproj", "{0CD363A7-96D9-4B5A-8651-AE597F6FCA53}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SRPL.Logging", "SRPL.Logging\SRPL.Logging.shproj", "{7449B8F1-DB5F-4C04-9735-68BFA9C4C1C6}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SRPL.Logging\Logging.projitems*{4cb3f506-d64c-400c-95a1-36da4cb11d5b}*SharedItemsImports = 4
+		SRPL.Logging\Logging.projitems*{7449b8f1-db5f-4c04-9735-68bfa9c4c1c6}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
