@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28306.52
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPL.Installer", "SRPL.Installer\SRPL.Installer.csproj", "{4CB3F506-D64C-400C-95A1-36DA4CB11D5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPL.Analyzer", "SRPL.Analyzer\SRPL.Analyzer.csproj", "{C5358100-E7D1-4C1B-96DE-A5472AED117E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPL", "SRPL\SRPL.csproj", "{0CD363A7-96D9-4B5A-8651-AE597F6FCA53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{4CB3F506-D64C-400C-95A1-36DA4CB11D5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CB3F506-D64C-400C-95A1-36DA4CB11D5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CB3F506-D64C-400C-95A1-36DA4CB11D5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C5358100-E7D1-4C1B-96DE-A5472AED117E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C5358100-E7D1-4C1B-96DE-A5472AED117E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C5358100-E7D1-4C1B-96DE-A5472AED117E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C5358100-E7D1-4C1B-96DE-A5472AED117E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CD363A7-96D9-4B5A-8651-AE597F6FCA53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CD363A7-96D9-4B5A-8651-AE597F6FCA53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CD363A7-96D9-4B5A-8651-AE597F6FCA53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CD363A7-96D9-4B5A-8651-AE597F6FCA53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
