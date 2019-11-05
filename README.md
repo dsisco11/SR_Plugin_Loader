@@ -1,5 +1,10 @@
 #<img src="https://github.com/dsisco11/SR_Plugin_Loader/raw/master/SR_Plugin_Loader/SR_PluginLoader/Resources/puzzle_slime_outlined_64.png" /> SlimeRancher Plugin Loader
 
+### WE NEED MAINTAINERS
+This project is no longer being maintained by myself and as such will not function with the current version of the game, if you are a developer whom is interested in reviving this project then contact me on steam. Find me through the steam group linked below for this project!
+
+
+
 ## Installing
 If you are just looking for the installer then click <a href="https://github.com/dsisco11/SR_Plugin_Loader/raw/master/Installer.zip">HERE</a>  
 For a guide on HOW to install the plugin loader look <a href="https://github.com/dsisco11/SR_Plugin_Loader/wiki/Installation">HERE</a>
